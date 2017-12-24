@@ -17,9 +17,16 @@ between them
 //We are in the class named LearnJava.
 //Note that in all classes, they are denoted like this:
 //  public class ClassName {
-//   //Some code goes here.
+//   //Class variables go here (by convention)
+//
+//   //Methods go here! (rmb method = function in Java)
 //  }
 //In Java, we use the curly brackets {} to denote blocks of code.
+
+/**
+ * A quick intro to Java.
+ */
+
 
 public class LearnJava {
 
@@ -39,7 +46,7 @@ public class LearnJava {
     //Object objName = new Object(Param1, Param2, ...); //Note you can have 0 parameters (@main function)
 
     //A more common shorthand is to just use:
-    // String text = "Hello World". This is an exception for Strings only!
+    // String text = "Hello World". This is an exception for Strings and a few others only!
 
     //This is an example of a method (aka. function).
     //The method is called printTextToScreen.
@@ -76,6 +83,8 @@ public class LearnJava {
     public LearnJava(){
         printTextToScreen(); //So here you see we run the print to screen function, this will print out the value of text
                 //The value of text hasn't changed so it's still "Hello World"
+
+        //Note the shorthand form of creating integers. Again the rule only applies to string, integers, and few other variable types
         int a = 4;
         int b = 5; //Note that here we create what is known as temporary variables.
         //These variables belong to the function, so other functions will NOT be able to see or access these variables
