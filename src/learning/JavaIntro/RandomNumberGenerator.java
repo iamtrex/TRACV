@@ -12,7 +12,7 @@ public class RandomNumberGenerator {
     //Note we have not initalized it, thsu it's constructor has not ran, and the object is pretty much empty rn.
     Random rand;
 
-    public RandomNumberGenerator(){
+    public RandomNumberGenerator() {
         //Here in the constructor, we initalize rand to be an object.
         // This initalizes the object and allows us to use it...
         rand = new Random();
@@ -24,7 +24,7 @@ public class RandomNumberGenerator {
 
     //Note that this takes a parameter max.
     //Also note that it returns an integer.
-    public int getRandomNumber(int max){
+    public int getRandomNumber(int max) {
         return rand.nextInt(max);
     }
 

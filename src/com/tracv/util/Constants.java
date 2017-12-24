@@ -8,7 +8,6 @@ public class Constants {
 
     public static final String GAME_NAME = "TRACV Tower Defense";
 
-    
 
     public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
 

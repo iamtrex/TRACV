@@ -9,8 +9,8 @@ import java.awt.*;
 public class Comp {
 
     public static void add(JComponent toAdd, JComponent addTo, int x, int y, int width, int height,
-                           double weightx, double weighty, int fill, int anchor){
-        if(!(addTo.getLayout() instanceof GridBagLayout)){
+                           double weightx, double weighty, int fill, int anchor) {
+        if (!(addTo.getLayout() instanceof GridBagLayout)) {
             addTo.setLayout(new GridBagLayout());
         }
 

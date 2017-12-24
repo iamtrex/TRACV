@@ -54,7 +54,7 @@ public class LearnJava {
     //public RETURN_TYPE functionName(VarType varName, Var2Type var2Name...){
     // ... Code here
     //}
-    public void printTextToScreen(){
+    public void printTextToScreen() {
 
         //This just prints to the console. In this case, it prints the value of the String named text that we created
         //  earlier;
@@ -66,8 +66,8 @@ public class LearnJava {
     //Here is a function that takes parameters, as you can see, it takes 2 integers, named a and b.
     //We also see that the return type is int instead of void. This means we must use the return statement in the functeion
     //Here we have return a+b;, therefore this function just adds the value of a and b and returns it.
-    public int addNumbers(int a, int b){
-        return a+b;
+    public int addNumbers(int a, int b) {
+        return a + b;
     }
 
 
@@ -80,9 +80,9 @@ public class LearnJava {
     // ... Create a string with value = word...
     //}
 
-    public LearnJava(){
+    public LearnJava() {
         printTextToScreen(); //So here you see we run the print to screen function, this will print out the value of text
-                //The value of text hasn't changed so it's still "Hello World"
+        //The value of text hasn't changed so it's still "Hello World"
 
         //Note the shorthand form of creating integers. Again the rule only applies to string, integers, and few other variable types
         int a = 4;
@@ -96,7 +96,7 @@ public class LearnJava {
         int e = addNumbers(c, -1);
 
         //NOte that we set the value of c to be the return value of addNumbers(1, 5); Looking back, we can see that
-            //This is obviously 6.
+        //This is obviously 6.
         //e is then c + -1, and since c is 6, we know e = -1;
 
         //Now we will create anotehr Object.
@@ -115,16 +115,12 @@ public class LearnJava {
         //      Types in Java. text is a string, f is an integer. they don't just combine simply.
 
         text = String.valueOf(f); //The function valueOf creates a string from an integer, so it effectively converts
-                    // f to be a string.
+        // f to be a string.
 
         //Now note we changed the variable text to be something else, so now let's try printing it again:
         printTextToScreen();
 
         //We will see this time it prints a random number between 1 and 5.
-
-
-
-
 
 
     }
@@ -137,7 +133,7 @@ public class LearnJava {
     // ...
     // }
     //So we just need to include it.
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
         //To start off our program, we create a LearnJava Object!
         //Note Learnjava is this class! But by creating an object we are able to run the constructor.

@@ -9,17 +9,17 @@ import javax.swing.*;
  */
 public class Button extends JButton {
 
-    public Button(){
+    public Button() {
         super();
         setLook();
     }
 
-    public Button(String s){
+    public Button(String s) {
         super(s);
         setLook();
     }
 
-    private void setLook(){
+    private void setLook() {
         this.setContentAreaFilled(false);
         this.setBorderPainted(false);
         this.setFont(Constants.DEFAULT_FONT);
