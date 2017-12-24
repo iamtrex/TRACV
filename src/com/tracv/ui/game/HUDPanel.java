@@ -1,4 +1,4 @@
-package com.tracv.ui;
+package com.tracv.ui.game;
 
 public class HUDPanel {
 }
