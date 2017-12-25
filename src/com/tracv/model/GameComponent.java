@@ -10,10 +10,7 @@ public abstract class GameComponent {
         this.x = x;
         this.y = y;
     }
-
-    public void draw(Graphics g) {
-
-    }
+    abstract void draw(Graphics g);
 
     public int getX() {
         return x;

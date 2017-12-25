@@ -12,7 +12,7 @@ public class Base extends GameComponent{
 
     @Override
     public void draw(Graphics g) {
-        
+
     }
 
     public int getHealth() {
