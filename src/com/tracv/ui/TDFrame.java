@@ -4,6 +4,7 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -15,21 +16,25 @@ public class TDFrame extends JFrame {
     //The various content panels.
     private MainPane mainPane;
     private TDGame tdGame;
+
+    //GlassPane
     private MenuPane menuPane;
 
-    //Underlying JLayeredPane which associates what thing to display.
-    //TODO - Consider changing structure to Content/Glass with the Game having a JLayeredPane
-    private BasePane basePane;
 
     public TDFrame() {
         //Create Content Panes.
-        mainPane = new MainPane(TDFrame.this);
-        tdGame = new TDGame();
-        menuPane = new MenuPane();
+        mainPane = new MainPane(this);
+        mainPane.setOpaque(false);
+        tdGame = new TDGame(this);
+        tdGame.setOpaque(false);
 
-        //Create LayeredPane
-        basePane = new BasePane();
-        this.setLayeredPane(basePane);
+        menuPane = new MenuPane(this);
+
+        this.setUndecorated(true);
+        //this.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.8f));
+
+        this.setContentPane(mainPane);
+        this.setGlassPane(menuPane);
 
         this.setSize(Constants.FRAME_DEFAULT_SIZE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,73 +45,29 @@ public class TDFrame extends JFrame {
         new TDFrame(); //Starts the program by calling TDFrame's constructor
     }
 
+
+    public void switchToMainPanel() {
+        switchPanel(mainPane);
+    }
     public void switchToGamePanel() {
-        basePane.switchPanel(tdGame);
+        switchPanel(tdGame);
     }
 
-
-    private class BasePane extends JLayeredPane{
-
-        JPanel currentPane;
-
-        public BasePane(){
-            this.switchPanel(mainPane);
-
-            menuPane.addMouseListener(new MyMouseListener());
-            menuPane.setVisible(false);
-
-            Comp.add(menuPane, this, 1);
+    private void switchPanel(JComponent panel){
+        this.setContentPane(panel);
+        if(menuPane.isVisible()){
+            toggleMenu(false);
+        }else {
+            SwingUtilities.invokeLater(() -> this.validate());
         }
 
-        public JPanel getCurrentPane(){
-            return currentPane;
-        }
-
-        public void toggleMenu(boolean on){
-            if(on){
-                menuPane.setVisible(true);
-            }else{
-                menuPane.setVisible(false);
-            }
-            SwingUtilities.invokeLater(()->this.validate());
-        }
-
-        public void switchPanel(JPanel panel) {
-            if(currentPane != null){
-                this.remove(currentPane);
-            }
-            Comp.add(panel, this, 0);
-
-            currentPane = panel;
-
-            SwingUtilities.invokeLater(()->this.validate());
-        }
 
     }
 
-    private class MyMouseListener implements MouseListener{
+    public void toggleMenu(boolean b) {
+        menuPane.setVisible(b);
+        SwingUtilities.invokeLater(()-> this.validate());
 
-        @Override
-        public void mouseClicked(MouseEvent e) {}
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            System.out.println("hi");
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-
-        }
     }
+
 }

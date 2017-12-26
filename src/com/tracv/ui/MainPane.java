@@ -10,6 +10,9 @@ public class MainPane extends JPanel
                         implements ActionListener{
 
     private Button start;
+    private Button menu;
+    private Button quit;
+
 
     private TDFrame tdf;
 
@@ -19,7 +22,15 @@ public class MainPane extends JPanel
         start = new Button("Start Game");
         start.addActionListener(this);
 
+        menu = new Button("Menu");
+        menu.addActionListener(this);
+
+        quit = new Button("Quit");
+        quit.addActionListener(this);
+
         this.add(start);
+        this.add(menu);
+        this.add(quit);
 
     }
 
@@ -29,6 +40,10 @@ public class MainPane extends JPanel
 
         if(source == start){
             tdf.switchToGamePanel();
+        }else if(source == menu){
+            tdf.toggleMenu(true);
+        }else if(source == quit){
+            System.exit(0);
         }
     }
 }
