@@ -1,8 +1,10 @@
 package com.tracv.ui;
 
 import com.tracv.swing.Button;
+import com.tracv.util.Comp;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,9 +30,13 @@ public class MainPane extends JPanel
         quit = new Button("Quit");
         quit.addActionListener(this);
 
-        this.add(start);
-        this.add(menu);
-        this.add(quit);
+        Comp.add(start, this, 0, 0, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(menu, this, 0, 1, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(quit, this, 0, 2, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
 
     }
 

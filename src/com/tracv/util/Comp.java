@@ -9,7 +9,8 @@ import java.awt.*;
 public class Comp {
 
     public static void add(JComponent toAdd, JComponent addTo, int x, int y, int width, int height,
-                           double weightx, double weighty, int fill, int anchor) {
+                           double weightx, double weighty, int fill, int anchor,
+                           int i, int j, int k, int l){
         if (!(addTo.getLayout() instanceof GridBagLayout)) {
             addTo.setLayout(new GridBagLayout());
         }
@@ -23,8 +24,13 @@ public class Comp {
         c.gridy = y;
         c.weightx = weightx;
         c.weighty = weighty;
+        c.insets = new Insets(i, j, k, l);
 
         addTo.add(toAdd, c);
+    }
+    public static void add(JComponent toAdd, JComponent addTo, int x, int y, int width, int height,
+                           double weightx, double weighty, int fill, int anchor) {
+        add(toAdd, addTo, x, y, width, height, weightx, weighty, fill, anchor, 0, 0, 0, 0);
     }
 
     public static void add(JComponent toAdd, JComponent addTo) {

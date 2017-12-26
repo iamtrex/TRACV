@@ -27,7 +27,7 @@ public class Button extends JButton {
         this.setFont(Constants.DEFAULT_FONT);
 
         //TODO remove testing:
-        this.setBorder(new LineBorder(Color.BLACK, 1));
+        //this.setBorder(new LineBorder(Color.BLACK, 1));
 
     }
 }
