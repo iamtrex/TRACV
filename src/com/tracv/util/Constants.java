@@ -7,7 +7,8 @@ public class Constants {
     public static final Double HUD_VERTICAL_SCALE = 0.125;
     public static final Double GAME_VERTICAL_SCALE = 1-HUD_VERTICAL_SCALE;
 
-    public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(1000, 500);
+    public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(1500, 750);
+
     public static final Dimension HUD_DIMENSION = new Dimension(FRAME_DEFAULT_SIZE.width,
             (int)(FRAME_DEFAULT_SIZE.height * HUD_VERTICAL_SCALE));
 

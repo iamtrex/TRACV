@@ -8,6 +8,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * JPanel representing the main landing page of the program.
+ */
 public class MainPane extends JPanel
                         implements ActionListener{
 

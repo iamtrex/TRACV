@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- * The Window containing all other components to the game.
+ * The Window containing all other components to the program
  */
 public class TDFrame extends JFrame {
 
@@ -38,6 +38,8 @@ public class TDFrame extends JFrame {
 
         this.setSize(Constants.FRAME_DEFAULT_SIZE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Comp.center(this);
         this.setVisible(true);
     }
 
