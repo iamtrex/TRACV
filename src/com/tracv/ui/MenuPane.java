@@ -59,7 +59,7 @@ public class MenuPane extends JPanel implements ActionListener {
         try {
             Robot robot = new Robot();
             BufferedImage image = robot.createScreenCapture(new Rectangle(
-                    tdf.getX(), tdf.getY(), this.getWidth(), this.getHeight()));
+                    tdf.getX()+this.getX(), tdf.getY()+this.getY(), this.getWidth(), this.getHeight()));
 
             Kernel kernel = new Kernel(3, 3, new float[]{1f / 9f, 1f / 9f, 1f / 9f,
                     1f / 9f, 1f / 9f, 1f / 9f, 1f / 9f, 1f / 9f, 1f / 9f});
