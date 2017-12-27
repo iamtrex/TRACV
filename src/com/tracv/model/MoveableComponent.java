@@ -5,7 +5,7 @@ import java.awt.*;
 public abstract class MoveableComponent extends GameComponent {
     protected double velocity;
 
-    public MoveableComponent (double velocity, int x, int y) {
+    public MoveableComponent (double velocity, double x, double y) {
         super(x, y);
         this.velocity = velocity;
     }
