@@ -11,7 +11,7 @@ public abstract class GameComponent {
         this.y = y;
     }
 
-    abstract void draw(Graphics g);
+    public abstract void draw(Graphics g);
 
     public double getX() {
         return x;

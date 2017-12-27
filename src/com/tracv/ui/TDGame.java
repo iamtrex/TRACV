@@ -1,5 +1,6 @@
 package com.tracv.ui;
 
+import com.tracv.directional.PointToPointDistance;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -92,16 +93,28 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
 
     private class MyMouseListener implements MouseListener {
+        private Point click;
         @Override
-        public void mouseClicked(MouseEvent e) {
-            gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTowerType());
+        public void mouseClicked(MouseEvent e) {}
+
+        //Registers point of first click, then builds tower on mouse release.
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(click == null) {
+                click = e.getPoint();
+            }
         }
 
         @Override
-        public void mousePressed(MouseEvent e) {}
-
-        @Override
-        public void mouseReleased(MouseEvent e) {}
+        public void mouseReleased(MouseEvent e) {
+            if(click != null){
+                if(PointToPointDistance.withinDistance(e.getPoint(), click)) {
+                    gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTowerType());
+                }
+                //Set to null regardless
+                click = null;
+            }
+        }
 
         @Override
         public void mouseEntered(MouseEvent e) {}

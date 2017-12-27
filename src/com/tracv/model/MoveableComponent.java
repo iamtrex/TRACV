@@ -9,7 +9,7 @@ public abstract class MoveableComponent extends GameComponent {
         super(x, y);
         this.speed = speed;
     }
-    abstract void draw(Graphics g);
+    public abstract void draw(Graphics g);
 
     public double getSpeed() {
         return speed;

@@ -30,6 +30,8 @@ public class Button extends JButton {
         this.setFont(Constants.DEFAULT_FONT);
         this.addMouseListener(new MyMouseListener());
 
+        this.setFocusPainted(false);
+
         //TODO make proper selected border.
         this.setBorder(new LineBorder(Color.BLACK, 1));
     }
