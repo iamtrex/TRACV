@@ -1,5 +1,6 @@
 package com.tracv.swing;
 
+import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
 import javax.imageio.ImageIO;
@@ -12,16 +13,16 @@ import java.awt.image.BufferedImage;
 
 public class HUDTowerButton extends JButton{
 
-    private String name;
+    private TowerType type;
 
     private Border lineBorder, emptyBorder;
 
-    public HUDTowerButton(String name, String iconPath, int cost){
+    public HUDTowerButton(TowerType type, String iconPath, int cost){
         lineBorder = new LineBorder(Color.BLUE, 1);
         emptyBorder = new EmptyBorder(1, 1, 1, 1);
 
         Icon i = getIcon(iconPath);
-        this.name = name;
+        this.type = type;
 
         if(i != null){
             this.setIcon(i);
@@ -50,7 +51,7 @@ public class HUDTowerButton extends JButton{
 
     @Override
     public void setSelected(boolean b){
-        System.out.println("Selected " + b);
+        super.setSelected(b);
         if(b){
             this.setBorder(lineBorder);
         }else{
@@ -68,8 +69,8 @@ public class HUDTowerButton extends JButton{
     }
 
 
-    public String getTowerName() {
-        return name;
+    public TowerType getType(){
+        return type;
     }
 
     private ImageIcon getIcon(String s){

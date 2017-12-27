@@ -2,6 +2,7 @@ package com.tracv.ui.game;
 
 import com.tracv.swing.HUDTowerButton;
 import com.tracv.swing.Pane;
+import com.tracv.types.TowerType;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
@@ -38,8 +39,8 @@ public class HUDButtonPane extends Pane
      */
     private void makeAndAddButtons(){
         //TODO read buttons from some sort of file or lazily just make them staticlaly in some other file and copy them over
-        HUDTowerButton temp = new HUDTowerButton("Base Tower", "TestIcon2", 100);
-        HUDTowerButton temp2 = new HUDTowerButton("Base Tower", "TestIcon2", 500);
+        HUDTowerButton temp = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 100);
+        HUDTowerButton temp2 = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 500);
         buttons.add(temp);
         buttons.add(temp2);
 
@@ -81,7 +82,7 @@ public class HUDButtonPane extends Pane
         Object source = e.getSource();
         for(HUDTowerButton b : buttons){
             if(b == source){
-                hudPane.setSetSelectedTower(b.getTowerName());
+                hudPane.setSelectedTowerType(b.getType());
                 if(!b.isSelected()) {
                     b.setSelected(true);
                 }
@@ -89,6 +90,7 @@ public class HUDButtonPane extends Pane
                 if(b.isSelected()) {
                     b.setSelected(false);
                 }
+
             }
         }
     }

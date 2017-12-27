@@ -2,6 +2,7 @@ package com.tracv.ui.game;
 
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
+import com.tracv.types.TowerType;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
@@ -13,7 +14,7 @@ public class HUDPane extends JPanel implements Observer{
     private HUDStatsPane hudStatsPane;
     private HUDStatePane hudStatePane;
 
-    private String selectedTower;
+    private TowerType selectedTowerType;
 
 
     public HUDPane(){
@@ -34,13 +35,13 @@ public class HUDPane extends JPanel implements Observer{
 
     }
 
-    public String getSelectedTower(){
-        return selectedTower;
+    public TowerType getSelectedTowerType(){
+        return selectedTowerType;
     }
 
-    public void setSetSelectedTower(String towerName) {
+    public void setSelectedTowerType(TowerType towerName) {
         //TODO IMPLEMENTATION -- Talk to stats pane to show the stats of the tower.
-        selectedTower = towerName;
+        selectedTowerType = towerName;
 
     }
 
@@ -49,4 +50,5 @@ public class HUDPane extends JPanel implements Observer{
     public void update(Observable o) {
 
     }
+
 }

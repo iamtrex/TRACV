@@ -94,7 +94,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
     private class MyMouseListener implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
-            gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTower());
+            gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTowerType());
         }
 
         @Override
