@@ -3,11 +3,11 @@ package com.tracv.model;
 
 import java.util.List;
 
-public class Map {
+public class GameMap {
     private List<GameComponent> gameComponents;
     private Terrain[][] terrains;
 
-    public Map (List<GameComponent> gameComponents, Terrain[][] terrains) {
+    public GameMap (List<GameComponent> gameComponents, Terrain[][] terrains) {
         this.gameComponents = gameComponents;
         this.terrains = terrains;
     }

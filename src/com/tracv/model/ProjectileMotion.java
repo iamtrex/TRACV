@@ -8,7 +8,7 @@ public class ProjectileMotion {
     /*
     private Map map;
 
-    public ProjectileMotion(Map map){
+    public ProjectileMotion(GameMap map){
         this.map = map;
     }
 
