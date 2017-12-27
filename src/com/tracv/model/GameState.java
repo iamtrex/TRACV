@@ -2,7 +2,6 @@ package com.tracv.model;
 
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TowerType;
-
 import java.awt.*;
 
 public class GameState extends Observable{

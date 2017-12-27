@@ -1,6 +1,7 @@
 package com.tracv.model;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 public class Tower extends GameComponent {
     private int atkDmg;
@@ -19,7 +20,12 @@ public class Tower extends GameComponent {
     }
 
     public void draw(Graphics g) {
-
+        g.setColor(Color.RED);
+        Graphics2D g2d = (Graphics2D)g;
+        double centerX = x - (1/2);
+        double centerY = y - (1/2);
+        Ellipse2D.Double circle = new Ellipse2D.Double(centerX, centerY, 1, 1);
+        g2d.fill(circle);
     }
 
     public int getAtkDmg() {
@@ -41,5 +47,6 @@ public class Tower extends GameComponent {
     public int getRange() {
         return range;
     }
+
 
 }
