@@ -1,20 +1,28 @@
 package com.tracv.swing;
 
+import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class HUDTowerButton extends JButton{
 
-    private String name;
+    private TowerType type;
 
-    public HUDTowerButton(String name, String iconPath, int cost){
+    private Border lineBorder, emptyBorder;
+
+    public HUDTowerButton(TowerType type, String iconPath, int cost){
+        lineBorder = new LineBorder(Color.BLUE, 1);
+        emptyBorder = new EmptyBorder(1, 1, 1, 1);
+
         Icon i = getIcon(iconPath);
-        this.name = name;
+        this.type = type;
 
         if(i != null){
             this.setIcon(i);
@@ -29,7 +37,7 @@ public class HUDTowerButton extends JButton{
 
     private void setLook(){
         this.setPreferredSize(Constants.HUD_TOWER_ICON_SIZE);
-        this.setBorderPainted(false);
+        //this.setBorderPainted(false);
         this.setContentAreaFilled(false);
         this.setHorizontalAlignment(SwingConstants.CENTER);
         this.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -42,16 +50,27 @@ public class HUDTowerButton extends JButton{
     }
 
     @Override
+    public void setSelected(boolean b){
+        super.setSelected(b);
+        if(b){
+            this.setBorder(lineBorder);
+        }else{
+            this.setBorder(emptyBorder);
+        }
+    }
+    @Override
     protected void paintComponent(Graphics g){
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+
         super.paintComponent(g);
 
     }
 
 
-    public String getTowerName() {
-        return name;
+    public TowerType getType(){
+        return type;
     }
 
     private ImageIcon getIcon(String s){
