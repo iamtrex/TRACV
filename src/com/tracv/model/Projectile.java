@@ -23,12 +23,9 @@ public class Projectile extends MoveableComponent {
 
     public int getDmg() {return dmg;}
 
-    public double getSpeed() {return speed;}
-
     public void setTarget(Enemy t) {this.target = t;}
 
     public void setDmg(int d) {this.dmg = d;}
 
     public void setSpeed(double s) {this.speed = s;}
-
 }
