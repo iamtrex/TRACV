@@ -9,7 +9,7 @@ public class Tower extends GameComponent {
     private int size;
     private int range;
 
-    public Tower(int atkDmg, double fireRate, int cost, int size, int range, int x, int y) {
+    public Tower(int atkDmg, double fireRate, int cost, int size, int range, double x, double y) {
         super(x,y);
         this.atkDmg = atkDmg;
         this.fireRate = fireRate;
@@ -18,7 +18,6 @@ public class Tower extends GameComponent {
         this.range = range;
     }
 
-    @Override
     public void draw(Graphics g) {
 
     }
@@ -42,6 +41,5 @@ public class Tower extends GameComponent {
     public int getRange() {
         return range;
     }
-
 
 }
