@@ -31,11 +31,7 @@ public class Enemy extends MoveableComponent {
     public int getDmg() {
         return dmg;
     }
-
-    public double getSpeed() {
-        return speed;
-    }
-
+    
     public void setDistanceToEnd(int d){
         this.distanceToEnd = d;
     }
