@@ -5,7 +5,6 @@ import com.tracv.swing.Pane;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
-import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -83,6 +82,13 @@ public class HUDButtonPane extends Pane
         for(HUDTowerButton b : buttons){
             if(b == source){
                 hudPane.setSetSelectedTower(b.getTowerName());
+                if(!b.isSelected()) {
+                    b.setSelected(true);
+                }
+            }else{
+                if(b.isSelected()) {
+                    b.setSelected(false);
+                }
             }
         }
     }
