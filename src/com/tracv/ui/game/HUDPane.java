@@ -1,13 +1,14 @@
 package com.tracv.ui.game;
 
-import com.tracv.swing.Pane;
+import com.tracv.observerpattern.Observable;
+import com.tracv.observerpattern.Observer;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class HUDPane extends JPanel {
+public class HUDPane extends JPanel implements Observer{
     private HUDButtonPane hudButtonPane;
     private HUDStatsPane hudStatsPane;
     private HUDStatePane hudStatePane;
@@ -43,4 +44,9 @@ public class HUDPane extends JPanel {
 
     }
 
+    //TODO = Implement
+    @Override
+    public void update(Observable o) {
+
+    }
 }

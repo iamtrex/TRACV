@@ -1,6 +1,8 @@
 package com.tracv.ui;
 
-import com.tracv.swing.Button;
+import com.tracv.model.GameState;
+import com.tracv.observerpattern.Observable;
+import com.tracv.observerpattern.Observer;
 import com.tracv.swing.IconButton;
 import com.tracv.ui.game.GamePane;
 import com.tracv.ui.game.HUDPane;
@@ -12,11 +14,13 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * The Game.
  */
-public class TDGame extends JLayeredPane implements ActionListener{
+public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
     private TDFrame tdf;
 
@@ -31,6 +35,11 @@ public class TDGame extends JLayeredPane implements ActionListener{
 
         hudPane = new HUDPane();
         gamePane = new GamePane();
+        GameState gs = gamePane.getGameState();
+        gs.addObserver(this);
+        gs.addObserver(hudPane);
+        gs.addObserver(gamePane);
+
         menuPane = new MenuPane();
 
         Comp.add(gamePane, this, 0, 0, 0, 1, 1, 1, 1,
@@ -44,7 +53,18 @@ public class TDGame extends JLayeredPane implements ActionListener{
         Comp.add(menuPane, this, 1, 0, 0, 1, 1, 1, 1,
                 GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
 
+        gamePane.addMouseListener(new MyMouseListener());
 
+    }
+
+    @Override
+    public void update(Observable o) {
+        GameState gs = gamePane.getGameState();
+        if(o == gs){
+            if(gs.isGameOver()){
+                tdf.toggleMenu(true);
+            }
+        }
     }
 
 
@@ -57,17 +77,36 @@ public class TDGame extends JLayeredPane implements ActionListener{
             Comp.add(pause, this, 0, 0, 1, 1, 0, 0,
                     GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
         }
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == pause){
-            //TODO Pause state of game and show menu.
-
+            gamePane.getGameState().pause();
             tdf.toggleMenu(true);
         }
 
+    }
+
+
+
+    private class MyMouseListener implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTower());
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {}
+
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+
+        @Override
+        public void mouseExited(MouseEvent e) {}
     }
 }

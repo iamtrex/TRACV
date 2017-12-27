@@ -12,7 +12,7 @@ public abstract class Observable {
 
     }
 
-    public void addObservers(Observer o){
+    public void addObserver(Observer o){
         observers.add(o);
     }
 
