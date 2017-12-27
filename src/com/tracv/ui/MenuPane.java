@@ -4,7 +4,6 @@ import com.tracv.swing.Button;
 import com.tracv.util.Comp;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +20,8 @@ import java.awt.image.Kernel;
 public class MenuPane extends JPanel implements ActionListener {
 
     private TDFrame tdf;
+
+    private Button newGame;
     private Button returnToMain;
 
 
@@ -31,8 +32,10 @@ public class MenuPane extends JPanel implements ActionListener {
 
         returnToMain = new Button("Return to Main");
         Comp.add(returnToMain, this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.PAGE_START);
+                GridBagConstraints.NONE, GridBagConstraints.CENTER);
         returnToMain.addActionListener(this);
+
+
 
 
     }
