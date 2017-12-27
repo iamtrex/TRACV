@@ -9,14 +9,9 @@ import java.awt.*;
     Static methods for adding components
  */
 public class Comp {
-
-    /**
-     * Adds component based off GridBagConstraints.
-     * i,j,k,l represent the insets.
-     */
     public static void add(JComponent toAdd, JComponent addTo, int x, int y, int width, int height,
                            double weightx, double weighty, int fill, int anchor,
-                           int i, int j, int k, int l){
+                           Insets i){
         if (!(addTo.getLayout() instanceof GridBagLayout)) {
             addTo.setLayout(new GridBagLayout());
         }
@@ -30,9 +25,18 @@ public class Comp {
         c.gridy = y;
         c.weightx = weightx;
         c.weighty = weighty;
-        c.insets = new Insets(i, j, k, l);
+        c.insets = i;
 
         addTo.add(toAdd, c);
+    }
+    /**
+     * Adds component based off GridBagConstraints.
+     * i,j,k,l represent the insets.
+     */
+    public static void add(JComponent toAdd, JComponent addTo, int x, int y, int width, int height,
+                            double weightx, double weighty, int fill, int anchor,
+                            int i, int j, int k, int l){
+        add(toAdd, addTo, x, y, width, height, weightx, weighty, fill, anchor, new Insets(i, j, k, l));
     }
 
     //Overloaded add methods.
