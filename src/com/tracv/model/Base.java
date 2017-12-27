@@ -5,12 +5,11 @@ import java.awt.*;
 public class Base extends GameComponent{
     private int health;
 
-    public Base(int health, int x, int y) {
+    public Base(int health, double x, double y) {
         super(x,y);
         this.health = health;
     }
 
-    @Override
     public void draw(Graphics g) {
 
     }

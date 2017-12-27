@@ -3,20 +3,21 @@ package com.tracv.model;
 import java.awt.*;
 
 public abstract class GameComponent {
-    protected int x;
-    protected int y;
+    protected double x;
+    protected double y;
 
-    public GameComponent(int x, int y) {
+    public GameComponent(double x, double y) {
         this.x = x;
         this.y = y;
     }
+
     abstract void draw(Graphics g);
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
