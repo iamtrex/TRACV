@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.TimerTask;
 
 /**
  * The Game.
@@ -32,6 +33,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
     private IconButton pause;
 
+    private GameState gs;
 
 
     public TDGame(TDFrame tdf){
@@ -39,7 +41,9 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
         hudPane = new HUDPane();
         gamePane = new GamePane();
-        GameState gs = gamePane.getGameState();
+        gamePane.getGameState();
+
+        gs = new GameState();
         gs.addObserver(this);
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
@@ -59,6 +63,37 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
+        createGameTimer();
+    }
+
+    public void startNewGame(){
+        gs.newGame();
+        System.out.println("Creating new game");
+        setGameRunning(true);
+    }
+
+    public void setGameRunning(boolean b) {
+        if(gameTimer != null){
+            if(running != b){
+                if(b){
+                    gameTimer.start();
+                    System.out.println("Starting/Resuming Game");
+                }else{
+                    gameTimer.stop();
+                    System.out.println("Stopping Game");
+                }
+                running = b;
+            }
+        }
+    }
+
+    private boolean running = false;
+    private javax.swing.Timer gameTimer;
+    private void createGameTimer(){
+       gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
+           gs.update();
+           gamePane.repaint();
+       });
     }
 
     @Override
@@ -71,7 +106,9 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
         }
     }
 
-
+    /**
+     * Menu that lies on top of the game in order to pause hte game/sounds etc...
+     */
     private class MenuPane extends JPanel{
         public MenuPane(){
             this.setPreferredSize(Constants.ICON_SIZE); //TODO REMOVE TEMP.
@@ -88,6 +125,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
         Object source = e.getSource();
         if(source == pause){
             gamePane.getGameState().pause();
+            setGameRunning(false);
             tdf.toggleMenu(true);
         }
 

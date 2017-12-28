@@ -17,7 +17,7 @@ import java.awt.event.MouseMotionListener;
 /**
  * The 'game' portion of the interface (not including hud).
  *
- * TODO - May change implementation to draw the mouse overlay on a glasspane/layered pane on top of the game as to
+ * TODO - May change implementation to have 3 layers: Background (Terrain), moveable sprites, and mouse... and only redraw as needed
  *      a. Not interfere
  *      b. Redraw faster?
  */
@@ -60,13 +60,13 @@ public class GamePane extends JPanel implements Observer{
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        /* //TODO Awaiting implementation of getGameComponents();
-        //TODO consider implementing iterator in gs.
+        //TODO Awaiting implementation of getGameComponents();
+        //DONE -- consider implementing iterator in gs.
 
-        for(GameComponent gc : gs.getGameComponents()){
+        for(GameComponent gc : gs){
             gc.draw(g);
         }
-        */
+
 
 
         //Draw Mouse hover.
@@ -85,7 +85,7 @@ public class GamePane extends JPanel implements Observer{
 
     @Override
     public void update(Observable o) {
-        this.repaint();
+
     }
 
     public void setSelectedTower(TowerType selectedTower) {

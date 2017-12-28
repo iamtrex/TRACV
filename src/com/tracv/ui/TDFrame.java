@@ -53,6 +53,7 @@ public class TDFrame extends JFrame {
     }
     public void switchToGamePanel() {
         switchPanel(tdGame);
+        tdGame.startNewGame(); //Starts new game!
     }
 
     private void switchPanel(JComponent panel){
@@ -68,6 +69,11 @@ public class TDFrame extends JFrame {
 
     public void toggleMenu(boolean b) {
         menuPane.setVisible(b);
+
+        //If resuming game, resume game.
+        if(this.getContentPane() == tdGame && !b){
+            tdGame.setGameRunning(true);
+        }
         SwingUtilities.invokeLater(()-> this.validate());
 
     }

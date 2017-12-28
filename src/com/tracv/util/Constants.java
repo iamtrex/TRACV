@@ -48,4 +48,7 @@ public class Constants {
 
         // The distance between click and release to still build a tower... Makes for comfortable UI feel...
         public static final double CLICK_VAR_DISTANCE = 50;
+
+    public static final int REFRESH_RATE = 60; //FPS
+    public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
 }
