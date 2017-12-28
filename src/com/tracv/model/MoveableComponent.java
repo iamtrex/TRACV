@@ -14,4 +14,12 @@ public abstract class MoveableComponent extends GameComponent {
     public double getSpeed() {
         return speed;
     }
+
+    public void addX(double n) {
+         x = x + n;
+    }
+
+    public void addY(double n) {
+        y = y + n;
+    }
 }
