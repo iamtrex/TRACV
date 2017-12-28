@@ -10,8 +10,8 @@ public class Tower extends GameComponent {
     private int size;
     private int range;
 
-    public Tower(int atkDmg, double fireRate, int cost, int size, int range, double x, double y) {
-        super(x,y);
+    public Tower(int atkDmg, double fireRate, int cost, int size, int range, double x, double y, String iconPath) {
+        super(x, y, iconPath);
         this.atkDmg = atkDmg;
         this.fireRate = fireRate;
         this.cost = cost;

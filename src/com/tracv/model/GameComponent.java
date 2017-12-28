@@ -9,16 +9,18 @@ import java.awt.*;
 public abstract class GameComponent {
     protected double x;
     protected double y;
-
+    protected String iconPath;
     /**
      * Constructor for GameComponent; assigns the x, y coordinates of the
      * GameComponent
      * @param x a double representing the x coordinate
      * @param y a double representing the y coordinate
+     * @param iconPath a String representing the directory and name of the icon file
      */
-    public GameComponent(double x, double y) {
+    public GameComponent(double x, double y, String iconPath) {
         this.x = x;
         this.y = y;
+        this.iconPath = iconPath;
     }
 
     /**

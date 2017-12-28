@@ -5,8 +5,8 @@ import java.awt.*;
 public class Base extends GameComponent{
     private int health;
 
-    public Base(int health, double x, double y) {
-        super(x,y);
+    public Base(int health, double x, double y, String iconPath) {
+        super(x, y, iconPath);
         this.health = health;
     }
 
