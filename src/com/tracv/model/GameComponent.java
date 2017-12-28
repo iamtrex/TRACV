@@ -11,7 +11,7 @@ public abstract class GameComponent {
         this.y = y;
     }
 
-    abstract void draw(Graphics g);
+    public abstract void draw(Graphics g);
 
     public double getX() {
         return x;
@@ -21,11 +21,11 @@ public abstract class GameComponent {
         return y;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 }

@@ -77,6 +77,7 @@ public class HUDButtonPane extends Pane
         return new Insets(top, left, bottom, right);
     }
 
+    // TODO - May have issue with deselecting if another button is pressed.
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
