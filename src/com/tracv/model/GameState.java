@@ -6,6 +6,7 @@ import com.tracv.types.TowerType;
 import java.awt.*;
 
 public class GameState extends Observable{
+
     public void newGame() {
 
     }
