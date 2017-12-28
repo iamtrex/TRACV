@@ -5,7 +5,9 @@ import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.swing.IconButton;
+import com.tracv.types.TowerType;
 import com.tracv.ui.game.GamePane;
+import com.tracv.ui.game.HUDButtonPane;
 import com.tracv.ui.game.HUDPane;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
@@ -13,10 +15,9 @@ import com.tracv.util.Constants;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * The Game.
@@ -30,6 +31,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
     private MenuPane menuPane;
 
     private IconButton pause;
+
+
 
     public TDGame(TDFrame tdf){
         this.tdf = tdf;
@@ -54,7 +57,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
         Comp.add(menuPane, this, 1, 0, 0, 1, 1, 1, 1,
                 GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
 
-        gamePane.addMouseListener(new MyMouseListener());
+        hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
     }
 
@@ -92,34 +95,13 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
 
 
-    private class MyMouseListener implements MouseListener {
-        private Point click;
+    private class TowerChangeListener implements PropertyChangeListener {
         @Override
-        public void mouseClicked(MouseEvent e) {}
-
-        //Registers point of first click, then builds tower on mouse release.
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if(click == null) {
-                click = e.getPoint();
+        public void propertyChange(PropertyChangeEvent evt) {
+            if(evt.getPropertyName().equals(HUDButtonPane.TOWER_CHANGED)){
+                gamePane.setSelectedTower((TowerType) evt.getNewValue());
             }
         }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if(click != null){
-                if(PointToPointDistance.withinDistance(e.getPoint(), click)) {
-                    gamePane.attemptToBuildTower(e.getPoint(), hudPane.getSelectedTowerType());
-                }
-                //Set to null regardless
-                click = null;
-            }
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {}
-
-        @Override
-        public void mouseExited(MouseEvent e) {}
     }
+
 }

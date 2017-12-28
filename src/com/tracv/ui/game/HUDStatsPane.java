@@ -1,6 +1,7 @@
 package com.tracv.ui.game;
 
 import com.tracv.swing.Pane;
+import com.tracv.types.TowerType;
 
 import javax.swing.*;
 
@@ -13,5 +14,16 @@ public class HUDStatsPane extends Pane {
 
     public HUDStatsPane(HUDPane hudPane) {
         this.hudPane = hudPane;
+    }
+
+    /**
+     * TODO - Implementation.
+     * @param towerName
+     */
+    public void displayStatsForTower(TowerType towerName) {
+
+
+        SwingUtilities.invokeLater(()-> this.validate());
+
     }
 }

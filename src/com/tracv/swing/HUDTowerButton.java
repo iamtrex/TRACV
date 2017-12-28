@@ -81,6 +81,8 @@ public class HUDTowerButton extends JButton{
             return new ImageIcon(scaled);
         }catch(Exception e){
             e.printStackTrace();
+            System.out.println("Friends - If you are getting this error, it is likely that you forgot to add" +
+                    " the res folder as resources. (Right click res folder -> mark directory as -> resources");
         }
 
         return null;

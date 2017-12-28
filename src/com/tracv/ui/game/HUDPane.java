@@ -8,6 +8,8 @@ import com.tracv.util.Constants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class HUDPane extends JPanel implements Observer{
     private HUDButtonPane hudButtonPane;
@@ -23,6 +25,8 @@ public class HUDPane extends JPanel implements Observer{
         //this.setOpaque(true);
 
         hudButtonPane = new HUDButtonPane(this);
+        hudButtonPane.addPropertyChangeListener(new TowerChangeListener());
+
         hudStatsPane = new HUDStatsPane(this);
         hudStatePane = new HUDStatePane(this);
 
@@ -42,8 +46,14 @@ public class HUDPane extends JPanel implements Observer{
     public void setSelectedTowerType(TowerType towerName) {
         //TODO IMPLEMENTATION -- Talk to stats pane to show the stats of the tower.
         selectedTowerType = towerName;
+        hudStatsPane.displayStatsForTower(towerName);
 
     }
+
+    public HUDButtonPane getHUDButtonsPane() {
+        return hudButtonPane;
+    }
+
 
     //TODO = Implement
     @Override
@@ -51,4 +61,12 @@ public class HUDPane extends JPanel implements Observer{
 
     }
 
+    private class TowerChangeListener implements PropertyChangeListener {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if(evt.getPropertyName().equals(HUDButtonPane.TOWER_CHANGED)){
+                HUDPane.this.setSelectedTowerType((TowerType)evt.getNewValue());
+            }
+        }
+    }
 }

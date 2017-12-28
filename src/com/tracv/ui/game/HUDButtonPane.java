@@ -20,6 +20,8 @@ import java.util.List;
 public class HUDButtonPane extends Pane
                                 implements ActionListener{
     private HUDPane hudPane;
+    public static final String TOWER_CHANGED = "Tower Changed";
+
 
     private List<HUDTowerButton> buttons;
 
@@ -83,7 +85,8 @@ public class HUDButtonPane extends Pane
         Object source = e.getSource();
         for(HUDTowerButton b : buttons){
             if(b == source){
-                hudPane.setSelectedTowerType(b.getType());
+                //hudPane.setSelectedTowerType(b.getType());
+                firePropertyChange(TOWER_CHANGED, null, b.getType());
                 if(!b.isSelected()) {
                     b.setSelected(true);
                 }
