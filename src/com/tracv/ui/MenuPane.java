@@ -2,6 +2,7 @@ package com.tracv.ui;
 
 import com.tracv.swing.Button;
 import com.tracv.util.Comp;
+import com.tracv.util.Constants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,26 +22,61 @@ public class MenuPane extends JPanel implements ActionListener {
 
     private TDFrame tdf;
 
-    private Button newGame;
-    private Button returnToMain;
 
+    private Button newGame;
+    private Button continueGame;
+    private Button returnToMain;
+    private Button settings;
 
     public MenuPane(TDFrame tdf) {
         this.tdf = tdf;
         //    this.setBorder(new LineBorder(Color.RED, 3));
         this.addMouseListener(new MyMouseListener());
 
+
+        continueGame = new Button("Resume");
+        newGame = new Button("Restart");
         returnToMain = new Button("Return to Main");
-        Comp.add(returnToMain, this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.CENTER);
+        settings = new Button("Settings");
+
+
+        Comp.add(continueGame, this, 0, 0, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(newGame, this, 0, 1, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(returnToMain, this, 0, 2, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(settings, this, 0, 3, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
+        continueGame.addActionListener(this);
+        newGame.addActionListener(this);
         returnToMain.addActionListener(this);
-
-
-
-
+        settings.addActionListener(this);
     }
 
+
+
     private BufferedImage background;
+
+    /**
+     * Show different menus based off of where the source is from.
+     * @param source
+     */
+    public void showMenu(JComponent source){
+        if(source instanceof TDGame){
+            continueGame.setVisible(true);
+            newGame.setVisible(true);
+            returnToMain.setVisible(true);
+            settings.setVisible(true);
+        }else if(source instanceof MainPane){
+            continueGame.setVisible(false);
+            newGame.setVisible(false);
+            returnToMain.setVisible(true);
+            settings.setVisible(true);
+        }
+        setVisible(true);
+    }
 
     /**
      * Override set visible to create blurred image everytime the menu is shown.
@@ -84,7 +120,7 @@ public class MenuPane extends JPanel implements ActionListener {
         if(background != null) {
             g.drawImage(background, 0, 0, null);
         }
-        g.setColor(new Color(238,242,245,200));
+        g.setColor(new Color(238,242,245,200)); //TODO move to constants.
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
@@ -92,9 +128,16 @@ public class MenuPane extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == returnToMain) {
+        if(source == continueGame){
+            tdf.toggleMenu(false);
+        }else if(source == newGame){
+            tdf.newGame();
+        }else if (source == returnToMain) {
             tdf.switchToMainPanel();
+        }else if(source == settings){
+
         }
+        this.setVisible(false);
     }
 
 

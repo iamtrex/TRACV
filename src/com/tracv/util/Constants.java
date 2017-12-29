@@ -9,7 +9,7 @@ public class Constants {
 
     //Names
     public static final String GAME_NAME = "TRACV Tower Defense";
-
+    public static final String VERSION_NUMBER = "ALPHA 0.1";
 
     //Scaling and Dimensions
     public static final Double HUD_VERTICAL_SCALE = 0.125;
@@ -38,6 +38,10 @@ public class Constants {
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
         public static final Font HUD_TOWER_GOLD_FONT = new Font("Calibri", Font.PLAIN, 10);
 
+        public static final Font LARGE_LABEL_FONT = new Font("Calibri", Font.BOLD, 36);
+        public static final Font MEDIUM_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
+        public static final Font SMALL_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
+
     //Default colours of selected vs unselected buttons
         public static final Color BUTTON_SELECTED_COLOR = new Color(150, 150, 150, 150);
         public static final Color BUTTON_UNSELECTED_COLOR = new Color(1, 1, 1, 1.0f);
@@ -51,4 +55,5 @@ public class Constants {
 
     public static final int REFRESH_RATE = 60; //FPS
     public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
+
 }
