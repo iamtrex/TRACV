@@ -5,8 +5,8 @@ import java.awt.*;
 public abstract class MoveableComponent extends GameComponent {
     protected double speed;
 
-    public MoveableComponent (double speed, double x, double y) {
-        super(x, y);
+    public MoveableComponent (double speed, double x, double y, String iconPath) {
+        super(x, y, iconPath);
         this.speed = speed;
     }
     public abstract void draw(Graphics g);

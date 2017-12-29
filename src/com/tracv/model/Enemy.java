@@ -8,8 +8,8 @@ public class Enemy extends MoveableComponent {
     private int dmg;
     private double speed;
 
-    public Enemy(int distanceToEnd, int health, int dmg, double speed, double velocity, double x, double y) {
-        super(velocity, x, y);
+    public Enemy(int distanceToEnd, int health, int dmg, double speed, double velocity, double x, double y, String iconPath) {
+        super(velocity, x, y, iconPath);
         this.distanceToEnd = distanceToEnd;
         this.health = health;
         this.dmg = dmg;

@@ -8,8 +8,8 @@ public class Projectile extends MoveableComponent {
     private int dmg;
     private double speed;
 
-    public Projectile (Enemy target, int dmg, double speed, double x, double y) {
-        super (speed, x, y);
+    public Projectile (Enemy target, int dmg, double speed, double x, double y, String iconPath) {
+        super (speed, x, y, iconPath);
         this.target = target;
         this.dmg = dmg;
         this.speed = speed;
