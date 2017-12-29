@@ -14,10 +14,10 @@ public class EnemyFactory {
     public EnemyFactory() {
         toSpawn = new LinkedList<Enemy>();
         for (int i = 0; i < 10; i++) {
-            toSpawn.add(new Enemy(0, 5, 1, 5, 2, 1920, 540, null));
+            toSpawn.add(new Enemy(0, 5, 1, 5, 1920, 540, null));
         }                                   //^change this
         for (int i = 0; i < 10; i++) {
-            toSpawn.add(new Enemy(0, 5, 1, 5, 2, 1920, 540, null));
+            toSpawn.add(new Enemy(0, 5, 1, 5, 1920, 540, null));
         }                                   //^change this distance
     }
 
