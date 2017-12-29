@@ -11,11 +11,11 @@ import java.util.List;
 public class GameState extends Observable implements Iterable<GameComponent>{
 
 
-    private List<GameComponent> gameComponents;
+    //private List<GameComponent> gameComponents;
+    private GameMap map;
 
     public GameState() {
-        gameComponents = new ArrayList<>();
-
+        map = new GameMap();
     }
 
     /**
