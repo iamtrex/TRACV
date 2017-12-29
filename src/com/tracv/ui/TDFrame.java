@@ -51,31 +51,43 @@ public class TDFrame extends JFrame {
     public void switchToMainPanel() {
         switchPanel(mainPane);
     }
+
+    //Create new game and swap to the game panel.
+    public void newGame() {
+        tdGame.startNewGame();
+        if(this.getContentPane() != tdGame) {
+            switchToGamePanel();
+        }
+    }
+
     public void switchToGamePanel() {
         switchPanel(tdGame);
-        tdGame.startNewGame(); //Starts new game!
     }
 
     private void switchPanel(JComponent panel){
         this.setContentPane(panel);
-        if(menuPane.isVisible()){
-            toggleMenu(false);
-        }else {
-            SwingUtilities.invokeLater(() -> this.validate());
-        }
-
+        SwingUtilities.invokeLater(() -> this.validate());
 
     }
 
+
+    /**
+     * Bit hacky rn... Maybe do it a better way?
+     * @param b - show menu if true, hide if false
+     */
     public void toggleMenu(boolean b) {
-        menuPane.setVisible(b);
+        if(b){
+            menuPane.showMenu((JComponent) this.getContentPane());
+        }else {
+            menuPane.setVisible(false);
+        }
 
         //If resuming game, resume game.
         if(this.getContentPane() == tdGame && !b){
             tdGame.setGameRunning(true);
         }
-        SwingUtilities.invokeLater(()-> this.validate());
 
+        SwingUtilities.invokeLater(()-> this.validate());
     }
 
 }
