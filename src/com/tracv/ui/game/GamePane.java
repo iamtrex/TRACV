@@ -60,26 +60,41 @@ public class GamePane extends JPanel implements Observer{
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        //TODO Awaiting implementation of getGameComponents();
+        //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
+        //TODO -- Awaiting Draw implementation of GameComponents();
+        /*
         for(GameComponent gc : gs){
             gc.draw(g);
         }
-
+        */
 
 
         //Draw Mouse hover.
         //TODO - Implement actual drawing... Right now draws a RED dot
+                // -> Get the Sprite based off of TowerType that is currently selected.
+
         if(mouse != null) {
             //TODO - Ask GameState if the current position is legal. (Determine red or green shade on the object)
 
+            /* //Old testing code to draw a red dot.
             g.setColor(Color.RED);
             int r = 5; //5 pixel radius.
             int x = (int) Math.round(this.mouse.getX() - r);
             int y = (int) Math.round(this.mouse.getY() - r);
 
             g.fillOval(x, y, 2*r, 2*r);
+            */
+
+            //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
+            //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
+            if(selectedTower != null) { // Only draw if currently has selected tower!
+
+                int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
+                int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
+                g.drawImage(selectedTower.getSprite(), x, y, null);
+            }
         }
     }
 

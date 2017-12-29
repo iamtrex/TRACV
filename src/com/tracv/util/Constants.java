@@ -32,7 +32,9 @@ public class Constants {
 
     //Directory Locations
         public static final String TOWER_ICON_DIR = "/TowerIcons/";
+        public static final String TOWER_SPRITE_DIR = "/TowerSprites/";
         public static final String TOWER_ICON_FILETYPE = ".png";
+        public static final String TOWER_SPRITE_FILETYPE = ".png";
 
     //Fonts
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
