@@ -12,16 +12,29 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     //private List<GameComponent> gameComponents;
     private GameMap map;
+    private EnemyFactory mobs;
+    private TowerFactory construction;
+
+    private int gold;
+    private int score;
+
 
     public GameState() {
-        map = new GameMap();
+        //map = new GameMap(); <- please make this work
+        mobs = new EnemyFactory();
+        construction = new TowerFactory();
+        gold = 500; // temp value, 500 cuz league
+        score = 0;
     }
 
     /**
      * Initiates a new game.
+     * (victor) restores all the field back to basic values, basically copied the default ctor
      */
     public void newGame() {
-
+        //map = new GameMap();
+        gold = 500; // temp value, 500 cuz league
+        score = 0;
     }
 
     /**
@@ -52,6 +65,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     @Override
     public Iterator<GameComponent> iterator() {
-        return gameComponents.iterator();
+        return map.getGameComponents().iterator();
     }
 }
