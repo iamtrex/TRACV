@@ -6,14 +6,12 @@ public class Enemy extends MoveableComponent {
     private int distanceToEnd;
     private int health;
     private int dmg;
-    private double speed;
 
-    public Enemy(int distanceToEnd, int health, int dmg, double speed, double velocity, double x, double y, String iconPath) {
-        super(velocity, x, y, iconPath);
-        this.distanceToEnd = distanceToEnd;
-        this.health = health;
-        this.dmg = dmg;
-        this.speed = speed;
+    public Enemy(int distanceToEnd, int health, int dmg, double speed, double x, double y, String iconPath) {
+            super(speed, x, y, iconPath);
+            this.distanceToEnd = distanceToEnd;
+            this.health = health;
+            this.dmg = dmg;
     }
 
     public void draw(Graphics g) {
