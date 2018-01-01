@@ -31,6 +31,8 @@ public class Label extends JLabel {
         super(name);
         this.setHorizontalAlignment(SwingConstants.CENTER);
         this.setHorizontalTextPosition(SwingConstants.CENTER);
+        this.setOpaque(true);
+
         setSize(size);
     }
 
