@@ -13,4 +13,10 @@ public enum Terrain {
     Terrain(String s){
         this.type = s;
     }
+
+    public static Terrain[] getTerrains(){
+        Terrain[] terrains = {MOVEABLE, BUILDABLE, VOID};
+        return terrains;
+    }
+
 }

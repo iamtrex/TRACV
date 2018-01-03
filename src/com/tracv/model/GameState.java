@@ -2,10 +2,11 @@ package com.tracv.model;
 
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TowerType;
+import com.tracv.util.TerrainParser;
+import com.tracv.util.Constants;
+
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class GameState extends Observable implements Iterable<GameComponent>{
 
@@ -21,6 +22,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     public GameState() {
         //map = new GameMap(); <- please make this work
+
+
+        //TODO FIX TESTING PURPOSES.
+        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
+
         mobs = new EnemyFactory();
         construction = new TowerFactory();
         gold = 500; // temp value, 500 cuz league

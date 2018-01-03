@@ -1,6 +1,7 @@
 package com.tracv.util;
 
 import java.awt.*;
+import java.io.File;
 
 /**
  * In future can make this read from a settings.ini
@@ -35,6 +36,8 @@ public class Constants {
         public static final String TOWER_SPRITE_DIR = "/TowerSprites/";
         public static final String TOWER_ICON_FILETYPE = ".png";
         public static final String TOWER_SPRITE_FILETYPE = ".png";
+
+        public static final String TERRAIN_FILE = "TerrainMapTest1.csv";
 
     //Fonts
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
