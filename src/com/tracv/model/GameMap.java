@@ -19,7 +19,7 @@ public class GameMap {
      * @param terrains the input model of the map
      */
     public GameMap ( Terrain[][] terrains) {
-        this.gameComponents = new ArrayList<GameComponent>();
+        this.gameComponents = new ArrayList<>();
         this.terrains = terrains;
     }
 

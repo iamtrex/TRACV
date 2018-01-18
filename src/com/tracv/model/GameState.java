@@ -24,13 +24,17 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         //map = new GameMap(); <- please make this work
 
 
-        //TODO FIX TESTING PURPOSES.
-        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
 
         mobs = new EnemyFactory();
         construction = new TowerFactory();
+        //TODO FIX TESTING PURPOSES.
+
+        /*
+        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
         gold = 500; // temp value, 500 cuz league
         score = 0;
+        */
+        newGame(); //Initialize new game.
     }
 
     /**
@@ -38,7 +42,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * (victor) restores all the field back to basic values, basically copied the default ctor
      */
     public void newGame() {
-        //map = new GameMap();
+        System.out.println("Starting new game");
+        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
         gold = 500; // temp value, 500 cuz league
         score = 0;
     }

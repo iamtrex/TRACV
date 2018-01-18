@@ -41,9 +41,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
         hudPane = new HUDPane();
         gamePane = new GamePane();
-        gamePane.getGameState();
-
-        gs = new GameState();
+        gs = gamePane.getGameState();
         gs.addObserver(this);
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
@@ -68,7 +66,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
     public void startNewGame(){
         gs.newGame();
-        System.out.println("Creating new game");
         setGameRunning(true);
     }
 

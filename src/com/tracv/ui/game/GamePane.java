@@ -28,12 +28,15 @@ public class GamePane extends JPanel implements Observer{
     private GameState gs;
     private TowerType selectedTower;
 
+    // Acts as layers, so not the entire UI has to refresh on each iteration
+    private Rectangle mobLayer, towerLayer, projectileLayer, terrainLayer;
+
     public GamePane(){
         gs = new GameState();
 
         this.setPreferredSize(Constants.GAME_DIMENSION);
         this.setBackground(Color.BLUE);
-
+        //this.setOpaque(false);
         this.addMouseListener(new MyMouseListener());
         this.addMouseMotionListener(new MyMouseMotionListener());
 
@@ -64,11 +67,11 @@ public class GamePane extends JPanel implements Observer{
         //DONE -- consider implementing iterator in gs.
 
         //TODO -- Awaiting Draw implementation of GameComponents();
-        /*
+
         for(GameComponent gc : gs){
             gc.draw(g);
         }
-        */
+
 
 
         //Draw Mouse hover.
