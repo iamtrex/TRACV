@@ -14,6 +14,8 @@ public class Tower extends GameComponent {
     private int size;
     private int range;
 
+    private double timeTilNextFire; //In milliseconds.
+
     /**
      * Constructor for a Tower
      * @param atkDmg the attack damage value of the tower
@@ -32,6 +34,8 @@ public class Tower extends GameComponent {
         this.cost = cost;
         this.size = size;
         this.range = range;
+
+        this.timeTilNextFire = 1000.0/fireRate;
     }
 
     /**
@@ -68,4 +72,15 @@ public class Tower extends GameComponent {
     }
 
 
+    public boolean canFire(){
+        return timeTilNextFire <= 0;
+
+    }
+    public void decrementCooldown(double v) {
+        this.timeTilNextFire -= v;
+    }
+
+    public void setFired() {
+        timeTilNextFire = 1000.0/fireRate;
+    }
 }

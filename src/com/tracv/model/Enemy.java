@@ -46,4 +46,9 @@ public class Enemy extends MoveableComponent {
         this.speed = s;
 
     }
+
+    public boolean takeDmg(int dmg) {
+        this.health -= dmg;
+        return health <= 0;
+    }
 }

@@ -15,6 +15,7 @@ public class GameMap {
     private List<GameComponent> gameComponents;
     private Terrain[][] terrains;
     private Double blockSize;
+    private Base base;
 
 
     /**
@@ -26,6 +27,7 @@ public class GameMap {
         this.gameComponents = new ArrayList<>();
         this.terrains = terrains;
         this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+        base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
 
     }
 
@@ -71,5 +73,9 @@ public class GameMap {
     public void setBlockSize(Double blockSize){
         this.blockSize = blockSize;
 
+    }
+
+    public Base getBase() {
+        return base;
     }
 }

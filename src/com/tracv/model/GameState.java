@@ -1,9 +1,10 @@
 package com.tracv.model;
 
+import com.tracv.directional.PointToPointDistance;
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TowerType;
-import com.tracv.util.TerrainParser;
 import com.tracv.util.Constants;
+import com.tracv.util.TerrainParser;
 
 import java.awt.*;
 import java.util.Iterator;
@@ -16,6 +17,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private EnemyFactory mobs;
     private TowerFactory construction;
 
+
+    private ProjectileMotion pMotion;
+    private EnemyMotion eMotion;
+
     private int gold;
     private int score;
 
@@ -23,6 +28,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public GameState() {
         //map = new GameMap(); <- please make this work
 
+        pMotion = new ProjectileMotion();
+        eMotion = new EnemyMotion();
 
 
         mobs = new EnemyFactory();
@@ -55,26 +62,75 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      */
     public void update() {
         //insert pathfinding algorithm here
+        System.out.println("Updating");
+        for(GameComponent gc : this){
+            if(gc instanceof Enemy){
+                Enemy e = (Enemy) gc;
+                boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
+
+
+
+
+            }else if(gc instanceof Projectile){
+                Projectile p = (Projectile) gc;
+                boolean crashed = ProjectileMotion.updateProjectile(p);
+                if(crashed){
+                    Enemy e = p.getTarget();
+                    boolean dead = e.takeDmg(p.getDmg());
+                    if(dead){
+                        map.removeComponent(e);
+                    }
+                    map.removeComponent(p);
+                }
+            }else if(gc instanceof Tower){
+                Tower t = (Tower) gc;
+                t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
+                boolean fire = t.canFire();
+                if(fire){
+                    //Search enemies in range.
+                    int range = t.getRange();
+                    Point p2 = new Point((int)t.getX(), (int)t.getY());
+
+                    for(GameComponent gc2 : this){
+                        if(gc instanceof Enemy ){
+                            Point p = new Point((int)gc2.getX(), (int)gc2.getY());
+
+                            if(PointToPointDistance.getDistance(p, p2) < range){
+                                //Create new projectile with this Enemy as targe
+                                // TODO FIX TEMP LINE
+                                Projectile proj = new Projectile((Enemy) gc2, 10, 100, t.getX(), t.getY(), null);
+                                map.addComponent(proj);
+                            }
+                        }
+                    }
+                }
+                t.setFired();
+
+            }
+        }
+
     }
 
-    public boolean isTowerBuildValid(Point p){
+    public boolean isTowerBuildValid(Point p, TowerType selectedTower){
         //Draw Terrain
         Terrain[][] terrain = map.getTerrains();
 
         int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrain[0].length);
         int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrain.length);
 
-        Terrain ter = terrain[p.y/blockSizeY][p.x/blockSizeX];
+
+        Terrain ter = terrain[(p.y-selectedTower.getHeight()/2)/blockSizeY]
+                [(p.x-selectedTower.getWidth()/2)/blockSizeX]; //Block it belongs in.
+
         if(ter != Terrain.BUILDABLE){
             return false;
         }
 
-        for(GameComponent gc : map.getGameComponents()){
+        for(GameComponent gc : this){
             if(gc instanceof Tower){
                 Tower t = (Tower) gc;
-                if((p.getX()-t.getX()) <= t.getSize()){
-                    return false;
-                }else if((p.getY() - t.getY()) <= t.getSize()){
+                if(Math.abs(p.getX()-t.getX()) <= t.getSize() &&
+                        Math.abs((p.getY() - t.getY())) <= t.getSize()){
                     return false;
                 }
             }
@@ -95,7 +151,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         double x = point.getX();
         double y = point.getY();
 
-        if (!isTowerBuildValid(point) || gold < cost) {
+        if (!isTowerBuildValid(point, selectedTower) || gold < cost) {
             return false;
             //checks for whether the terrain is buildable
             //checks for whether theres already a terrain there

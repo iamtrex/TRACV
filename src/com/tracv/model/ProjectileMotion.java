@@ -20,9 +20,10 @@ public class ProjectileMotion {
      * Updates the projectile's position.
      * @param p - Projectile
      */
-    public void updateProjectile(Projectile p){
+    public static boolean updateProjectile(Projectile p){
         Enemy e = p.getTarget();
         //TODO eval if enemy is within range of movement. If so, set projectile to enemy and autocollide.
+
 
         double x2 = e.getX();
         double y2 = e.getY();
@@ -31,19 +32,33 @@ public class ProjectileMotion {
         double y1 = p.getY();
 
         Vector v = new Vector(x2-x1, y2-y1);
-        double magnitude = p.getSpeed();
 
+        double magnitude = p.getSpeed();
+        if(v.getLength() <= magnitude){
+            //Collide!
+            p.setX(x2);
+            p.setY(y2); //Set locations to be same just in case lol
+            return true;
+        }
+
+        //Otherwise, update location
         //Evaluate the dX and dY based off of vector values and magnitude.
         double dx = magnitude * v.getXRatio();
         double dy = magnitude * v.getYRatio();
 
+        p.setX(x1 + dx);
+        p.setY(y1 + dy);
+
         /* //TODO - Waiting on implementation in Moveable component: addX(double) and addY(double).
+                //Replace the two lines above.
         p.addX(dx);
         p.addY(dy);
         */
-
+        return false; //No Collision
     }
 
+
+    //TODO - This probably doesn't belong here?
     /**
      * Establishes a new enemy if the current enemy is no longer existant.
      * @param enemies

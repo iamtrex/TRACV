@@ -89,9 +89,19 @@ public class GamePane extends JPanel implements Observer{
                         break;
                     }
                 }
-                g.fillRect(x*blockSizeX, y*blockSizeY, blockSizeX, blockSizeY);
-                //g.fillRect((int)(x*blockSize), (int)(y*blockSize), (int)blockSize, (int)blockSize);
 
+                //TODO perhaps change implementation of how we draw Terrain
+                //  Either use preloaded image? or fix how the border looks
+                //  The +1 works because drawn from top left to bottom right, so the top and left borders
+                //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
+
+                g.fillRect(x*blockSizeX+1, y*blockSizeY+1, blockSizeX, blockSizeY);
+                //Draw Border
+
+                if(terrain[y][x] == Terrain.BUILDABLE) {
+                    g.setColor(Color.BLACK);
+                    g.drawRect(x * blockSizeX, y * blockSizeY, blockSizeX, blockSizeY);
+                }
 
             }
         }
@@ -128,7 +138,7 @@ public class GamePane extends JPanel implements Observer{
         //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
         //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
         if(selectedTower != null) { // Only draw if currently has selected tower!
-            if(gs.isTowerBuildValid(mouse.getLocation())){
+            if(gs.isTowerBuildValid(mouse.getLocation(), selectedTower)){
                 g.setColor(Color.BLUE);
             }else{
                 g.setColor(Color.RED);
