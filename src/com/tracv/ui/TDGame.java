@@ -1,6 +1,5 @@
 package com.tracv.ui;
 
-import com.tracv.directional.PointToPointDistance;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -15,10 +14,10 @@ import com.tracv.util.Constants;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.TimerTask;
 
 /**
  * The Game.
@@ -64,7 +63,11 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
         createGameTimer();
     }
 
-    public void startNewGame(){
+    /*
+    Map determines level to load.
+     */
+    public void startNewGame(String map){
+        gs.loadMap(map);
         gs.newGame();
         setGameRunning(true);
     }
@@ -94,7 +97,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
     }
 
     @Override
-    public void update(Observable o) {
+    public void update(Observable o, String msg) {
+        System.out.println("Notified!?");
         GameState gs = gamePane.getGameState();
         if(o == gs){
             if(gs.isGameOver()){

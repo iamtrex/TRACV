@@ -4,9 +4,6 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * The Window containing all other components to the program
@@ -54,7 +51,7 @@ public class TDFrame extends JFrame {
 
     //Create new game and swap to the game panel.
     public void newGame() {
-        tdGame.startNewGame();
+        tdGame.startNewGame("TODO DEBUGGING");
         if(this.getContentPane() != tdGame) {
             switchToGamePanel();
         }
