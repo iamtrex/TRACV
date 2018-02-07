@@ -1,6 +1,8 @@
 package com.tracv.model;
 
 
+import com.tracv.util.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,8 @@ import java.util.List;
 public class GameMap {
     private List<GameComponent> gameComponents;
     private Terrain[][] terrains;
+    private Double blockSize;
+
 
     /**
      * Constructor for GameMap, makes a new GameMap with the input terrains containing
@@ -21,6 +25,8 @@ public class GameMap {
     public GameMap ( Terrain[][] terrains) {
         this.gameComponents = new ArrayList<>();
         this.terrains = terrains;
+        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+
     }
 
     /**
@@ -57,4 +63,13 @@ public class GameMap {
         return terrains;
     }
 
+
+    public Double getBlockSize(){
+        return blockSize;
+    }
+
+    public void setBlockSize(Double blockSize){
+        this.blockSize = blockSize;
+
+    }
 }

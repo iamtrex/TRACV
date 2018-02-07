@@ -57,7 +57,7 @@ public class HUDPane extends JPanel implements Observer{
 
     //TODO = Implement
     @Override
-    public void update(Observable o) {
+    public void update(Observable o, String msg) {
 
     }
 

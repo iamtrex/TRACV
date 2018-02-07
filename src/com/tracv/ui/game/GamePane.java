@@ -3,6 +3,7 @@ package com.tracv.ui.game;
 import com.tracv.directional.PointToPointDistance;
 import com.tracv.model.GameComponent;
 import com.tracv.model.GameState;
+import com.tracv.model.Terrain;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.types.TowerType;
@@ -29,7 +30,7 @@ public class GamePane extends JPanel implements Observer{
     private TowerType selectedTower;
 
     // Acts as layers, so not the entire UI has to refresh on each iteration
-    private Rectangle mobLayer, towerLayer, projectileLayer, terrainLayer;
+    //private Rectangle mobLayer, towerLayer, projectileLayer, terrainLayer;
 
     public GamePane(){
         gs = new GameState();
@@ -39,6 +40,8 @@ public class GamePane extends JPanel implements Observer{
         //this.setOpaque(false);
         this.addMouseListener(new MyMouseListener());
         this.addMouseMotionListener(new MyMouseMotionListener());
+
+
 
     }
 
@@ -68,18 +71,50 @@ public class GamePane extends JPanel implements Observer{
 
         //TODO -- Awaiting Draw implementation of GameComponents();
 
+        //Draw Terrain
+
+        Terrain[][] terrain = getGameState().getTerrain();
+
+        int blockSizeX = this.getWidth() / terrain[0].length;
+        int blockSizeY = this.getHeight() / terrain.length;
+
+        //double blockSize;
+
+        //Draw Terrain
+        for(int y=0; y<terrain.length; y++){
+            for(int x=0; x<terrain[y].length; x++){
+                for(Terrain t : Terrain.getTerrains()){
+                    if(t.getType().equals(terrain[y][x].getType())){
+                        g.setColor(t.getColor());
+                        break;
+                    }
+                }
+                g.fillRect(x*blockSizeX, y*blockSizeY, blockSizeX, blockSizeY);
+                //g.fillRect((int)(x*blockSize), (int)(y*blockSize), (int)blockSize, (int)blockSize);
+
+
+            }
+        }
+
+        //TODO OPTIMIZE?
         for(GameComponent gc : gs){
             gc.draw(g);
         }
 
-
-
         //Draw Mouse hover.
-        //TODO - Implement actual drawing... Right now draws a RED dot
+        if(mouse != null) {
+            drawTowerHighlightOnMouse(g);
+        }
+    }
+
+    /*
+    Draws an outline of the tower on the screen
+    //DONE - Implement actual drawing... Right now draws a RED dot
                 // -> Get the Sprite based off of TowerType that is currently selected.
 
-        if(mouse != null) {
-            //TODO - Ask GameState if the current position is legal. (Determine red or green shade on the object)
+     */
+    private void drawTowerHighlightOnMouse(Graphics g){
+        //TODO - Ask GameState if the current position is legal. (Determine red or green shade on the object)
 
             /* //Old testing code to draw a red dot.
             g.setColor(Color.RED);
@@ -90,19 +125,24 @@ public class GamePane extends JPanel implements Observer{
             g.fillOval(x, y, 2*r, 2*r);
             */
 
-            //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
-            //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
-            if(selectedTower != null) { // Only draw if currently has selected tower!
-
-                int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
-                int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
-                g.drawImage(selectedTower.getSprite(), x, y, null);
+        //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
+        //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
+        if(selectedTower != null) { // Only draw if currently has selected tower!
+            if(gs.isTowerBuildValid(mouse.getLocation())){
+                g.setColor(Color.BLUE);
+            }else{
+                g.setColor(Color.RED);
             }
+            int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
+            int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
+            //g.drawImage(selectedTower.getSprite(), x, y, null);
+            g.fillRect(x, y, selectedTower.getWidth(), selectedTower.getHeight());
         }
     }
 
     @Override
-    public void update(Observable o) {
+    public void update(Observable o, String msg) {
+        System.out.println("GamePane was notified");
 
     }
 

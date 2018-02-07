@@ -10,6 +10,7 @@ public class TerrainParser {
 
 
     public static Terrain[][] parseTerrainFile(String s){
+        System.out.println("Parsed Terrain File");
         String[][] data = parseCSVFile(s);
 
         List<Terrain[]> terrains = new ArrayList<>();
@@ -21,9 +22,12 @@ public class TerrainParser {
                 for(Terrain t : Terrain.getTerrains()){
                     if(t.getType().equals(data[i][j])){
                         tetPart.add(t);
+                        System.out.print(t.getType());
+                        break;
                     }
                 }
             }
+            System.out.println();
             terrains.add(tetPart.toArray(new Terrain[tetPart.size()]));
         }
         return terrains.toArray(new Terrain[terrains.size()][]);

@@ -1,7 +1,6 @@
 package com.tracv.util;
 
 import java.awt.*;
-import java.io.File;
 
 /**
  * In future can make this read from a settings.ini
@@ -61,4 +60,5 @@ public class Constants {
     public static final int REFRESH_RATE = 60; //FPS
     public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
 
+    public static final Double DEFAULT_BLOCK_SIZE = 50.0;
 }

@@ -34,7 +34,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         gold = 500; // temp value, 500 cuz league
         score = 0;
         */
-        newGame(); //Initialize new game.
+        //newGame(); //Initialize new game.
+        
     }
 
     /**
@@ -44,6 +45,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public void newGame() {
         System.out.println("Starting new game");
         map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
+        
         gold = 500; // temp value, 500 cuz league
         score = 0;
     }
@@ -55,6 +57,31 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         //insert pathfinding algorithm here
     }
 
+    public boolean isTowerBuildValid(Point p){
+        //Draw Terrain
+        Terrain[][] terrain = map.getTerrains();
+
+        int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrain[0].length);
+        int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrain.length);
+
+        Terrain ter = terrain[p.y/blockSizeY][p.x/blockSizeX];
+        if(ter != Terrain.BUILDABLE){
+            return false;
+        }
+
+        for(GameComponent gc : map.getGameComponents()){
+            if(gc instanceof Tower){
+                Tower t = (Tower) gc;
+                if((p.getX()-t.getX()) <= t.getSize()){
+                    return false;
+                }else if((p.getY() - t.getY()) <= t.getSize()){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Attempt to build tower at selected point and tower.
@@ -62,18 +89,21 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * @param selectedTower - The type of tower to build
      */
     public boolean attemptToBuildTower(Point point, TowerType selectedTower) {
-        int COST = 0; //temp, later will take from TowerType
-        if (false) {
+        int cost = 0; //temp, later will take from TowerType //TODO FIX.
+
+
+        double x = point.getX();
+        double y = point.getY();
+
+        if (!isTowerBuildValid(point) || gold < cost) {
+            return false;
             //checks for whether the terrain is buildable
             //checks for whether theres already a terrain there
             //checks for whether theres enough gold
-            //return false;
         }
-        double x = point.getX();
-        double y = point.getY();
         GameComponent construct = construction.buildTower(x, y, selectedTower);
         if (map.addComponent(construct)) {
-            gold = gold - COST;
+            gold = gold - cost;
             return true;
         }
         return false;
@@ -126,5 +156,17 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     public void resetScore() {
         score = 0;
+    }
+
+    public Terrain[][] getTerrain() {
+        return map.getTerrains();
+    }
+
+    public GameMap getMap(){
+        return map;
+    }
+    //Load Map with name
+    public void loadMap(String map) {
+
     }
 }
