@@ -11,9 +11,7 @@ import com.tracv.util.Constants;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
 /**
  * The 'game' portion of the interface (not including hud).
@@ -22,7 +20,7 @@ import java.awt.event.MouseMotionListener;
  *      a. Not interfere
  *      b. Redraw faster?
  */
-public class GamePane extends JPanel implements Observer{
+public class GamePane extends JPanel implements Observer, KeyListener{
 
     private Point mouse;
 
@@ -41,6 +39,7 @@ public class GamePane extends JPanel implements Observer{
         this.addMouseListener(new MyMouseListener());
         this.addMouseMotionListener(new MyMouseMotionListener());
 
+        setupKeyListeners(this);
 
 
     }
@@ -158,6 +157,42 @@ public class GamePane extends JPanel implements Observer{
 
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
+    }
+
+
+    //HACKS
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println("Key typed " + e.getKeyChar());
+        if(Constants.DEBUGGING_MODE){
+            if(e.getKeyChar() == 'e'){
+                //Spawn enemy.
+                gs.spawnEnemy(new Point(0, 0));
+            }
+        }
+    }
+    @Override
+    public void keyPressed(KeyEvent e) {
+        System.out.println("Key Pressed " + e.getKeyChar());
+        if(Constants.DEBUGGING_MODE){
+            if(e.getKeyChar() == 'e'){
+                //Spawn enemy.
+                gs.spawnEnemy(new Point(0, 0));
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    private void setupKeyListeners(Component c) {
+        if(c instanceof Container){
+            Component[] comps = ((Container) c).getComponents();
+            for(Component cc : comps){
+                setupKeyListeners(cc);
+            }
+        }
+        c.addKeyListener(this);
     }
 
 

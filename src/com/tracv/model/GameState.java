@@ -18,18 +18,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private TowerFactory construction;
 
 
-    private ProjectileMotion pMotion;
-    private EnemyMotion eMotion;
-
     private int gold;
     private int score;
 
 
     public GameState() {
         //map = new GameMap(); <- please make this work
-
-        pMotion = new ProjectileMotion();
-        eMotion = new EnemyMotion();
 
 
         mobs = new EnemyFactory();
@@ -62,14 +56,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      */
     public void update() {
         //insert pathfinding algorithm here
-        System.out.println("Updating");
+        //System.out.println("Updating");
         for(GameComponent gc : this){
             if(gc instanceof Enemy){
                 Enemy e = (Enemy) gc;
                 boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
-
-
-
 
             }else if(gc instanceof Projectile){
                 Projectile p = (Projectile) gc;
@@ -105,10 +96,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                     }
                 }
                 t.setFired();
-
             }
         }
-
     }
 
     public boolean isTowerBuildValid(Point p, TowerType selectedTower){
@@ -120,9 +109,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
         Terrain ter = terrain[(p.y-selectedTower.getHeight()/2)/blockSizeY]
-                [(p.x-selectedTower.getWidth()/2)/blockSizeX]; //Block it belongs in.
+                [(p.x-selectedTower.getWidth()/2)/blockSizeX]; //Block the top left corner belongs in.
 
-        if(ter != Terrain.BUILDABLE){
+
+        Terrain ter2 = terrain[(p.y+selectedTower.getHeight())/blockSizeY]
+                [(p.x+selectedTower.getWidth()/2)/blockSizeX]; //Block the bottom right corner belongs in.
+
+
+        if((ter != Terrain.BUILDABLE) || (ter2 != Terrain.BUILDABLE)){
             return false;
         }
 
@@ -166,6 +160,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
     public void spawnEnemy(Point point) {
+        System.out.println("Spawning Enemy");
         GameComponent enemy = mobs.spawn();
         enemy.setX(point.getX());
         enemy.setY(point.getY());

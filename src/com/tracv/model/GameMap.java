@@ -17,13 +17,18 @@ public class GameMap {
     private Double blockSize;
     private Base base;
 
+    //sublists of gameComponents.
+    private List<GameComponent> towers;
+    private List<GameComponent> enemies;
+    private List<GameComponent> projectiles;
+
 
     /**
      * Constructor for GameMap, makes a new GameMap with the input terrains containing
      * no GameComponents
      * @param terrains the input model of the map
      */
-    public GameMap ( Terrain[][] terrains) {
+    public GameMap (Terrain[][] terrains) {
         this.gameComponents = new ArrayList<>();
         this.terrains = terrains;
         this.blockSize = Constants.DEFAULT_BLOCK_SIZE;

@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
 /**
  * The Game.
  */
-public class TDGame extends JLayeredPane implements ActionListener, Observer{
+public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     private TDFrame tdf;
 

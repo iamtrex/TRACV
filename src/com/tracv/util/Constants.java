@@ -61,4 +61,6 @@ public class Constants {
     public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
 
     public static final Double DEFAULT_BLOCK_SIZE = 50.0;
+
+    public static final boolean DEBUGGING_MODE = true;
 }
