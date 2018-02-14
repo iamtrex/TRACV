@@ -6,11 +6,10 @@ import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 import com.tracv.util.TerrainParser;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import java.awt.Point;
 
 
 public class GameState extends Observable implements Iterable<GameComponent>{
@@ -63,7 +62,55 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         //System.out.println("Updating");
         List<GameComponent> toAdd = new ArrayList<>();
         List<GameComponent> toDel = new ArrayList<>();
+        List<Enemy> needToRetarget = new ArrayList<>();
 
+        for(Enemy e : map.getEnemies()){
+            boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
+        }
+
+        for(Projectile p : map.getProjectiles()){
+            boolean crashed = ProjectileMotion.updateProjectile(p);
+            if(crashed){
+                Enemy e = p.getTarget();
+                boolean dead = e.takeDmg(p.getDmg());
+                toDel.add(p);
+                if(dead){
+                    toDel.add(e);
+                    needToRetarget.add(e);
+                }
+            }
+        }
+
+
+        for(Tower t : map.getTowers()){
+
+            t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
+
+            boolean fire = t.canFire();
+            if(fire){
+                //Search enemies in range.
+                int range = t.getRange();
+                Point towerPt = new Point((int)t.getX(), (int)t.getY());
+
+                for(Enemy e : map.getEnemies()){
+                    if(!toDel.contains(e)) {
+                        Point enemyPt = new Point((int) e.getX(), (int) e.getY());
+                        if (PointToPointDistance.getDistance(towerPt, enemyPt) < range) {
+                            //Create new projectile with this Enemy as targe
+                            // TODO FIX TEMP LINE
+                            Projectile proj = new Projectile(e, 10, 5, t.getX(), t.getY(), null);
+                            toAdd.add(proj);
+                            t.setFired();
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+
+
+        /*
         for(GameComponent gc : this){
             if(gc instanceof Enemy){
                 Enemy e = (Enemy) gc;
@@ -110,15 +157,23 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 }
             }
         }
+        */
 
         for(GameComponent gc : toAdd){
             map.addComponent(gc);
         }
 
-        //TODO currently if enemy dies, the projectiles aimed at it just miss!
         for(GameComponent gc : toDel){
             map.removeComponent(gc);
-            
+        }
+
+        for(Enemy e : needToRetarget){
+            for(Projectile p : map.getProjectiles()){
+                if(p.getTarget().equals(e)){
+                    System.out.println("Retargetting for dead enemy");
+                    p.setTarget(map.getEnemies().get(0)); //Retarget first enemy.
+                }
+            }
         }
     }
 
@@ -181,11 +236,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return false;
     }
 
-    public void spawnEnemy(Point point) {
+    public void spawnEnemy(int x, int y) {
         System.out.println("Spawning Enemy");
         GameComponent enemy = mobs.spawn();
-        enemy.setX(point.getX());
-        enemy.setY(point.getY());
+        enemy.setX(x);
+        enemy.setY(y);
         map.addComponent(enemy); // spawns at spawning point
     }
 

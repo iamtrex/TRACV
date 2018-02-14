@@ -15,12 +15,13 @@ public class GameMap {
     private List<GameComponent> gameComponents;
     private Terrain[][] terrains;
     private Double blockSize;
-    private Base base;
+    //private Base base;
 
     //sublists of gameComponents.
-    private List<GameComponent> towers;
-    private List<GameComponent> enemies;
-    private List<GameComponent> projectiles;
+    private List<Tower> towers;
+    private List<Enemy> enemies;
+    private List<Projectile> projectiles;
+    private List<Base> bases;
 
 
     /**
@@ -32,8 +33,17 @@ public class GameMap {
         this.gameComponents = new ArrayList<>();
         this.terrains = terrains;
         this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
-        base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
 
+        towers = new ArrayList<>();
+        enemies = new ArrayList<>();
+        projectiles = new ArrayList<>();
+        bases = new ArrayList<>();
+
+
+
+        //TODO do not use default base...
+        Base base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
+        bases.add(base);
     }
 
     /**
@@ -46,20 +56,42 @@ public class GameMap {
 
     /**
      * Adds the specific component to the GameMap
-     * @param component the component to add
+     * @param gc the component to add
      * @return true if the add operation was successful
      */
-    public boolean addComponent(GameComponent component) {
-        return gameComponents.add(component);
+    public boolean addComponent(GameComponent gc) {
+        if(gc instanceof Projectile){
+            projectiles.add((Projectile)gc);
+        }else if(gc instanceof Enemy){
+            enemies.add((Enemy)gc);
+        }else if(gc instanceof Tower){
+            towers.add((Tower)gc);
+        }else if(gc instanceof Base){
+            bases.add((Base)gc);
+        }else{
+            System.out.println("Wrong component type");
+        }
+        return gameComponents.add(gc);
     }
 
     /**
      * Removes teh specific component from the GameMap
-     * @param component the component to remove
+     * @param gc the component to remove
      * @return true if the remove operation was successful
      */
-    public boolean removeComponent(GameComponent component) {
-        return gameComponents.remove(component);
+    public boolean removeComponent(GameComponent gc) {
+        if(gc instanceof Projectile){
+            projectiles.remove(gc);
+        }else if(gc instanceof Enemy){
+            enemies.remove(gc);
+        }else if(gc instanceof Tower){
+            towers.remove(gc);
+        }else if(gc instanceof Base){
+            bases.remove(gc);
+        }else{
+            System.out.println("Wrong component type");
+        }
+        return gameComponents.remove(gc);
     }
 
     /**
@@ -80,7 +112,21 @@ public class GameMap {
 
     }
 
+
+    //TODO Fix this implementation
     public Base getBase() {
-        return base;
+        return bases.get(0);
+    }
+
+    public List<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public List<Projectile> getProjectiles() {
+        return projectiles;
+    }
+
+    public List<Tower> getTowers() {
+        return towers;
     }
 }

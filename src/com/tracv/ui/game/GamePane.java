@@ -186,7 +186,7 @@ public class GamePane extends JPanel implements Observer{
             if(Constants.DEBUGGING_MODE){
                 if(e.getKeyChar() == 'e'){
                     //Spawn enemy.
-                    gs.spawnEnemy(new Point(0, 0));
+                    SwingUtilities.invokeLater(()-> gs.spawnEnemy(0, 0));
                 }
             }
         }

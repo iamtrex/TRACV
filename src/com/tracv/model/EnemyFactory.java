@@ -1,7 +1,5 @@
 package com.tracv.model;
 
-import com.tracv.model.Enemy;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -13,10 +11,10 @@ public class EnemyFactory {
 
     public EnemyFactory() {
         toSpawn = new LinkedList<Enemy>();
-        for (int i = 0; i < 10; i++) {
-            toSpawn.add(new Enemy(0, 5, 1, 5, 1920, 540, null));
+        for (int i = 0; i < 100; i++) {
+            toSpawn.add(new Enemy(0, 15, 1, 5, 1920, 540, null));
         }                                   //^change this
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             toSpawn.add(new Enemy(0, 5, 1, 5, 1920, 540, null));
         }                                   //^change this distance
     }
