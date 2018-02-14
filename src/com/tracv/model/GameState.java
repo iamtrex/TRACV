@@ -6,8 +6,12 @@ import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 import com.tracv.util.TerrainParser;
 
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import java.awt.Point;
+
 
 public class GameState extends Observable implements Iterable<GameComponent>{
 
@@ -54,9 +58,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     /**
      * Updates the position of everything
      */
-    public void update() {
+    public synchronized void update() {
         //insert pathfinding algorithm here
         //System.out.println("Updating");
+        List<GameComponent> toAdd = new ArrayList<>();
+        List<GameComponent> toDel = new ArrayList<>();
+
         for(GameComponent gc : this){
             if(gc instanceof Enemy){
                 Enemy e = (Enemy) gc;
@@ -69,34 +76,49 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                     Enemy e = p.getTarget();
                     boolean dead = e.takeDmg(p.getDmg());
                     if(dead){
-                        map.removeComponent(e);
+                        //map.removeComponent(e);
+                        toDel.add(e);
                     }
-                    map.removeComponent(p);
+                    //map.removeComponent(p);
+                    toDel.add(p);
                 }
             }else if(gc instanceof Tower){
                 Tower t = (Tower) gc;
+
                 t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
+
                 boolean fire = t.canFire();
                 if(fire){
                     //Search enemies in range.
                     int range = t.getRange();
-                    Point p2 = new Point((int)t.getX(), (int)t.getY());
+                    Point towerPt = new Point((int)t.getX(), (int)t.getY());
 
                     for(GameComponent gc2 : this){
-                        if(gc instanceof Enemy ){
-                            Point p = new Point((int)gc2.getX(), (int)gc2.getY());
-
-                            if(PointToPointDistance.getDistance(p, p2) < range){
+                        if(gc2 instanceof Enemy){
+                            System.out.println("Checking Enemy");
+                            Point enemyPt = new Point((int)gc2.getX(), (int)gc2.getY());
+                            if(PointToPointDistance.getDistance(towerPt, enemyPt) < range){
                                 //Create new projectile with this Enemy as targe
                                 // TODO FIX TEMP LINE
-                                Projectile proj = new Projectile((Enemy) gc2, 10, 100, t.getX(), t.getY(), null);
-                                map.addComponent(proj);
+                                Projectile proj = new Projectile((Enemy) gc2, 10, 5, t.getX(), t.getY(), null);
+                                toAdd.add(proj);
+                                t.setFired();
+                                break;
                             }
                         }
                     }
                 }
-                t.setFired();
             }
+        }
+
+        for(GameComponent gc : toAdd){
+            map.addComponent(gc);
+        }
+
+        //TODO currently if enemy dies, the projectiles aimed at it just miss!
+        for(GameComponent gc : toDel){
+            map.removeComponent(gc);
+            
         }
     }
 
@@ -166,6 +188,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         enemy.setY(point.getY());
         map.addComponent(enemy); // spawns at spawning point
     }
+
+
     //TODO Implement
     public boolean isGameOver() {
         return false;

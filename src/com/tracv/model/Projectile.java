@@ -1,7 +1,6 @@
 package com.tracv.model;
 
 import java.awt.*;
-import java.lang.annotation.Target;
 
 public class Projectile extends MoveableComponent {
     private Enemy target;
@@ -16,7 +15,8 @@ public class Projectile extends MoveableComponent {
     }
 
     public void draw(Graphics g) {
-
+        g.setColor(Color.ORANGE);
+        g.fillOval((int) x, (int) y, 10, 10);
     }
 
     public Enemy getTarget() {return target;}

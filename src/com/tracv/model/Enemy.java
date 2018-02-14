@@ -15,7 +15,8 @@ public class Enemy extends MoveableComponent {
     }
 
     public void draw(Graphics g) {
-
+        g.setColor(Color.WHITE);
+        g.fillOval((int)x, (int)y, 25, 25);
     }
 
     public int getDistanceToEnd() {

@@ -77,7 +77,9 @@ public class Tower extends GameComponent {
 
     }
     public void decrementCooldown(double v) {
-        this.timeTilNextFire -= v;
+        if(timeTilNextFire > 0) {
+            this.timeTilNextFire -= v;
+        }
     }
 
     public void setFired() {
