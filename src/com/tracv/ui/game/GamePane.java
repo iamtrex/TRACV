@@ -72,7 +72,9 @@ public class GamePane extends JPanel implements Observer{
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
-        //TODO -- Awaiting Draw implementation of GameComponents();
+        //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
+        //TODO -- Switch to multilayered pane so that we don't have to redraw the terrain each iteration
+
 
         //Draw Terrain
 
@@ -109,7 +111,7 @@ public class GamePane extends JPanel implements Observer{
             }
         }
 
-        //TODO OPTIMIZE?
+
         for(GameComponent gc : gs){
             gc.draw(g);
         }

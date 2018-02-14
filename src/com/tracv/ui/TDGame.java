@@ -125,7 +125,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == pause){
-            gamePane.getGameState().pause();
+            //gamePane.getGameState().pause(); //TODO no need to pause right? since gamepane controls flow of game
+
             setGameRunning(false);
             tdf.toggleMenu(true);
         }

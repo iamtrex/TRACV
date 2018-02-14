@@ -57,7 +57,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     /**
      * Updates the position of everything
      */
-    public synchronized void update() {
+    public void update() {
         //insert pathfinding algorithm here
         //System.out.println("Updating");
         List<GameComponent> toAdd = new ArrayList<>();
@@ -109,56 +109,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             }
         }
 
-
-        /*
-        for(GameComponent gc : this){
-            if(gc instanceof Enemy){
-                Enemy e = (Enemy) gc;
-                boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
-
-            }else if(gc instanceof Projectile){
-                Projectile p = (Projectile) gc;
-                boolean crashed = ProjectileMotion.updateProjectile(p);
-                if(crashed){
-                    Enemy e = p.getTarget();
-                    boolean dead = e.takeDmg(p.getDmg());
-                    if(dead){
-                        //map.removeComponent(e);
-                        toDel.add(e);
-                    }
-                    //map.removeComponent(p);
-                    toDel.add(p);
-                }
-            }else if(gc instanceof Tower){
-                Tower t = (Tower) gc;
-
-                t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
-
-                boolean fire = t.canFire();
-                if(fire){
-                    //Search enemies in range.
-                    int range = t.getRange();
-                    Point towerPt = new Point((int)t.getX(), (int)t.getY());
-
-                    for(GameComponent gc2 : this){
-                        if(gc2 instanceof Enemy){
-                            System.out.println("Checking Enemy");
-                            Point enemyPt = new Point((int)gc2.getX(), (int)gc2.getY());
-                            if(PointToPointDistance.getDistance(towerPt, enemyPt) < range){
-                                //Create new projectile with this Enemy as targe
-                                // TODO FIX TEMP LINE
-                                Projectile proj = new Projectile((Enemy) gc2, 10, 5, t.getX(), t.getY(), null);
-                                toAdd.add(proj);
-                                t.setFired();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
-
         for(GameComponent gc : toAdd){
             map.addComponent(gc);
         }
@@ -166,15 +116,26 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         for(GameComponent gc : toDel){
             map.removeComponent(gc);
         }
+        toDel.clear();
 
         for(Enemy e : needToRetarget){
             for(Projectile p : map.getProjectiles()){
                 if(p.getTarget().equals(e)){
                     System.out.println("Retargetting for dead enemy");
-                    p.setTarget(map.getEnemies().get(0)); //Retarget first enemy.
+                    if(map.getEnemies().size() > 0) {
+                        p.setTarget(map.getEnemies().get(0)); //Retarget first enemy.
+                    }else{
+                        toDel.add(p);
+                    }
                 }
             }
         }
+
+        //Delete the projectiles since they no longer have targets.
+        for(GameComponent gc : toDel){
+            map.removeComponent(gc);
+        }
+
     }
 
     public boolean isTowerBuildValid(Point p, TowerType selectedTower){
@@ -189,7 +150,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 [(p.x-selectedTower.getWidth()/2)/blockSizeX]; //Block the top left corner belongs in.
 
 
-        Terrain ter2 = terrain[(p.y+selectedTower.getHeight())/blockSizeY]
+        Terrain ter2 = terrain[(p.y+selectedTower.getHeight()/2)/blockSizeY]
                 [(p.x+selectedTower.getWidth()/2)/blockSizeX]; //Block the bottom right corner belongs in.
 
 
@@ -197,13 +158,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             return false;
         }
 
-        for(GameComponent gc : this){
-            if(gc instanceof Tower){
-                Tower t = (Tower) gc;
-                if(Math.abs(p.getX()-t.getX()) <= t.getSize() &&
-                        Math.abs((p.getY() - t.getY())) <= t.getSize()){
-                    return false;
-                }
+        for(Tower t : map.getTowers()){
+            if(Math.abs(p.getX()-t.getX()) <= t.getSize() &&
+                    Math.abs((p.getY() - t.getY())) <= t.getSize()){
+                return false;
             }
         }
 
@@ -251,11 +209,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
 
-    // maybe pause shouldnt be here? -victor
-    public void pause() {
-    }
-
-
     @Override
     public Iterator<GameComponent> iterator() {
         return map.getGameComponents().iterator();
@@ -295,6 +248,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public GameMap getMap(){
         return map;
     }
+
     //Load Map with name
     public void loadMap(String map) {
 
