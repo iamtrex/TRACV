@@ -20,7 +20,8 @@ import java.awt.event.*;
  *      a. Not interfere
  *      b. Redraw faster?
  */
-public class GamePane extends JPanel implements Observer, KeyListener{
+public class GamePane extends JPanel implements Observer{
+
 
     private Point mouse;
 
@@ -39,7 +40,10 @@ public class GamePane extends JPanel implements Observer, KeyListener{
         this.addMouseListener(new MyMouseListener());
         this.addMouseMotionListener(new MyMouseMotionListener());
 
-        setupKeyListeners(this);
+        this.setFocusable(true);
+        this.addKeyListener(new MyKeyListener());
+        //this.add(new JTextField("Hello World"));
+        //setupKeyListeners(this);
 
 
     }
@@ -160,30 +164,7 @@ public class GamePane extends JPanel implements Observer, KeyListener{
     }
 
 
-    //HACKS
-    @Override
-    public void keyTyped(KeyEvent e) {
-        System.out.println("Key typed " + e.getKeyChar());
-        if(Constants.DEBUGGING_MODE){
-            if(e.getKeyChar() == 'e'){
-                //Spawn enemy.
-                gs.spawnEnemy(new Point(0, 0));
-            }
-        }
-    }
-    @Override
-    public void keyPressed(KeyEvent e) {
-        System.out.println("Key Pressed " + e.getKeyChar());
-        if(Constants.DEBUGGING_MODE){
-            if(e.getKeyChar() == 'e'){
-                //Spawn enemy.
-                gs.spawnEnemy(new Point(0, 0));
-            }
-        }
-    }
 
-    @Override
-    public void keyReleased(KeyEvent e) {}
 
     private void setupKeyListeners(Component c) {
         if(c instanceof Container){
@@ -192,14 +173,35 @@ public class GamePane extends JPanel implements Observer, KeyListener{
                 setupKeyListeners(cc);
             }
         }
-        c.addKeyListener(this);
+        c.addKeyListener(new MyKeyListener());
     }
 
 
+    private class MyKeyListener implements KeyListener{
+
+        //HACKS
+        @Override
+        public void keyTyped(KeyEvent e) {
+            //System.out.println("Key typed " + e.getKeyChar());
+            if(Constants.DEBUGGING_MODE){
+                if(e.getKeyChar() == 'e'){
+                    //Spawn enemy.
+                    gs.spawnEnemy(new Point(0, 0));
+                }
+            }
+        }
+        @Override
+        public void keyPressed(KeyEvent e) {}
+
+        @Override
+        public void keyReleased(KeyEvent e) {}
+    }
     private class MyMouseListener implements MouseListener {
         private Point click;
         @Override
-        public void mouseClicked(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {
+            GamePane.this.grabFocus();
+        }
 
         //Registers point of first click, then builds tower on mouse release.
         @Override
