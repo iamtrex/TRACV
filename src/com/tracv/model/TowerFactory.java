@@ -14,17 +14,9 @@ public class TowerFactory {
         return t;
     }
     */
-    public Tower buildTower(double xPos, double yPos, TowerType tower) {
-        String name = tower.getName();
-        if (name.equals(TowerType.BASE_TOWER.getName())) { // names are up for change, temp for now to see what its like
-            Tower t = new Tower(5, 1, 1, 30, 250, xPos, yPos, null); // default specs for a basic tower
-            return t;       //^atkDmg, fireRate, cost, size, range, x, y
-        } else if (name.equals("Laser Tower")) {
-            Tower t = new Tower(1, 10, 2, 3, 250, xPos, yPos, null); // Laser tower attacks faster, lower damage
-            return t;
-        }
 
-        System.out.println("Tower type not found " + name);
-        return null;
+    public Tower buildTower(double xPos, double yPos, TowerType tower) {
+        Tower t = new Tower(xPos, yPos, tower);
+        return t;
     }
 }
