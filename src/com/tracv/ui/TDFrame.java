@@ -59,6 +59,7 @@ public class TDFrame extends JFrame {
 
     public void switchToGamePanel() {
         switchPanel(tdGame);
+        tdGame.grabFocus(); // Give panel focus.
     }
 
     private void switchPanel(JComponent panel){

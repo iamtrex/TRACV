@@ -29,6 +29,8 @@ public class GameMap {
     private List<Base> bases;
 
 
+    private PathBuilder pathBuilder;
+
     /**
      * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
      * no GameComponents
@@ -38,6 +40,9 @@ public class GameMap {
         long startT = System.nanoTime();
         this.gameComponents = new ArrayList<>();
         buildTerrain(terrainTypes);
+
+        pathBuilder = new PathBuilder(terrains);
+
         start = terrains[0][0];
         destination = terrains[terrains.length-1][0];
 
@@ -91,7 +96,7 @@ public class GameMap {
             projectiles.add((Projectile)gc);
         }else if(gc instanceof Enemy){
             Enemy e = (Enemy) gc;
-            e.setPath(EnemyMotion.generatePath(terrains, start, destination));
+            e.setPath(pathBuilder.generatePath(start, destination));
             enemies.add(e);
         }else if(gc instanceof Tower){
             towers.add((Tower)gc);

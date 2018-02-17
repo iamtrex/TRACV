@@ -27,28 +27,27 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
     public GameState() {
-        //map = new GameMap(); <- please make this work
 
 
         mobs = new EnemyFactory();
         construction = new TowerFactory();
-        //TODO FIX TESTING PURPOSES.
 
+        //TODO FIX TESTING PURPOSES.
         /*
         map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
         gold = 500; // temp value, 500 cuz league
         score = 0;
         */
-        //newGame(); //Initialize new game.
         
     }
 
     /**
      * Initiates a new game.
-     * (victor) restores all the field back to basic values, basically copied the default ctor
+     * (victor) restores all the field back to basic values
      */
     public void newGame() {
         System.out.println("Starting new game");
+        //TODO temporarily loads a default map.. In future, can load different types of maps
         map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
         
         gold = 500; // temp value, 500 cuz league
@@ -59,17 +58,16 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * Updates the position of everything
      */
     public void update() {
-        //insert pathfinding algorithm here
-        //System.out.println("Updating");
         List<GameComponent> toAdd = new ArrayList<>();
         List<GameComponent> toDel = new ArrayList<>();
         List<Enemy> needToRetarget = new ArrayList<>();
 
         for(Enemy e : map.getEnemies()){
-            boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
+            boolean reachedBase = EnemyMotion.updateEnemy(e);
 
-            //Delete e;
+            //Delete e if it reaches base
             if(reachedBase){
+                //TODO update Health of base since it crashed.
                 System.out.println("CRASHED!");
                 toDel.add(e);
             }
@@ -90,13 +88,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
         for(Tower t : map.getTowers()){
-
             t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
-
             boolean fire = t.canFire();
             if(fire){
                 //Search enemies in range.
-                int range = t.getRange();
+                double range = t.getRange();
                 Point towerPt = new Point((int)t.getX(), (int)t.getY());
 
                 for(Enemy e : map.getEnemies()){
@@ -169,8 +165,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
 
         for(Tower t : map.getTowers()){
-            if(Math.abs(p.getX()-t.getX()) <= t.getSize() &&
-                    Math.abs((p.getY() - t.getY())) <= t.getSize()){
+            if(Math.abs(p.getX()-t.getX()) <= t.getWidth() &&
+                    Math.abs((p.getY() - t.getY())) <= t.getHeight()){
                 return false;
             }
         }

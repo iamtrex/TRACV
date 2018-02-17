@@ -12,7 +12,7 @@ public class EnemyFactory {
     public EnemyFactory() {
         toSpawn = new LinkedList<Enemy>();
         for (int i = 0; i < 100; i++) {
-            toSpawn.add(new Enemy(0, 15, 1, 3, 1920, 540, null));
+            toSpawn.add(new Enemy(0, 30, 1, 3, 1920, 540, null));
         }                                   //^change this
         for (int i = 0; i < 100; i++) {
             toSpawn.add(new Enemy(0, 5, 1, 3, 1920, 540, null));

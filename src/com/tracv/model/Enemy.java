@@ -7,6 +7,8 @@ import java.awt.*;
 public class Enemy extends MoveableComponent {
     private int distanceToEnd;
     private int health;
+    private int totalHealth;
+
     private int dmg;
 
     private List<Terrain> path;
@@ -16,12 +18,23 @@ public class Enemy extends MoveableComponent {
             super(speed, x, y, iconPath);
             this.distanceToEnd = distanceToEnd;
             this.health = health;
+            this.totalHealth = health;
             this.dmg = dmg;
     }
 
     public void draw(Graphics g) {
         g.setColor(Color.WHITE);
         g.fillOval((int)x, (int)y, 25, 25);
+
+        int healthX = (int) x;
+        int healthY = (int) y - 15;
+        int width = (int)((double)health/(double)totalHealth * 25);
+
+        // Draw Health bar
+        g.setColor(Color.GREEN);
+        g.fillRect(healthX, healthY, width, 5);
+        g.setColor(Color.BLACK);
+        g.drawRect(healthX, healthY, 25, 5);
     }
 
     public int getDistanceToEnd() {
