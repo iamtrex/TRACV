@@ -31,6 +31,10 @@ public class Constants {
 
 
     //Directory Locations
+
+        public static final String ICON_DIR = "/Icons/";
+        public static final String ICON_FILE_TYPE = ".png";
+
         public static final String TOWER_ICON_DIR = "/TowerIcons/";
         public static final String TOWER_SPRITE_DIR = "/TowerSprites/";
         public static final String TOWER_ICON_FILETYPE = ".png";
@@ -63,4 +67,5 @@ public class Constants {
     public static final Double DEFAULT_BLOCK_SIZE = 50.0;
 
     public static final boolean DEBUGGING_MODE = true;
+
 }

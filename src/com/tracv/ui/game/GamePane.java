@@ -57,13 +57,11 @@ public class GamePane extends JPanel implements Observer{
         if(selectedTower != null) {
             System.out.println("Attempting to build tower of type " + selectedTower.getName() +
                     " on point " + point.getX() + "," + point.getY());
+
+            gs.attemptToBuildTower(point, selectedTower);
         } else{
             System.out.println("No Tower selected, no build.");
-        }//GS will handle null cases, currently here for tests.
-
-
-        gs.attemptToBuildTower(point, selectedTower);
-
+        }
     }
 
     @Override

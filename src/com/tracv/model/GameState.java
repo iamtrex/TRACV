@@ -144,34 +144,40 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public boolean isTowerBuildValid(Point p, TowerType selectedTower){
         //Draw TerrainType
         //TerrainType[][] terrainType = map.getTerrainTypes();
-        Terrain[][] terrains = map.getTerrains();
+        try {
+            Terrain[][] terrains = map.getTerrains();
 
-        int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrains[0].length);
-        int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrains.length);
-
-
-        TerrainType ter = terrains[(p.y-selectedTower.getHeight()/2)/blockSizeY]
-                [(p.x-selectedTower.getWidth()/2)/blockSizeX]
-                .getType(); //Block the top left corner belongs in.
+            int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrains[0].length);
+            int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrains.length);
 
 
-        TerrainType ter2 = terrains[(p.y+selectedTower.getHeight()/2)/blockSizeY]
-                [(p.x+selectedTower.getWidth()/2)/blockSizeX]
-                .getType(); //Block the bottom right corner belongs in.
+            TerrainType ter = terrains[(p.y - selectedTower.getHeight() / 2) / blockSizeY]
+                    [(p.x - selectedTower.getWidth() / 2) / blockSizeX]
+                    .getType(); //Block the top left corner belongs in.
 
 
-        if((ter != TerrainType.BUILDABLE) || (ter2 != TerrainType.BUILDABLE)){
-            return false;
-        }
+            TerrainType ter2 = terrains[(p.y + selectedTower.getHeight() / 2) / blockSizeY]
+                    [(p.x + selectedTower.getWidth() / 2) / blockSizeX]
+                    .getType(); //Block the bottom right corner belongs in.
 
-        for(Tower t : map.getTowers()){
-            if(Math.abs(p.getX()-t.getX()) <= t.getWidth() &&
-                    Math.abs((p.getY() - t.getY())) <= t.getHeight()){
+
+            if ((ter != TerrainType.BUILDABLE) || (ter2 != TerrainType.BUILDABLE)) {
                 return false;
             }
-        }
 
-        return true;
+            for (Tower t : map.getTowers()) {
+                if (Math.abs(p.getX() - t.getX()) <= t.getWidth() &&
+                        Math.abs((p.getY() - t.getY())) <= t.getHeight()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }catch(ArrayIndexOutOfBoundsException e){
+            //TODO decide if it's worth fixing this...
+            //Silently ignore this bug... for now
+            return false;
+        }
     }
 
     /**

@@ -40,6 +40,10 @@ public class Tower extends GameComponent {
         int yPos = (int) (y - getHeight()/2);
         g.drawImage(type.getSprite(), xPos, yPos, null);
 
+        int range = (int) type.getRange();
+        g.setColor(Color.CYAN);
+        g.drawOval((int)x-range, (int)y-range, 2*range, 2*range);
+
 
     }
 

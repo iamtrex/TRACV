@@ -12,7 +12,6 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -112,12 +111,13 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
      */
     private class MenuPane extends JPanel{
         public MenuPane(){
-            this.setPreferredSize(Constants.ICON_SIZE); //TODO REMOVE TEMP.
-            this.setBorder(new LineBorder(Color.BLUE, 3));
+            this.setPreferredSize(Constants.ICON_SIZE);
+            //this.setBorder(new LineBorder(Color.BLUE, 3));
             pause = new IconButton("Pause"); //Show menu;
             pause.addActionListener(TDGame.this::actionPerformed);
             Comp.add(pause, this, 0, 0, 1, 1, 0, 0,
                     GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
+
         }
     }
 
