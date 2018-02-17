@@ -35,6 +35,7 @@ public class GameMap {
      * @param terrainTypes the input model of the map
      */
     public GameMap (TerrainType[][] terrainTypes) {
+        long startT = System.nanoTime();
         this.gameComponents = new ArrayList<>();
         buildTerrain(terrainTypes);
         start = terrains[0][0];
@@ -52,6 +53,9 @@ public class GameMap {
         //TODO do not use default base...
         Base base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
         bases.add(base);
+        long endT = System.nanoTime();
+
+        System.out.println("Time Taken to load map " + (endT-startT));
 
     }
 

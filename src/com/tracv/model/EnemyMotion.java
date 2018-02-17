@@ -14,7 +14,9 @@ public class EnemyMotion {
             List<Terrain> path = e.getPath();
 
             Terrain curr = path.get(0);
-            System.out.println("Next Loc " + curr.getX() + " " + curr.getY());
+            //TODO remove debugging
+            //System.out.println("Next Loc " + curr.getX() + " " + curr.getY());
+
 
             int curX = curr.getX();
             int curY = curr.getY();
@@ -30,7 +32,7 @@ public class EnemyMotion {
                     e.getX() <= (curX+1) * curr.getWidth() &&
                     e.getY() >= curY * curr.getHeight() &&
                     e.getY() <= (curY+1) * curr.getHeight()) {
-                System.out.println("Removing");
+                //System.out.println("Removing");
                 path.remove(curr);
             }
 
@@ -51,7 +53,8 @@ public class EnemyMotion {
     }
 
     public static List<Terrain> generatePath(Terrain[][] terrains, Terrain start, Terrain destination){
-        System.out.println("Destination " + destination.getX() + " " + destination.getY());
+    //    System.out.println("Destination " + destination.getX() + " " + destination.getY());
+        //TODO Remove debugging lines
 
         Set<Terrain> open = new HashSet<>();
         Set<Terrain> closed = new HashSet<>();
@@ -75,7 +78,9 @@ public class EnemyMotion {
 
         while(open.size() != 0){
             curr = getLowestInSet(gScore.get(curr), curr, open, destination);
-            System.out.println("testing curr " + curr.getX() + " " + curr.getY());
+
+            //TODO - Debugging line
+            //System.out.println("testing curr " + curr.getX() + " " + curr.getY());
             if(curr == destination){
                 System.out.println("Created Proper Path");
                 return generatePath(cameFrom, start, destination);
@@ -94,7 +99,6 @@ public class EnemyMotion {
                     }
 
                     int cost = (int)tmpG + estimateDistanceToEnd(tmp, destination);
-                    System.out.println("Cost to node " + cost);
                     cameFrom.put(tmp, curr);
                     gScore.put(tmp, new Integer((int) tmpG));
                     fScore.put(tmp, cost);

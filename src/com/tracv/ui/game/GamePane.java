@@ -226,7 +226,9 @@ public class GamePane extends JPanel implements Observer{
         }
 
         @Override
-        public void mouseEntered(MouseEvent e) {}
+        public void mouseEntered(MouseEvent e) {
+            GamePane.this.grabFocus();
+        }
 
         @Override
         public void mouseExited(MouseEvent e) {
