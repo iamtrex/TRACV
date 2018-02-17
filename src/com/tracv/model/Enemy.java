@@ -1,11 +1,16 @@
 package com.tracv.model;
 
+import java.util.List;
+
 import java.awt.*;
 
 public class Enemy extends MoveableComponent {
     private int distanceToEnd;
     private int health;
     private int dmg;
+
+    private List<Terrain> path;
+
 
     public Enemy(int distanceToEnd, int health, int dmg, double speed, double x, double y, String iconPath) {
             super(speed, x, y, iconPath);
@@ -51,5 +56,16 @@ public class Enemy extends MoveableComponent {
     public boolean takeDmg(int dmg) {
         this.health -= dmg;
         return health <= 0;
+    }
+
+    public void setPath(List<Terrain> path){
+        this.path = path;
+    }
+    public List<Terrain> getPath(){
+        return path;
+    }
+
+    public double getSize() {
+        return 25;
     }
 }

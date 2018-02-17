@@ -6,6 +6,7 @@ import com.tracv.model.GameState;
 import com.tracv.model.Terrain;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
+import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
@@ -16,7 +17,7 @@ import java.awt.event.*;
 /**
  * The 'game' portion of the interface (not including hud).
  *
- * TODO - May change implementation to have 3 layers: Background (Terrain), moveable sprites, and mouse... and only redraw as needed
+ * TODO - May change implementation to have 3 layers: Background (TerrainType), moveable sprites, and mouse... and only redraw as needed
  *      a. Not interfere
  *      b. Redraw faster?
  */
@@ -73,29 +74,29 @@ public class GamePane extends JPanel implements Observer{
         //DONE -- consider implementing iterator in gs.
 
         //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
-        //TODO -- Switch to multilayered pane so that we don't have to redraw the terrain each iteration
+        //TODO -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
 
 
-        //Draw Terrain
+        //Draw TerrainType
 
-        Terrain[][] terrain = getGameState().getTerrain();
+        Terrain[][] terrains = getGameState().getTerrain();
 
-        int blockSizeX = this.getWidth() / terrain[0].length;
-        int blockSizeY = this.getHeight() / terrain.length;
+        int blockSizeX = this.getWidth() / terrains[0].length;
+        int blockSizeY = this.getHeight() / terrains.length;
 
         //double blockSize;
 
-        //Draw Terrain
-        for(int y=0; y<terrain.length; y++){
-            for(int x=0; x<terrain[y].length; x++){
-                for(Terrain t : Terrain.getTerrains()){
-                    if(t.getType().equals(terrain[y][x].getType())){
+        //Draw TerrainType
+        for(int y = 0; y< terrains.length; y++){
+            for(int x = 0; x< terrains[y].length; x++){
+                for(TerrainType t : TerrainType.getTerrains()){
+                    if(t.equals(terrains[y][x].getType())){
                         g.setColor(t.getColor());
                         break;
                     }
                 }
 
-                //TODO perhaps change implementation of how we draw Terrain
+                //TODO perhaps change implementation of how we draw TerrainType
                 //  Either use preloaded image? or fix how the border looks
                 //  The +1 works because drawn from top left to bottom right, so the top and left borders
                 //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
@@ -103,7 +104,7 @@ public class GamePane extends JPanel implements Observer{
                 g.fillRect(x*blockSizeX+1, y*blockSizeY+1, blockSizeX, blockSizeY);
                 //Draw Border
 
-                if(terrain[y][x] == Terrain.BUILDABLE) {
+                if(terrains[y][x].getType() == TerrainType.BUILDABLE) {
                     g.setColor(Color.BLACK);
                     g.drawRect(x * blockSizeX, y * blockSizeY, blockSizeX, blockSizeY);
                 }

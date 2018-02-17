@@ -2,6 +2,7 @@ package com.tracv.model;
 
 import com.tracv.directional.PointToPointDistance;
 import com.tracv.observerpattern.Observable;
+import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 import com.tracv.util.TerrainParser;
@@ -66,6 +67,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
         for(Enemy e : map.getEnemies()){
             boolean reachedBase = EnemyMotion.updateEnemy(e, map.getBase());
+
+            //Delete e;
+            if(reachedBase){
+                System.out.println("CRASHED!");
+                toDel.add(e);
+            }
         }
 
         for(Projectile p : map.getProjectiles()){
@@ -139,22 +146,25 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
     public boolean isTowerBuildValid(Point p, TowerType selectedTower){
-        //Draw Terrain
-        Terrain[][] terrain = map.getTerrains();
+        //Draw TerrainType
+        //TerrainType[][] terrainType = map.getTerrainTypes();
+        Terrain[][] terrains = map.getTerrains();
 
-        int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrain[0].length);
-        int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrain.length);
-
-
-        Terrain ter = terrain[(p.y-selectedTower.getHeight()/2)/blockSizeY]
-                [(p.x-selectedTower.getWidth()/2)/blockSizeX]; //Block the top left corner belongs in.
+        int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrains[0].length);
+        int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrains.length);
 
 
-        Terrain ter2 = terrain[(p.y+selectedTower.getHeight()/2)/blockSizeY]
-                [(p.x+selectedTower.getWidth()/2)/blockSizeX]; //Block the bottom right corner belongs in.
+        TerrainType ter = terrains[(p.y-selectedTower.getHeight()/2)/blockSizeY]
+                [(p.x-selectedTower.getWidth()/2)/blockSizeX]
+                .getType(); //Block the top left corner belongs in.
 
 
-        if((ter != Terrain.BUILDABLE) || (ter2 != Terrain.BUILDABLE)){
+        TerrainType ter2 = terrains[(p.y+selectedTower.getHeight()/2)/blockSizeY]
+                [(p.x+selectedTower.getWidth()/2)/blockSizeX]
+                .getType(); //Block the bottom right corner belongs in.
+
+
+        if((ter != TerrainType.BUILDABLE) || (ter2 != TerrainType.BUILDABLE)){
             return false;
         }
 

@@ -1,6 +1,7 @@
 package com.tracv.model;
 
 
+import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
 
 import java.util.ArrayList;
@@ -13,7 +14,11 @@ import java.util.List;
  */
 public class GameMap {
     private List<GameComponent> gameComponents;
+
     private Terrain[][] terrains;
+    private Terrain start, destination;
+
+
     private Double blockSize;
     //private Base base;
 
@@ -25,13 +30,16 @@ public class GameMap {
 
 
     /**
-     * Constructor for GameMap, makes a new GameMap with the input terrains containing
+     * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
      * no GameComponents
-     * @param terrains the input model of the map
+     * @param terrainTypes the input model of the map
      */
-    public GameMap (Terrain[][] terrains) {
+    public GameMap (TerrainType[][] terrainTypes) {
         this.gameComponents = new ArrayList<>();
-        this.terrains = terrains;
+        buildTerrain(terrainTypes);
+        start = terrains[0][0];
+        destination = terrains[terrains.length-1][0];
+
         this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
 
         towers = new ArrayList<>();
@@ -44,6 +52,21 @@ public class GameMap {
         //TODO do not use default base...
         Base base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
         bases.add(base);
+
+    }
+
+    private void buildTerrain(TerrainType[][] terrainTypes) {
+
+        int width = Constants.GAME_DIMENSION.width / terrainTypes[0].length;
+        int height = Constants.GAME_DIMENSION.height / terrainTypes.length;
+        terrains = new Terrain[terrainTypes.length][terrainTypes[0].length];
+        for(int i=0; i<terrainTypes.length; i++){
+            for(int j=0; j<terrainTypes[i].length; j++){
+                //terrains.add(new Terrain(terrainTypes[i][j], j, i));
+                terrains[i][j] = new Terrain(terrainTypes[i][j], j, i, width, height);
+
+            }
+        }
     }
 
     /**
@@ -63,7 +86,9 @@ public class GameMap {
         if(gc instanceof Projectile){
             projectiles.add((Projectile)gc);
         }else if(gc instanceof Enemy){
-            enemies.add((Enemy)gc);
+            Enemy e = (Enemy) gc;
+            e.setPath(EnemyMotion.generatePath(terrains, start, destination));
+            enemies.add(e);
         }else if(gc instanceof Tower){
             towers.add((Tower)gc);
         }else if(gc instanceof Base){
@@ -95,8 +120,8 @@ public class GameMap {
     }
 
     /**
-     * Getter for the current terrains of the GameMap
-     * @return a 2D array representing the terrains
+     * Getter for the current terrainTypes of the GameMap
+     * @return a 2D array representing the terrainTypes
      */
     public Terrain[][] getTerrains() {
         return terrains;

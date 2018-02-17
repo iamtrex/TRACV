@@ -1,37 +1,47 @@
 package com.tracv.model;
 
-import java.awt.*;
 
-public enum Terrain {
-    MOVEABLE("M"),
-    BUILDABLE("B"),
-    VOID("V");
+import com.tracv.types.TerrainType;
 
-    private String type;
-    private Color color;
+public class Terrain {
 
-    public String getType(){
-        return this.type;
+    private int x, y, width, height;
+    private TerrainType type;
+
+    public Terrain(TerrainType type, int x, int y, int width, int height){
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+
     }
 
-    public Color getColor(){
-        return this.color;
+    public int getWidth(){
+        return width;
+    }
+    public int getHeight(){
+        return height;
+    }
+    public int getX(){
+        return x;
     }
 
-    Terrain(String s){
-        this.type = s;
-        if(s.equals("M")){
-            this.color = Color.GRAY;
-        }else if(s.equals("B")){
-            this.color = Color.GREEN;
-        }else if(s.equals("V")){
-            this.color = Color.WHITE;
-        }
+    public int getY(){
+        return y;
     }
 
-    public static Terrain[] getTerrains(){
-        Terrain[] terrains = {MOVEABLE, BUILDABLE, VOID};
-        return terrains;
+    public TerrainType getType(){
+        return type;
     }
 
+    public int getCenX() {
+        return (int)(x*width + 0.5*width);
+    }
+
+    public int getCenY() {
+        return (int) (y*height + 0.5*height);
+    }
 }
+
+
