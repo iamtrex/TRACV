@@ -68,4 +68,7 @@ public class Constants {
 
     public static final boolean DEBUGGING_MODE = true;
 
+    public static final int HEALTH_BAR_SPACING_BASE = 15;
+    public static final int HEALTH_BAR_HEIGHT_BASE = 5;
+    public static final double HEALTH_BAR_WIDTH_REDUCTION_FACTOR = 0.8;
 }

@@ -26,11 +26,16 @@ public class Terrain {
     public int getX(){
         return x;
     }
-
     public int getY(){
         return y;
     }
 
+    public int getPixelX(){
+        return x*width;
+    }
+    public int getPixelY(){
+        return y*height;
+    }
     public TerrainType getType(){
         return type;
     }

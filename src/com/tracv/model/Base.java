@@ -1,5 +1,8 @@
 package com.tracv.model;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import com.tracv.util.Constants;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
@@ -9,20 +12,25 @@ import java.awt.geom.Ellipse2D;
  */
 public class Base extends GameComponent{
     private int health;
-    private int size;
+    private int maxHealth;
+
+    private int width, height;
 
     /**
      * Constructor for the Base
      * @param health the health value of the base
-     * @param size the size of the base, width = height = size
-     * @param x the x coordinate of the base
-     * @param y the y coordinate of the base
+     *
      * @param iconPath the directory of the base's icon
      */
-    public Base(int health, int size, double x, double y, String iconPath) {
-        super(x, y, iconPath);
+    public Base(int health, Terrain t, String iconPath) {
+        super(t.getPixelX(), t.getPixelY(), iconPath);
+
         this.health = health;
-        this.size = size;
+        this.maxHealth = health;
+
+        this.width = t.getWidth();
+        this.height = t.getHeight();
+
     }
 
     /**
@@ -30,14 +38,44 @@ public class Base extends GameComponent{
      * @param g Swing Graphics
      */
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
+
+        /*
         Graphics2D g2d = (Graphics2D)g;
         double centerX = x - (size/2);
         double centerY = y - (size/2);
         Ellipse2D.Double circle = new Ellipse2D.Double(centerX, centerY, size, size);
         g2d.fill(circle);
+        */
+
+        g.setColor(Color.BLUE);
+        g.fillRect((int)x, (int)y, width, height);
+
+        g.setColor(Color.GREEN);
+
+        double maxWidth = (width * Constants.HEALTH_BAR_WIDTH_REDUCTION_FACTOR);
+
+        int healthX = (int)(x + 0.5*(width-maxWidth));
+        int healthY = (int) (y - Constants.HEALTH_BAR_SPACING_BASE);
+
+        int hWidth = (int)Math.round((maxWidth * ((double)health/(double)maxHealth)));
+
+
+        g.fillRect(healthX, healthY, hWidth, Constants.HEALTH_BAR_HEIGHT_BASE);
+
+        g.setColor(Color.BLACK);
+        g.drawRect(healthX, healthY, (int)maxWidth, Constants.HEALTH_BAR_HEIGHT_BASE);
+
     }
 
+    /**
+     * Returns true if nexus explodes (out of hp);
+     * @param dmg - dmg to take.
+     * @return
+     */
+    public boolean takeDmg(int dmg){
+        health -= dmg;
+        return health <= 0;
+    }
     public int getHealth() {
         return health;
     }

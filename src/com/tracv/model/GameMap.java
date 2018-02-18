@@ -56,11 +56,15 @@ public class GameMap {
 
 
         //TODO do not use default base...
-        Base base = new Base(1000, 50, 0, Constants.GAME_DIMENSION.getHeight(), null);
+        Base base = new Base(1000, terrains[terrains.length-1][0], null);
+
         bases.add(base);
+        gameComponents.add(base);
+
+
         long endT = System.nanoTime();
 
-        System.out.println("Time Taken to load map " + (endT-startT));
+        System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
 
     }
 
