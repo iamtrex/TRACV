@@ -156,25 +156,12 @@ public class GamePane extends JPanel implements Observer{
 
     @Override
     public void update(Observable o, String msg) {
-        System.out.println("GamePane was notified");
+        //System.out.println("GamePane was notified");
 
     }
 
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
-    }
-
-
-
-
-    private void setupKeyListeners(Component c) {
-        if(c instanceof Container){
-            Component[] comps = ((Container) c).getComponents();
-            for(Component cc : comps){
-                setupKeyListeners(cc);
-            }
-        }
-        c.addKeyListener(new MyKeyListener());
     }
 
 

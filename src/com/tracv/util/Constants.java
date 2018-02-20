@@ -12,7 +12,7 @@ public class Constants {
     public static final String VERSION_NUMBER = "ALPHA 0.1";
 
     //Scaling and Dimensions
-    public static final Double HUD_VERTICAL_SCALE = 0.125;
+    public static final Double HUD_VERTICAL_SCALE = 0.2;
     public static final Double GAME_VERTICAL_SCALE = 1-HUD_VERTICAL_SCALE;
 
 
@@ -71,4 +71,14 @@ public class Constants {
     public static final int HEALTH_BAR_SPACING_BASE = 15;
     public static final int HEALTH_BAR_HEIGHT_BASE = 5;
     public static final double HEALTH_BAR_WIDTH_REDUCTION_FACTOR = 0.8;
+
+
+    public static final String OBSERVER_GOLD_CHANGED = "Gold Changed";
+    public static final String OBSERVER_NEW_GAME = "New Game";
+    public static final String OBSERVER_TIME_MODIFIED = "Time Modified";
+
+    public static final int INSETS_OUTSIDE = 10;
+    public static final int INSETS_BETWEEN = 5;
+
+    public static final String OBSERVER_GAME_OVER = "GGWP";
 }

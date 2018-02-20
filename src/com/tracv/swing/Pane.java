@@ -7,6 +7,6 @@ import javax.swing.*;
  */
 public class Pane extends JPanel {
     public Pane(){
-        this.setOpaque(false);
+        //this.setOpaque(false);
     }
 }

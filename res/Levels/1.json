@@ -1,0 +1,18 @@
+{
+  "levels": {
+    "level1": {
+      "name": "Introduction to the Mansion",
+      "map": "TerrainMapTest1.csv",
+      "enemy-spawn": {
+        "Wave1": {
+          "Duration": "6",
+          "spawn": "B,B,B,B,B,B,B"
+        },
+        "Wave2":{
+          "Duration": "4",
+          "spawn": "F,F,F,F,F,F,F"
+        }
+      }
+    }
+  }
+}

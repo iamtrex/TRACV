@@ -21,6 +21,8 @@ public enum TowerType {
     private double fireRate;
     private double dmg;
     private double range;
+
+    private int cost;
     private ProjectileType projType;
 
 
@@ -34,6 +36,7 @@ public enum TowerType {
         this.dmg = dmg;
         this.range = range;
         this.projType = projType;
+        this.cost = cost;
 
         if(spritePath != null){
             try{
@@ -75,5 +78,9 @@ public enum TowerType {
 
     public double getRange(){
         return range;
+    }
+
+    public int getCost() {
+        return cost;
     }
 }

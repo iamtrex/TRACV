@@ -37,12 +37,13 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     public TDGame(TDFrame tdf){
         this.tdf = tdf;
 
-        hudPane = new HUDPane();
         gamePane = new GamePane();
         gs = gamePane.getGameState();
+        hudPane = new HUDPane(gs);
         gs.addObserver(this);
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
+        gs.addObserver(hudPane.getHUDStatePane());
 
         menuPane = new MenuPane();
 
@@ -65,9 +66,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     /*
     Map determines level to load.
      */
-    public void startNewGame(String map){
-        gs.loadMap(map);
-        gs.newGame();
+    public void startNewGame(int level){
+        gs.newGame(level);
         setGameRunning(true);
     }
 
@@ -97,10 +97,9 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     @Override
     public void update(Observable o, String msg) {
-        System.out.println("Notified!?");
-        GameState gs = gamePane.getGameState();
         if(o == gs){
-            if(gs.isGameOver()){
+            if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
+                setGameRunning(false); //TODO - bug, user can still resume game.
                 tdf.toggleMenu(true);
             }
         }

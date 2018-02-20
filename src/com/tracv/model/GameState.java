@@ -24,6 +24,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     private int gold;
     private int score;
+    private int timeElapsed;
+    private int wave;
+    private int level;
 
 
     public GameState() {
@@ -45,19 +48,27 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * Initiates a new game.
      * (victor) restores all the field back to basic values
      */
-    public void newGame() {
+    public void newGame(int level) {
         System.out.println("Starting new game");
         //TODO temporarily loads a default map.. In future, can load different types of maps
         map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
         
         gold = 500; // temp value, 500 cuz league
         score = 0;
+        timeElapsed = 0;
+        wave = 0;
+        this.level = level; //TODO FIX.
+        loadLevel(level);
+
+        notifyObservers(Constants.OBSERVER_NEW_GAME);
     }
 
     /**
      * Updates the position of everything
      */
     public void update() {
+        timeElapsed += Constants.REFRESH_DELAY;
+
         List<GameComponent> toAdd = new ArrayList<>();
         List<GameComponent> toDel = new ArrayList<>();
         List<Enemy> needToRetarget = new ArrayList<>();
@@ -69,6 +80,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             if(reachedBase){
                 //TODO update Health of base since it crashed.
                 System.out.println("CRASHED!");
+                if(map.getBase().takeDmg(e.getDmg())){
+                    //Base exploded.
+                    gameOver();
+                }
                 toDel.add(e);
             }
         }
@@ -82,6 +97,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 if(dead){
                     toDel.add(e);
                     needToRetarget.add(e);
+
+                    gainGold(e.getKillGold());
+
                 }
             }
         }
@@ -139,6 +157,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             map.removeComponent(gc);
         }
 
+        notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
+
+    }
+
+    private void gameOver() {
+
+        notifyObservers(Constants.OBSERVER_GAME_OVER);
+
     }
 
     public boolean isTowerBuildValid(Point p, TowerType selectedTower){
@@ -186,8 +212,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * @param selectedTower - The type of tower to build
      */
     public boolean attemptToBuildTower(Point point, TowerType selectedTower) {
-        int cost = 0; //temp, later will take from TowerType //TODO FIX.
-
+        int cost = selectedTower.getCost();
 
         double x = point.getX();
         double y = point.getY();
@@ -200,7 +225,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
         GameComponent construct = construction.buildTower(x, y, selectedTower);
         if (map.addComponent(construct)) {
-            gold = gold - cost;
+            useGold(cost);
             return true;
         }
         return false;
@@ -230,11 +255,13 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     //boring getters and setters
     public void gainGold(int i) {
         gold = gold + i;
+        notifyObservers(Constants.OBSERVER_GOLD_CHANGED);
     }
 
     public void useGold(int i) {
         gold = gold - i;
         if (gold < 0) gold = 0; //prevent negative gold, if for somereason it happens
+        notifyObservers(Constants.OBSERVER_GOLD_CHANGED);
     }
 
     public int getGold() {
@@ -261,8 +288,18 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return map;
     }
 
-    //Load Map with name
-    public void loadMap(String map) {
+    //Load Map and Enemy Spwaner with the proper level
+    public void loadLevel(int level){
 
+    }
+
+    public int getLevel() {
+        return level;
+    }
+    public int getWave(){
+        return wave;
+    }
+    public int getTime(){
+        return timeElapsed;
     }
 }

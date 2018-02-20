@@ -10,16 +10,20 @@ public class Enemy extends MoveableComponent {
     private int totalHealth;
 
     private int dmg;
+    private int gold;
+
 
     private List<Terrain> path;
 
 
-    public Enemy(int distanceToEnd, int health, int dmg, double speed, double x, double y, String iconPath) {
+    public Enemy(int distanceToEnd, int health, int dmg, double speed, double x, double y, String iconPath, int gold) {
             super(speed, x, y, iconPath);
             this.distanceToEnd = distanceToEnd;
             this.health = health;
             this.totalHealth = health;
             this.dmg = dmg;
+            this.gold = gold;
+
     }
 
     public void draw(Graphics g) {
@@ -80,5 +84,9 @@ public class Enemy extends MoveableComponent {
 
     public double getSize() {
         return 25;
+    }
+
+    public int getKillGold() {
+        return gold;
     }
 }

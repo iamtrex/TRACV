@@ -1,5 +1,6 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameState;
 import com.tracv.swing.HUDTowerButton;
 import com.tracv.swing.Pane;
 import com.tracv.types.TowerType;
@@ -20,12 +21,12 @@ import java.util.List;
 public class HUDButtonPane extends Pane
                                 implements ActionListener{
     private HUDPane hudPane;
-    public static final String TOWER_CHANGED = "Tower Changed";
+    public static final String TOWER_CHANGED = "Tower Changed"; //TODO move these to constants?
 
 
     private List<HUDTowerButton> buttons;
 
-    public HUDButtonPane(HUDPane hudPane) {
+    public HUDButtonPane(HUDPane hudPane, GameState gs) {
         this.hudPane = hudPane;
         buttons = new ArrayList<>();
         makeAndAddButtons();

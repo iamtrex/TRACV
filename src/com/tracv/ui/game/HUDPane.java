@@ -1,5 +1,6 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.types.TowerType;
@@ -18,24 +19,27 @@ public class HUDPane extends JPanel implements Observer{
 
     private TowerType selectedTowerType;
 
+    private GameState gs;
+    private com.tracv.ui.game.HUDStatePane HUDStatePane;
 
-    public HUDPane(){
+    public HUDPane(GameState gs){
         this.setPreferredSize(Constants.HUD_DIMENSION);
         this.setBackground(Color.BLACK);
         //this.setOpaque(true);
+        this.gs = gs;
 
-        hudButtonPane = new HUDButtonPane(this);
+        hudButtonPane = new HUDButtonPane(this, gs);
         hudButtonPane.addPropertyChangeListener(new TowerChangeListener());
 
-        hudStatsPane = new HUDStatsPane(this);
-        hudStatePane = new HUDStatePane(this);
+        hudStatsPane = new HUDStatsPane(this, gs);
+        hudStatePane = new HUDStatePane(this, gs);
 
         Comp.add(hudStatsPane, this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.WEST);
+                GridBagConstraints.NONE, GridBagConstraints.WEST, 0, 10, 0, 5);
         Comp.add(hudButtonPane, this, 1, 0, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.CENTER);
+                GridBagConstraints.NONE, GridBagConstraints.CENTER, 0, 5, 0, 5);
         Comp.add(hudStatePane, this, 2, 0, 1, 1, 1, 1,
-                      GridBagConstraints.NONE, GridBagConstraints.EAST);
+                      GridBagConstraints.NONE, GridBagConstraints.EAST, 0, 5, 0, 10);
 
     }
 
@@ -59,6 +63,10 @@ public class HUDPane extends JPanel implements Observer{
     @Override
     public void update(Observable o, String msg) {
 
+    }
+
+    public HUDStatePane getHUDStatePane() {
+        return hudStatePane;
     }
 
     private class TowerChangeListener implements PropertyChangeListener {
