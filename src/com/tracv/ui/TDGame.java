@@ -106,10 +106,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         if(o == gs){
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
                 setGameRunning(false); //TODO - bug, user can still resume game.
-                tdf.toggleMenu(true);
+                tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
             }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
                 setGameRunning(false);
-                tdf.toggleMenu(true); //TODO ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
+                tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //TODO ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
 
             }
         }

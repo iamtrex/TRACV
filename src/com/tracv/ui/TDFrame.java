@@ -72,10 +72,11 @@ public class TDFrame extends JFrame {
     /**
      * Bit hacky rn... Maybe do it a better way?
      * @param b - show menu if true, hide if false
+     * @param msg
      */
-    public void toggleMenu(boolean b) {
+    public void toggleMenu(boolean b, String msg) {
         if(b){
-            menuPane.showMenu((JComponent) this.getContentPane());
+            menuPane.showMenu((JComponent) this.getContentPane(), msg);
         }else {
             menuPane.setVisible(false);
         }
@@ -88,4 +89,7 @@ public class TDFrame extends JFrame {
         SwingUtilities.invokeLater(()-> this.validate());
     }
 
+    public void toggleMenu(boolean b) {
+        toggleMenu(b, null);
+    }
 }

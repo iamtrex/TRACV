@@ -74,11 +74,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     /**
      * Updates the position of everything
+     * //TODO make system update to actualTimeMS
      */
     public void update(int actualTimeMS) {
         //timeElapsed += Constants.REFRESH_DELAY;
         timeElapsed += actualTimeMS;
-        System.out.println(actualTimeMS);
+        //System.out.println(actualTimeMS);
 
         List<GameComponent> toAdd = new ArrayList<>();
         List<GameComponent> toDel = new ArrayList<>();

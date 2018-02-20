@@ -178,13 +178,14 @@ public class GameMap {
     public void addEnemies(List<Enemy> spawn) {
         //TODO FIX- TOO TIRED TO DO SO RN
         SpawnThread st = new SpawnThread(spawn);
-        st.run();
+        st.start();
 
     }
 
     public class SpawnThread extends Thread{
         private List<Enemy> spawn;
         public SpawnThread(List<Enemy> spawn){
+            super();
             this.spawn = spawn;
             r = new Random();
         }
@@ -197,6 +198,7 @@ public class GameMap {
                 e.setPath(pathBuilder.generatePath(start, destination));
                 enemies.add(e);
                 gameComponents.add(e);
+
                 try{
                     int randomFactor = r.nextInt(10);
                     Thread.sleep(100*randomFactor); //0.1 sec delay between spawns

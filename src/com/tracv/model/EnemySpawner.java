@@ -2,10 +2,7 @@ package com.tracv.model;
 
 import com.tracv.types.EnemyType;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Spawns enemies in accordance to the json's instructions
@@ -36,13 +33,15 @@ public class EnemySpawner {
      */
     public boolean update(int timeMillis){
         millisFromLastSpawn += timeMillis;
-        int timeToNext = timeToSpawn.get(next);
 
         boolean spawnRepeat = true;
 
         while(spawnRepeat) { //Can spawn multiple waves if lag... lol
+
+            int timeToNext = timeToSpawn.get(next);
             if (timeToNext <= millisFromLastSpawn / 1000.0) { //Convert to seconds.
-                millisFromLastSpawn -= timeToNext;
+                System.out.println("Spawning Wave");
+                millisFromLastSpawn -= timeToNext*1000;
                 map.addEnemies(spawn(next)); // Saves some time with Casting of all the comps to enemies...?
 
                 timeToSpawn.remove(next);
@@ -60,9 +59,13 @@ public class EnemySpawner {
 
     private List<Enemy> spawn(List<EnemyType> next) {
         List<Enemy> enemies = new LinkedList<>();
+        Random random = new Random();
+        int x = 0, y = 0;
 
         for(EnemyType type : next){
-            enemies.add(new Enemy(type, 0, 0));
+            enemies.add(new Enemy(type, x, y));
+            x -= random.nextInt(10)*10;
+            y = random.nextInt(10) * 5;
 
         }
         return enemies;

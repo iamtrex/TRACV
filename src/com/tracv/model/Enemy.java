@@ -14,6 +14,8 @@ public class Enemy extends MoveableComponent {
     private int dmg;
     private int gold;
 
+    private EnemyType type;
+
 
     private List<Terrain> path;
 
@@ -24,10 +26,16 @@ public class Enemy extends MoveableComponent {
         this.totalHealth = health;
         this.dmg = type.getDmg();
         this.gold = type.getGold();
+        this.type = type;
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.WHITE);
+        //TODO remove temp
+        if(type == EnemyType.BASIC) {
+            g.setColor(Color.WHITE);
+        }else{
+            g.setColor(Color.lightGray);
+        }
         g.fillOval((int)x, (int)y, 25, 25);
 
         int healthX = (int) x;
