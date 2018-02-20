@@ -84,4 +84,6 @@ public class Constants {
 
     public static final String OBSERVER_GAME_OVER = "GGWP";
     public static final String OBSERVER_LEVEL_COMPLETE = "GGEZ";
+    public static final String OBSERVER_GAME_TICK = "UPDATE";
+    public static final String OBSERVER_WAVE_SPAWNED = "wave spawned";
 }

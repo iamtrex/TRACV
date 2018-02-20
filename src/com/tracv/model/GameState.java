@@ -7,6 +7,7 @@ import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 import com.tracv.util.TerrainParser;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,29 +25,26 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private EnemySpawner spawner;
 
 
+    private Timer gameTimer;
+
 
     private int gold;
     private int score;
     private int timeElapsed;
-    private int wave;
     private int level;
 
-    private boolean doneSpawn;
+    private boolean doneSpawn; //Keeps track of if there are still anymore enemy waves left to spawn (used to check if level complete)
 
+    //Keeps track of game running state/refresh
+    private long lastTimeNano;
+    private boolean running = false;
 
     public GameState() {
-
         parser = new LevelJsonParser();
         construction = new TowerFactory();
         map = new GameMap();
-        spawner = new EnemySpawner(parser, map);
-        //TODO FIX TESTING PURPOSES.
-        /*
-        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
-        gold = 500; // temp value, 500 cuz league
-        score = 0;
-        */
-        
+        spawner = new EnemySpawner(parser, this);
+
     }
 
     /**
@@ -54,16 +52,17 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * (victor) restores all the field back to basic values
      */
     public void newGame(int level) {
+        gameTimer = null; //reset the timer (tbh won't really change much since refresh rate is so fast, but why not.. :P)
+
         System.out.println("Starting new game");
         //TODO temporarily loads a default map.. In future, can load different types of maps
-
         
         gold = 500; // temp value, 500 cuz league
         score = 0;
         timeElapsed = 0;
-        wave = 0;
-        this.level = level; //TODO FIX.
 
+        //Load level based on inputted string.
+        this.level = level;
         parser.readLevel(level);
         spawner.reset();
         map.reset();
@@ -71,6 +70,38 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         doneSpawn = false;
         notifyObservers(Constants.OBSERVER_NEW_GAME);
     }
+
+
+
+    public void setGameRunning(boolean b){
+        if(gameTimer == null){
+            createGameTimer();
+        }
+
+        if(running != b){
+            if(b){
+                lastTimeNano = System.nanoTime();
+                gameTimer.start();
+                System.out.println("Start/resume Game");
+            }else{
+                gameTimer.stop();
+                System.out.println("Pausing/Stopping game");
+            }
+
+            running = b;
+        }
+    }
+    public void createGameTimer(){
+        gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
+            long nowTime = System.nanoTime();
+            update((int)Math.round((nowTime-lastTimeNano)/1000000.0));
+            notifyObservers(Constants.OBSERVER_GAME_TICK); //Call UI to redraw
+            lastTimeNano = nowTime;
+        });
+    }
+
+
+
 
     /**
      * Updates the position of everything
@@ -94,7 +125,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 System.out.println("CRASHED!");
                 if(map.getBase().takeDmg(e.getDmg())){
                     //Base exploded.
-                    gameOver();
+                    setLevelFailure();
                 }
                 toDel.add(e);
             }
@@ -176,7 +207,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }else{
             if(map.getEnemies().isEmpty()){
                 //Beat level!
-                notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+                setLevelSuccess();
             }
         }
 
@@ -184,9 +215,13 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     }
 
-    private void gameOver() {
-
+    private void setLevelSuccess(){
+        notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+        setGameRunning(false);
+    }
+    private void setLevelFailure() {
         notifyObservers(Constants.OBSERVER_GAME_OVER);
+        setGameRunning(false);
 
     }
 
@@ -256,12 +291,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
 
-    //TODO Implement
-    public boolean isGameOver() {
-        return false;
-    }
-
-
     @Override
     public Iterator<GameComponent> iterator() {
         return map.getGameComponents().iterator();
@@ -308,10 +337,16 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public int getLevel() {
         return level;
     }
-    public int getWave(){
-        return wave;
-    }
+
     public int getTime(){
         return timeElapsed;
+    }
+
+    public String getWave(){
+        return spawner.getWave();
+    }
+
+    public void updateWave() {
+        notifyObservers(Constants.OBSERVER_WAVE_SPAWNED);
     }
 }

@@ -1,22 +1,30 @@
 package com.tracv.model;
 
+import com.tracv.observerpattern.Observable;
 import com.tracv.types.EnemyType;
+import com.tracv.util.Constants;
 
 import java.util.*;
+
 
 /**
  * Spawns enemies in accordance to the json's instructions
  */
-public class EnemySpawner {
+public class EnemySpawner{
 
     private LevelJsonParser parser;
     private GameMap map;
+    private GameState gs;
+
 
     private double millisFromLastSpawn = 0;
 
-    public EnemySpawner(LevelJsonParser parser, GameMap map){
+    private int wave;
+    private int maxWave;
+    public EnemySpawner(LevelJsonParser parser, GameState gs){
         this.parser = parser;
-        this.map = map;
+        this.map = gs.getMap();
+        this.gs = gs;
 
     }
 
@@ -41,9 +49,11 @@ public class EnemySpawner {
             int timeToNext = timeToSpawn.get(next);
             if (timeToNext <= millisFromLastSpawn / 1000.0) { //Convert to seconds.
                 System.out.println("Spawning Wave");
+                wave++;
+                updateGSWave();
+
                 millisFromLastSpawn -= timeToNext*1000;
                 map.addEnemies(spawn(next)); // Saves some time with Casting of all the comps to enemies...?
-
                 timeToSpawn.remove(next);
                 if(toSpawn.isEmpty()){
                     return true;
@@ -55,6 +65,15 @@ public class EnemySpawner {
         }
 
         return false;
+    }
+
+
+    public String getWave(){
+        return String.valueOf(wave) + "/" + String.valueOf(maxWave);
+    }
+    //TODO - I dont' like this implementation, but can't think of a better way.
+    public void updateGSWave(){
+        gs.updateWave();
     }
 
     private List<Enemy> spawn(List<EnemyType> next) {
@@ -75,7 +94,11 @@ public class EnemySpawner {
 
         millisFromLastSpawn = 0;
         toSpawn = parser.getSpawnQueue();
+        wave = 0;
+        maxWave = toSpawn.size();
         timeToSpawn = parser.getSpawnTime();
         next = toSpawn.poll();
+
     }
+
 }

@@ -62,6 +62,8 @@ public class HUDStatePane extends Pane implements Observer {
                 updateLevel();
             }else if(msg.equals(Constants.OBSERVER_TIME_MODIFIED)){
                 updateTime();
+            }else if(msg.equals(Constants.OBSERVER_WAVE_SPAWNED)){
+                updateWave();
             }
         }
     }
@@ -89,9 +91,9 @@ public class HUDStatePane extends Pane implements Observer {
         SwingUtilities.invokeLater(()->lGold.setText("Gold " + gs.getGold()));
     }
     private void updateWave(){
-        SwingUtilities.invokeLater(()->lGold.setText("Wave " + gs.getWave()));
+        SwingUtilities.invokeLater(()->lWave.setText("Wave " + gs.getWave()));
     }
     private void updateLevel(){
-        SwingUtilities.invokeLater(()->lGold.setText("Level " + gs.getLevel()));
+        SwingUtilities.invokeLater(()->lLevel.setText("Level " + gs.getLevel()));
     }
 }

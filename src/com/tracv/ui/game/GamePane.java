@@ -117,6 +117,7 @@ public class GamePane extends JPanel implements Observer{
             gc.draw(g);
         }
 
+
         //Draw Mouse hover.
         if(mouse != null) {
             drawTowerHighlightOnMouse(g);
@@ -158,8 +159,10 @@ public class GamePane extends JPanel implements Observer{
 
     @Override
     public void update(Observable o, String msg) {
-        //System.out.println("GamePane was notified");
+        if(msg.equals(Constants.OBSERVER_GAME_TICK)){
+            this.repaint();
 
+        }
     }
 
     public void setSelectedTower(TowerType selectedTower) {

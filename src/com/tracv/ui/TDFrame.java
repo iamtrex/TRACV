@@ -83,7 +83,7 @@ public class TDFrame extends JFrame {
 
         //If resuming game, resume game. // should be in else lol.
         if(this.getContentPane() == tdGame && !b){
-            tdGame.setGameRunning(true);
+            tdGame.getGameState().setGameRunning(true);
         }
 
         SwingUtilities.invokeLater(()-> this.validate());

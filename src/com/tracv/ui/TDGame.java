@@ -60,7 +60,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
-        createGameTimer();
     }
 
     /*
@@ -68,9 +67,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
      */
     public void startNewGame(int level){
         gs.newGame(level);
-        setGameRunning(true);
+        gs.setGameRunning(true);
     }
 
+    /* //DONE - Move to GameState (UI should not control model)
     public void setGameRunning(boolean b) {
         if(gameTimer != null){
             if(running != b){
@@ -92,6 +92,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     private long lastUpdateTimeNano;
 
+
     private void createGameTimer(){
        gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
            long nowTime = System.nanoTime();
@@ -101,19 +102,25 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
        });
     }
 
+    */
+
+
     @Override
     public void update(Observable o, String msg) {
         if(o == gs){
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
-                setGameRunning(false); //TODO - bug, user can still resume game.
                 tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
             }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
-                setGameRunning(false);
-                tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //TODO ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
+                tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //DONE - ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
 
             }
         }
     }
+
+    public GameState getGameState() {
+        return gs;
+    }
+
 
     /**
      * Menu that lies on top of the game in order to pause hte game/sounds etc...
@@ -134,9 +141,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == pause){
-            //gamePane.getGameState().pause(); //TODO no need to pause right? since gamepane controls flow of game
-
-            setGameRunning(false);
+            gs.setGameRunning(false);
             tdf.toggleMenu(true);
         }
 
