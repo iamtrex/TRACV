@@ -18,8 +18,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     //private List<GameComponent> gameComponents;
     private GameMap map;
-    private EnemyFactory mobs;
     private TowerFactory construction;
+
+    private LevelJsonParser parser;
+    private EnemySpawner spawner;
+
 
 
     private int gold;
@@ -28,13 +31,15 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private int wave;
     private int level;
 
+    private boolean doneSpawn;
+
 
     public GameState() {
 
-
-        mobs = new EnemyFactory();
+        parser = new LevelJsonParser();
         construction = new TowerFactory();
-
+        map = new GameMap();
+        spawner = new EnemySpawner(parser, map);
         //TODO FIX TESTING PURPOSES.
         /*
         map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
@@ -51,23 +56,29 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public void newGame(int level) {
         System.out.println("Starting new game");
         //TODO temporarily loads a default map.. In future, can load different types of maps
-        map = new GameMap(TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE));
+
         
         gold = 500; // temp value, 500 cuz league
         score = 0;
         timeElapsed = 0;
         wave = 0;
         this.level = level; //TODO FIX.
-        loadLevel(level);
 
+        parser.readLevel(level);
+        spawner.reset();
+        map.reset();
+
+        doneSpawn = false;
         notifyObservers(Constants.OBSERVER_NEW_GAME);
     }
 
     /**
      * Updates the position of everything
      */
-    public void update() {
-        timeElapsed += Constants.REFRESH_DELAY;
+    public void update(int actualTimeMS) {
+        //timeElapsed += Constants.REFRESH_DELAY;
+        timeElapsed += actualTimeMS;
+        System.out.println(actualTimeMS);
 
         List<GameComponent> toAdd = new ArrayList<>();
         List<GameComponent> toDel = new ArrayList<>();
@@ -157,6 +168,17 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             map.removeComponent(gc);
         }
 
+        if(!doneSpawn){
+            if(spawner.update(actualTimeMS)){
+                doneSpawn = true; //End spawns
+            }
+        }else{
+            if(map.getEnemies().isEmpty()){
+                //Beat level!
+                notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+            }
+        }
+
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
 
     }
@@ -231,13 +253,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return false;
     }
 
-    public void spawnEnemy(int x, int y) {
-        System.out.println("Spawning Enemy");
-        GameComponent enemy = mobs.spawn();
-        enemy.setX(x);
-        enemy.setY(y);
-        map.addComponent(enemy); // spawns at spawning point
-    }
 
 
     //TODO Implement
@@ -288,10 +303,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return map;
     }
 
-    //Load Map and Enemy Spwaner with the proper level
-    public void loadLevel(int level){
-
-    }
 
     public int getLevel() {
         return level;

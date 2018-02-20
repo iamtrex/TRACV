@@ -3,9 +3,11 @@ package com.tracv.model;
 
 import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
+import com.tracv.util.TerrainParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Represents a mutable Map of the game which contains terrain and
@@ -31,12 +33,9 @@ public class GameMap {
 
     private PathBuilder pathBuilder;
 
-    /**
-     * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
-     * no GameComponents
-     * @param terrainTypes the input model of the map
-     */
-    public GameMap (TerrainType[][] terrainTypes) {
+
+    public void reset() {
+        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE);
         long startT = System.nanoTime();
         this.gameComponents = new ArrayList<>();
         buildTerrain(terrainTypes);
@@ -65,7 +64,15 @@ public class GameMap {
         long endT = System.nanoTime();
 
         System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
+    }
 
+    /**
+     * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
+     * no GameComponents
+     *
+     */
+    public GameMap () {
+        reset();
     }
 
     private void buildTerrain(TerrainType[][] terrainTypes) {
@@ -166,5 +173,37 @@ public class GameMap {
 
     public List<Tower> getTowers() {
         return towers;
+    }
+
+    public void addEnemies(List<Enemy> spawn) {
+        //TODO FIX- TOO TIRED TO DO SO RN
+        SpawnThread st = new SpawnThread(spawn);
+        st.run();
+
+    }
+
+    public class SpawnThread extends Thread{
+        private List<Enemy> spawn;
+        public SpawnThread(List<Enemy> spawn){
+            this.spawn = spawn;
+            r = new Random();
+        }
+
+        private Random r;
+
+        @Override
+        public void run(){
+            for(Enemy e : spawn){
+                e.setPath(pathBuilder.generatePath(start, destination));
+                enemies.add(e);
+                gameComponents.add(e);
+                try{
+                    int randomFactor = r.nextInt(10);
+                    Thread.sleep(100*randomFactor); //0.1 sec delay between spawns
+                }catch(InterruptedException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 }

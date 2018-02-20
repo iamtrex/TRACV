@@ -1,5 +1,7 @@
 package com.tracv.model;
 
+import com.tracv.types.EnemyType;
+
 import java.util.List;
 
 import java.awt.*;
@@ -16,14 +18,12 @@ public class Enemy extends MoveableComponent {
     private List<Terrain> path;
 
 
-    public Enemy(int distanceToEnd, int health, int dmg, double speed, double x, double y, String iconPath, int gold) {
-            super(speed, x, y, iconPath);
-            this.distanceToEnd = distanceToEnd;
-            this.health = health;
-            this.totalHealth = health;
-            this.dmg = dmg;
-            this.gold = gold;
-
+    public Enemy(EnemyType type, double x, double y) {
+        super(type.getSpeed(), x, y, type.getIconPath());
+        this.health = type.getHealth();
+        this.totalHealth = health;
+        this.dmg = type.getDmg();
+        this.gold = type.getGold();
     }
 
     public void draw(Graphics g) {

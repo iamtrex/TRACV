@@ -1,11 +1,13 @@
 package com.tracv.ui.game;
 
 import com.tracv.directional.PointToPointDistance;
+import com.tracv.model.Enemy;
 import com.tracv.model.GameComponent;
 import com.tracv.model.GameState;
 import com.tracv.model.Terrain;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
+import com.tracv.types.EnemyType;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
@@ -174,7 +176,8 @@ public class GamePane extends JPanel implements Observer{
             if(Constants.DEBUGGING_MODE){
                 if(e.getKeyChar() == 'e'){
                     //Spawn enemy.
-                    SwingUtilities.invokeLater(()-> gs.spawnEnemy(0, 0));
+                    //SwingUtilities.invokeLater(()-> gs.spawnEnemy(0, 0));
+                    gs.getMap().addComponent(new Enemy(EnemyType.BASIC, 0, 0));
                 }
             }
         }

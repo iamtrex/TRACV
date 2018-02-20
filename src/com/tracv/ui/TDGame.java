@@ -75,6 +75,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         if(gameTimer != null){
             if(running != b){
                 if(b){
+                    lastUpdateTimeNano = System.nanoTime();
                     gameTimer.start();
                     System.out.println("Starting/Resuming Game");
                 }else{
@@ -88,9 +89,14 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     private boolean running = false;
     private javax.swing.Timer gameTimer;
+
+    private long lastUpdateTimeNano;
+
     private void createGameTimer(){
        gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
-           gs.update();
+           long nowTime = System.nanoTime();
+           gs.update((int) Math.round((nowTime-lastUpdateTimeNano)/1000000.0)); //send millisecond delay to update.
+           lastUpdateTimeNano = nowTime;
            gamePane.repaint();
        });
     }
@@ -101,6 +107,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
                 setGameRunning(false); //TODO - bug, user can still resume game.
                 tdf.toggleMenu(true);
+            }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
+                setGameRunning(false);
+                tdf.toggleMenu(true); //TODO ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
+
             }
         }
     }

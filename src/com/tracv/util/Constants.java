@@ -32,6 +32,8 @@ public class Constants {
 
     //Directory Locations
 
+        public static final String LEVEL_DIR = "/Levels/";
+
         public static final String ICON_DIR = "/Icons/";
         public static final String ICON_FILE_TYPE = ".png";
 
@@ -81,4 +83,5 @@ public class Constants {
     public static final int INSETS_BETWEEN = 5;
 
     public static final String OBSERVER_GAME_OVER = "GGWP";
+    public static final String OBSERVER_LEVEL_COMPLETE = "GGEZ";
 }
