@@ -11,28 +11,37 @@ import java.util.List;
 
 public enum TowerType {
 
-    FAR_SHOT_TOWER_2("Far Shot 2 Tower", "FarSprite", 35, 35, 200,
+    FAR_SHOT_TOWER_2("Far Shot 2 Tower", "FarSprite", "TestIcon2", 35, 35, 200,
             1.5, 12.0, 500.0,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    MEGA_HIT_TOWER("Mega Hit Tower", "MegaSprite", 35, 35, 200,
+    MEGA_HIT_TOWER("Mega Hit Tower", "MegaSprite","TestIcon2", 35, 35, 200,
             1.5, 40.0, 150,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    FAR_SHOT_TOWER("Far Shot Tower", "FarSprite", 35, 35, 200,
+    FAR_SHOT_TOWER("Far Shot Tower", "FarSprite", "TestIcon2", 35, 35, 200,
             1.5, 10.0, 300.0,
             ProjectileType.BASIC, new TowerType[]{FAR_SHOT_TOWER_2}),
 
-    RAPID_TOWER("Rapid Tower", "RapidSprite", 35, 35, 100,
+    RAPID_TOWER("Rapid Tower", "RapidSprite", "TestIcon2", 35, 35, 100,
             2.5, 10.0, 100.0,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    BASE_TOWER("Base Tower", "BaseSprite", 35, 35, 100,
+    BASE_TOWER("Base Tower", "BaseSprite", "TestIcon2", 35, 35, 100,
             1.5, 10.0, 100.0,
-            ProjectileType.BASIC, new TowerType[]{RAPID_TOWER, FAR_SHOT_TOWER, MEGA_HIT_TOWER});
+            ProjectileType.BASIC, new TowerType[]{RAPID_TOWER, FAR_SHOT_TOWER, MEGA_HIT_TOWER}),
 
+    MAGE_TOWER_2("Mage Tower 2", "Mage2Sprite", "TestIcon2", 35, 35, 100,
+                       0.5, 20.0, 250.0,
+               ProjectileType.MAGIC, new TowerType[]{}),
 
+    MAGE_TOWER("Mage Tower", "MageSprite", "TestIcon2", 35, 35, 100,
+            0.5, 10.0, 250.0,
+            ProjectileType.MAGIC, new TowerType[]{MAGE_TOWER_2});
+
+    public static final TowerType[] BASIC_TOWERS =  {BASE_TOWER, MAGE_TOWER};
     private String name;
+    private String iconPath;
     private Image sprite;
     private int width;
     private int height;
@@ -48,7 +57,7 @@ public enum TowerType {
 
 
 
-    TowerType(String name, String spritePath, int width, int height, int cost,
+    TowerType(String name, String spritePath, String iconPath, int width, int height, int cost,
               double fireRate, double dmg, double range,
               ProjectileType projType, TowerType[] ups){
         this.name = name;
@@ -59,6 +68,7 @@ public enum TowerType {
         this.range = range;
         this.projType = projType;
         this.cost = cost;
+        this.iconPath = iconPath;
 
         this.upgrades = new ArrayList<>();
         upgrades.addAll(Arrays.asList(ups));
@@ -119,5 +129,9 @@ public enum TowerType {
 
     public int getUpgradeCost() {
         return cost; //TODO not sure how we want to do costs vs upgrade costs... so for now "cost is upgrade cost" for uppertier towers...
+    }
+
+    public String getIcon() {
+        return iconPath;
     }
 }

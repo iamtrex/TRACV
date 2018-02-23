@@ -1,8 +1,7 @@
 package com.tracv.model;
 
-import com.tracv.observerpattern.Observable;
+import com.tracv.gamecomponents.Enemy;
 import com.tracv.types.EnemyType;
-import com.tracv.util.Constants;
 
 import java.util.*;
 

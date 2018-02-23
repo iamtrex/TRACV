@@ -1,7 +1,6 @@
 package com.tracv.directional;
 
-import com.tracv.model.GameComponent;
-import com.tracv.model.Tower;
+import com.tracv.gamecomponents.GameComponent;
 import com.tracv.util.Constants;
 
 import java.awt.*;

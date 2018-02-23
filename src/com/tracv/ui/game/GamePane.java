@@ -1,6 +1,9 @@
 package com.tracv.ui.game;
 
 import com.tracv.directional.PointToPointDistance;
+import com.tracv.gamecomponents.Enemy;
+import com.tracv.gamecomponents.GameComponent;
+import com.tracv.gamecomponents.Terrain;
 import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;

@@ -1,6 +1,8 @@
 package com.tracv.model;
 
 import com.tracv.directional.Vector;
+import com.tracv.gamecomponents.Enemy;
+import com.tracv.gamecomponents.Terrain;
 
 import java.util.List;
 

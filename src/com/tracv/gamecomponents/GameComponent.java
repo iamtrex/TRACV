@@ -1,4 +1,4 @@
-package com.tracv.model;
+package com.tracv.gamecomponents;
 
 import java.awt.*;
 

@@ -41,10 +41,12 @@ public class HUDButtonPane extends Pane
      */
     private void makeAndAddButtons(){
         //TODO read buttons from some sort of file or lazily just make them staticlaly in some other file and copy them over
-        HUDTowerButton temp = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 100);
-        HUDTowerButton temp2 = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 500);
-        buttons.add(temp);
-        buttons.add(temp2);
+
+        TowerType[] basicTowers = TowerType.BASIC_TOWERS;
+        for(TowerType tt : basicTowers){
+            HUDTowerButton temp = new HUDTowerButton(tt, tt.getIcon(), tt.getCost());
+            buttons.add(temp);
+        }
 
 
         int x = Constants.HUD_BUTTONS_PER_ROW;

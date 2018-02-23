@@ -1,7 +1,7 @@
 package com.tracv.ui.game;
 
 import com.tracv.model.GameState;
-import com.tracv.model.Tower;
+import com.tracv.gamecomponents.Tower;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.swing.Button;

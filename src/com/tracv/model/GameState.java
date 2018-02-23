@@ -1,11 +1,12 @@
 package com.tracv.model;
 
 import com.tracv.directional.PointToPointDistance;
+import com.tracv.gamecomponents.*;
 import com.tracv.observerpattern.Observable;
+import com.tracv.obsolete.TowerFactory;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
-import com.tracv.util.TerrainParser;
 
 import javax.swing.*;
 import java.awt.*;

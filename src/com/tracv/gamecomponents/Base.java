@@ -1,10 +1,8 @@
-package com.tracv.model;
+package com.tracv.gamecomponents;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.tracv.util.Constants;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 
 /**
  * Represents the Base on the Game Map

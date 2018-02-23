@@ -1,4 +1,6 @@
-package com.tracv.model;
+package com.tracv.obsolete;
+
+import com.tracv.gamecomponents.GameComponent;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -7,7 +9,8 @@ import java.awt.geom.Ellipse2D;
  * Represents a Tower on the GameMap
  * No fields should be null, atkDmg, fireRate, cost, size and range should be greater than 0
  */
-public class TowerOld extends GameComponent {
+public class TowerOld /*extends GameComponent*/{
+    /*
     private int atkDmg;
     private double fireRate;
     private int cost;
@@ -16,7 +19,7 @@ public class TowerOld extends GameComponent {
 
     private double timeTilNextFire; //In milliseconds.
 
-    /**
+
      * Constructor for a Tower
      * @param atkDmg the attack damage value of the tower
      * @param fireRate the fire rate of the tower
@@ -26,7 +29,7 @@ public class TowerOld extends GameComponent {
      * @param x the x coordinate of the tower's position
      * @param y the y coordinate of the tower's position
      * @param iconPath directory of the tower's icon
-     */
+
     public TowerOld(int atkDmg, double fireRate, int cost, int size, int range, double x, double y, String iconPath) {
         super(x, y, iconPath);
         this.atkDmg = atkDmg;
@@ -38,10 +41,10 @@ public class TowerOld extends GameComponent {
         this.timeTilNextFire = 1000.0/fireRate;
     }
 
-    /**
-     * CURRENTLY DRAWS A CENTERED RED CIRCLE WITH SIZE EQUALS TO size
-     * @param g Swing Graphics
-     */
+
+    // * CURRENTLY DRAWS A CENTERED RED CIRCLE WITH SIZE EQUALS TO size
+    //* @param g Swing Graphics
+
     public void draw(Graphics g) {
 
         g.setColor(Color.RED);
@@ -86,4 +89,5 @@ public class TowerOld extends GameComponent {
     public void setFired() {
         timeTilNextFire = 1000.0/fireRate;
     }
+    */
 }

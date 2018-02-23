@@ -1,5 +1,6 @@
 package com.tracv.model;
 
+import com.tracv.gamecomponents.Terrain;
 import com.tracv.types.TerrainType;
 
 import java.util.*;
