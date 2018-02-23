@@ -2,7 +2,7 @@ package com.tracv.model;
 
 import com.tracv.types.EnemyType;
 import com.tracv.util.Constants;
-import com.tracv.util.TerrainParser;
+import com.tracv.util.TextFileReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,32 +20,10 @@ public class LevelJsonParser {
 
 
     public void readLevel(int level) {
-        String contents = readFile(level);
+        String contents = TextFileReader.readFile(Constants.LEVEL_DIR + String.valueOf(level) + ".json");
         parseJson(contents);
     }
 
-    private String readFile(int level) {
-
-        String response = "";
-        String fileName = Constants.LEVEL_DIR + String.valueOf(level) + ".json";
-
-        try {
-            InputStream in = getClass().getResourceAsStream(fileName);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            String line;
-            while((line = br.readLine()) != null){
-                response += line;
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Shouldn't happen");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Response " + response);
-        return response;
-
-    }
 
 
     public String getFile() {

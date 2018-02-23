@@ -1,4 +1,4 @@
-package com.tracv.util;
+package com.tracv.model;
 
 import com.tracv.types.TerrainType;
 

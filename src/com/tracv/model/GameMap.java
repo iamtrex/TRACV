@@ -4,7 +4,6 @@ package com.tracv.model;
 import com.tracv.gamecomponents.*;
 import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
-import com.tracv.util.TerrainParser;
 
 import java.util.ArrayList;
 import java.util.List;

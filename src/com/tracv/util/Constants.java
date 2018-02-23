@@ -95,4 +95,5 @@ public class Constants {
     public static final String OBSERVER_WAVE_SPAWNED = "wave spawned";
     public static final String OBSERVER_TOWER_SELECTED = "tower sel";
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
+    public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
 }

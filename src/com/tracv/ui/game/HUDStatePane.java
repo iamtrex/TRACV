@@ -25,6 +25,8 @@ public class HUDStatePane extends Pane implements Observer {
     private Label lTime;
     private Label lLevel;
     private Label lWave;
+    private Label lHealth;
+
 
 
     public HUDStatePane(HUDPane hudPane, GameState gs) {
@@ -37,6 +39,8 @@ public class HUDStatePane extends Pane implements Observer {
         lLevel = new Label("Level ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
         lWave = new Label("Wave ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
 
+        lHealth = new Label("Health ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+
         Comp.add(lGold, this, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
         Comp.add(lTime, this, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
@@ -45,9 +49,10 @@ public class HUDStatePane extends Pane implements Observer {
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
         Comp.add(lWave, this, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
+        Comp.add(lHealth, this, 0, 4, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+                Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
 
         this.setBackground(Color.WHITE);
-        this.setBorder(new LineBorder(Color.YELLOW, 1));
 
         this.setMinimumSize(Constants.HUD_STATE_SIZE);
         this.setPreferredSize(Constants.HUD_STATE_SIZE);
@@ -63,10 +68,13 @@ public class HUDStatePane extends Pane implements Observer {
                 updateTime();
                 updateWave();
                 updateLevel();
+                updateHealth();
             }else if(msg.equals(Constants.OBSERVER_TIME_MODIFIED)){
                 updateTime();
             }else if(msg.equals(Constants.OBSERVER_WAVE_SPAWNED)){
                 updateWave();
+            }else if(msg.equals(Constants.OBSERVER_BASE_HEALTH_CHANGED)){
+                updateHealth();
             }
         }
     }
@@ -99,4 +107,5 @@ public class HUDStatePane extends Pane implements Observer {
     private void updateLevel(){
         SwingUtilities.invokeLater(()->lLevel.setText("Level " + gs.getLevel()));
     }
+    private void updateHealth(){SwingUtilities.invokeLater(()->lHealth.setText("Health " + gs.getBaseHealth()));}
 }

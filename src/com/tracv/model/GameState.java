@@ -3,7 +3,6 @@ package com.tracv.model;
 import com.tracv.directional.PointToPointDistance;
 import com.tracv.gamecomponents.*;
 import com.tracv.observerpattern.Observable;
-import com.tracv.obsolete.TowerFactory;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
@@ -20,14 +19,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     //private List<GameComponent> gameComponents;
     private GameMap map;
-    private TowerFactory construction;
 
     private LevelJsonParser parser;
     private EnemySpawner spawner;
 
-
     private Timer gameTimer;
-
     private Tower selectedTower; //Selected by user.
 
 
@@ -44,11 +40,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     //Keeps track of game running state/refresh
     private long lastTimeNano;
+
     private boolean running = false;
 
     public GameState() {
         parser = new LevelJsonParser();
-        construction = new TowerFactory();
         map = new GameMap();
         spawner = new EnemySpawner(parser, this);
 
@@ -135,6 +131,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                     //Base exploded.
                     setLevelFailure();
                 }
+
+                notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
+
                 toDel.add(e);
             }
         }
@@ -316,8 +315,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             //checks for whether theres already a terrain there
             //checks for whether theres enough gold
         }
-        GameComponent construct = construction.buildTower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
-        if (map.addComponent(construct)) {
+        //GameComponent construct = construction.buildTower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
+
+        Tower tower = new Tower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
+
+        if (map.addComponent(tower)) {
             useGold(cost);
             return true;
         }
@@ -406,5 +408,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         toDel.add(t);
         gainGold((int)t.getSellPrice());
         notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
+    }
+
+    public int getBaseHealth() {
+        return map.getBase().getHealth();
     }
 }
