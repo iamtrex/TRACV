@@ -31,9 +31,8 @@ public class HUDButtonPane extends Pane
         buttons = new ArrayList<>();
         makeAndAddButtons();
 
-        //TODO remove debug
-        this.setBorder(new LineBorder(Color.ORANGE, 1));
-
+        this.setPreferredSize(Constants.HUD_BUTTON_SIZE);
+        this.setMinimumSize(Constants.HUD_BUTTON_SIZE);
     }
 
     /**
@@ -87,9 +86,12 @@ public class HUDButtonPane extends Pane
         for(HUDTowerButton b : buttons){
             if(b == source){
                 //hudPane.setSelectedTowerType(b.getType());
-                firePropertyChange(TOWER_CHANGED, null, b.getType());
                 if(!b.isSelected()) {
+                    firePropertyChange(TOWER_CHANGED, null, b.getType());
                     b.setSelected(true);
+                }else{
+                    firePropertyChange(TOWER_CHANGED, null, null);
+                    b.setSelected(false);
                 }
             }else{
                 if(b.isSelected()) {

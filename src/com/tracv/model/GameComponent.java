@@ -9,12 +9,16 @@ import java.awt.*;
 public abstract class GameComponent {
     protected double x;
     protected double y;
+    protected double width;
+    protected double height;
+
     protected String iconPath;
     /**
      * Constructor for GameComponent; assigns the x, y coordinates of the
      * GameComponent
      * @param x a double representing the x coordinate
-     * @param y a double representing the y coordinate
+     * @param y a double represent
+     *          ng the y coordinate
      * @param iconPath a String representing the directory and name of the icon file
      */
     public GameComponent(double x, double y, String iconPath) {
@@ -28,6 +32,15 @@ public abstract class GameComponent {
      * @param g Swing Graphics
      */
     public abstract void draw(Graphics g);
+
+    public double getWidth(){
+        return width;
+    }
+    public double getHeight(){
+        return height;
+    }
+
+
 
     /**
      * Getter method for the x coordinate
@@ -60,4 +73,6 @@ public abstract class GameComponent {
     public void setY(double y) {
         this.y = y;
     }
+
+
 }

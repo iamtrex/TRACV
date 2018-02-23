@@ -51,7 +51,7 @@ public class TDFrame extends JFrame {
 
     //Create new game and swap to the game panel.
     public void newGame() {
-        tdGame.startNewGame(1); //TODO FIX
+        tdGame.startNewGame(2); //TODO FIX
         if(this.getContentPane() != tdGame) {
             switchToGamePanel();
         }

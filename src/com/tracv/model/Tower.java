@@ -3,6 +3,7 @@ package com.tracv.model;
 import com.tracv.types.TowerType;
 
 import java.awt.*;
+import java.util.List;
 
 /**
  * Represents a Tower on the GameMap
@@ -16,33 +17,51 @@ public class Tower extends GameComponent {
     private double timeTilNextFire;
     private double fireRate;
 
+    private boolean selected;
+
+
     /**
      *
-     * @param x - Center x position of tower
-     * @param y - Center y position of tower
+     * @param x - top left x coord of tower
+     * @param y - top left y coord of tower
      * @param type - Type of tower, contains properties such as range, dmg, fire rate, width/height, and image.
      *
      */
     public Tower(double x, double y, TowerType type){
         super(x, y, null);
-        this.type = type;
-
+        modifyType(type); //Setup the type
+        selected = false;
         timeTilNextFire = type.getFireRate();
-        fireRate = type.getFireRate();
+    }
 
+    //Also how upgrading type works.
+    public void modifyType(TowerType upgradeType) {
+        this.type = upgradeType;
+        width = type.getWidth();
+        height = type.getHeight();
+        fireRate = type.getFireRate();
     }
 
     /**
      * @param g Swing Graphics
      */
     public void draw(Graphics g) {
-        int xPos = (int) (x - getWidth()/2);
-        int yPos = (int) (y - getHeight()/2);
+        int xPos = (int) (x);
+        int yPos = (int) (y);
         g.drawImage(type.getSprite(), xPos, yPos, null);
 
         int range = (int) type.getRange();
-        g.setColor(Color.CYAN);
-        g.drawOval((int)x-range, (int)y-range, 2*range, 2*range);
+
+        if(selected){
+            g.setColor(Color.BLACK);
+            g.drawRect(xPos, yPos, (int)width, (int)height);
+            g.drawRect(xPos+1, yPos+1, (int)(width-1), (int) (height-1));
+
+            //Draw range of selectd tower only
+            g.setColor(Color.CYAN);
+            g.drawOval((int)(x-range+width/2), (int)(y-range+width/2), 2*range, 2*range);
+
+        }
 
 
     }
@@ -51,12 +70,6 @@ public class Tower extends GameComponent {
         return type.getDmg();
     }
 
-    public double getWidth(){
-        return type.getWidth();
-    }
-    public double getHeight(){
-        return type.getHeight();
-    }
     public double getRange() {
         return type.getRange();
     }
@@ -76,4 +89,26 @@ public class Tower extends GameComponent {
     public void setFired() {
         timeTilNextFire = 1000.0/fireRate;
     }
+
+    public void setSelected(boolean b){
+        selected = b;
+        
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public List<TowerType> getUpgrades() {
+        return type.getUpgrades();
+    }
+
+    public String getTypeName() {
+        return type.getName();
+    }
+
+    public double getSellPrice() {
+        return type.getSellPrice();
+    }
+
 }

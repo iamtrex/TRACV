@@ -27,6 +27,9 @@ public class Enemy extends MoveableComponent {
         this.dmg = type.getDmg();
         this.gold = type.getGold();
         this.type = type;
+
+        width = 25;
+        height = 25; //TODO remove temp.
     }
 
     public void draw(Graphics g) {
@@ -36,7 +39,7 @@ public class Enemy extends MoveableComponent {
         }else{
             g.setColor(Color.lightGray);
         }
-        g.fillOval((int)x, (int)y, 25, 25);
+        g.fillOval((int)x, (int)y, (int)width, (int)height);
 
         int healthX = (int) x;
         int healthY = (int) y - 15;

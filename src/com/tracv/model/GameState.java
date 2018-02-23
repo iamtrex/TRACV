@@ -27,6 +27,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     private Timer gameTimer;
 
+    private Tower selectedTower; //Selected by user.
+
+
+    List<GameComponent> toAdd;
+    List<GameComponent> toDel;
+
 
     private int gold;
     private int score;
@@ -45,6 +51,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         map = new GameMap();
         spawner = new EnemySpawner(parser, this);
 
+        toAdd = new ArrayList<>();
+        toDel = new ArrayList<>();
     }
 
     /**
@@ -66,6 +74,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         parser.readLevel(level);
         spawner.reset();
         map.reset();
+        map.loadLevel(parser.getFile());
 
         doneSpawn = false;
         notifyObservers(Constants.OBSERVER_NEW_GAME);
@@ -112,8 +121,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         timeElapsed += actualTimeMS;
         //System.out.println(actualTimeMS);
 
-        List<GameComponent> toAdd = new ArrayList<>();
-        List<GameComponent> toDel = new ArrayList<>();
         List<Enemy> needToRetarget = new ArrayList<>();
 
         for(Enemy e : map.getEnemies()){
@@ -162,7 +169,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                         if (PointToPointDistance.getDistance(towerPt, enemyPt) < range) {
                             //Create new projectile with this Enemy as targe
                             // TODO FIX TEMP LINE
-                            Projectile proj = new Projectile(e, 10, 5, t.getX(), t.getY(), null);
+                            // TODO STILL HAVE TO MODIFY...
+                            Projectile proj = new Projectile(e, (int)t.getAtkDmg(), 5, t.getX(), t.getY(), null);
                             toAdd.add(proj);
                             t.setFired();
                             break;
@@ -180,7 +188,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         for(GameComponent gc : toDel){
             map.removeComponent(gc);
         }
+
         toDel.clear();
+        toAdd.clear();
 
         for(Enemy e : needToRetarget){
             for(Projectile p : map.getProjectiles()){
@@ -264,6 +274,30 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
     }
 
+
+    public void attemptToSelectTower(Point point) {
+        boolean notify = false;
+
+        if(selectedTower != null) {
+            selectedTower.setSelected(false);
+            selectedTower = null;
+            notify = true;
+        }
+
+        for(Tower t : map.getTowers()){
+            if(PointToPointDistance.isPointInObject(point, t)){
+                t.setSelected(true);
+                selectedTower = t;
+                notify = true;
+                break;
+            }
+        }
+
+        if(notify)
+            notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
+
+    }
+
     /**
      * Attempt to build tower at selected point and tower.
      * @param point - The point to build the tower at
@@ -281,7 +315,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             //checks for whether theres already a terrain there
             //checks for whether theres enough gold
         }
-        GameComponent construct = construction.buildTower(x, y, selectedTower);
+        GameComponent construct = construction.buildTower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
         if (map.addComponent(construct)) {
             useGold(cost);
             return true;
@@ -348,5 +382,28 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     public void updateWave() {
         notifyObservers(Constants.OBSERVER_WAVE_SPAWNED);
+    }
+
+    public Tower getSelectedTower() {
+        return selectedTower;
+    }
+
+    public void attemptUpgradeTower(Tower selectedTower, TowerType upgradeType) {
+        if(gold >= upgradeType.getUpgradeCost()){
+            useGold(upgradeType.getUpgradeCost());
+            selectedTower.modifyType(upgradeType);
+            notifyObservers(Constants.OBSERVER_UPGRADED_TOWER);
+        }
+
+    }
+
+    public void attemptSellTower(Tower t) {
+        //map.removeComponent(selectedTower);
+        if(t == selectedTower){
+            selectedTower = null;
+        }
+        toDel.add(t);
+        gainGold((int)t.getSellPrice());
+        notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
     }
 }

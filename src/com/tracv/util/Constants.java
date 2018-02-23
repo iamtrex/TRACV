@@ -17,13 +17,21 @@ public class Constants {
 
 
     //Size of Frame, game and HUD
-        public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(1500, 750);
+        private static final int FRAME_WIDTH = 1500;
+        private static final int FRAME_HEIGHT = 750;
+
+        public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
 
         public static final Dimension HUD_DIMENSION = new Dimension(FRAME_DEFAULT_SIZE.width,
                 (int)(FRAME_DEFAULT_SIZE.height * HUD_VERTICAL_SCALE));
 
         public static final Dimension GAME_DIMENSION = new Dimension(FRAME_DEFAULT_SIZE.width,
                 (int)(FRAME_DEFAULT_SIZE.height * GAME_VERTICAL_SCALE));
+
+
+        public static final Dimension HUD_STATS_SIZE = new Dimension((int)(FRAME_WIDTH * 0.33), (int)HUD_DIMENSION.getHeight());
+        public static final Dimension HUD_STATE_SIZE = new Dimension((int)(FRAME_WIDTH * 0.33), (int)HUD_DIMENSION.getHeight());
+        public static final Dimension HUD_BUTTON_SIZE = new Dimension((int)(FRAME_WIDTH * 0.33), (int)HUD_DIMENSION.getHeight());
 
     //Sizes of icons.
         public static final Dimension HUD_TOWER_ICON_SIZE = new Dimension(35, 35+10+2); //Add HUD Font + spacing
@@ -42,7 +50,6 @@ public class Constants {
         public static final String TOWER_ICON_FILETYPE = ".png";
         public static final String TOWER_SPRITE_FILETYPE = ".png";
 
-        public static final String TERRAIN_FILE = "TerrainMapTest1.csv";
 
     //Fonts
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
@@ -86,4 +93,6 @@ public class Constants {
     public static final String OBSERVER_LEVEL_COMPLETE = "GGEZ";
     public static final String OBSERVER_GAME_TICK = "UPDATE";
     public static final String OBSERVER_WAVE_SPAWNED = "wave spawned";
+    public static final String OBSERVER_TOWER_SELECTED = "tower sel";
+    public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
 }

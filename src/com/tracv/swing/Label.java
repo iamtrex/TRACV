@@ -74,4 +74,5 @@ public class Label extends JLabel {
                 break;
         }
     }
+
 }

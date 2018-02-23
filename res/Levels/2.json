@@ -1,7 +1,7 @@
 {
     "level": {
-      "name": "Introduction to the Mansion",
-      "map": "TerrainMapTest1.csv",
+      "name": "BuildPathTest",
+      "map": "TerrainMapTest2.csv",
       "enemy-spawn": [
         {
           "Duration": "6",

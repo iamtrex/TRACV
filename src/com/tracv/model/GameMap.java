@@ -35,18 +35,11 @@ public class GameMap {
 
 
     public void reset() {
-        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(Constants.TERRAIN_FILE);
         long startT = System.nanoTime();
+
+
+
         this.gameComponents = new ArrayList<>();
-        buildTerrain(terrainTypes);
-
-        pathBuilder = new PathBuilder(terrains);
-
-        start = terrains[0][0];
-        destination = terrains[terrains.length-1][0];
-
-        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
-
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -54,16 +47,24 @@ public class GameMap {
 
 
 
-        //TODO do not use default base...
-        Base base = new Base(1000, terrains[terrains.length-1][0], null);
-
-        bases.add(base);
-        gameComponents.add(base);
 
 
         long endT = System.nanoTime();
 
         System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
+    }
+
+
+    public void loadLevel(String levelTerrainFile) {
+        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
+        buildTerrain(terrainTypes);
+        pathBuilder = new PathBuilder(terrains);
+        start = terrains[0][0];
+        destination = terrains[terrains.length-1][0];
+        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+
+
+
     }
 
     /**
@@ -85,8 +86,16 @@ public class GameMap {
                 //terrains.add(new Terrain(terrainTypes[i][j], j, i));
                 terrains[i][j] = new Terrain(terrainTypes[i][j], j, i, width, height);
 
+                if(terrainTypes[i][j] == TerrainType.NEXUS){
+                    //TODO do not use default base...
+                    Base base = new Base(1000, terrains[i][j], null);
+                    bases.add(base);
+                    gameComponents.add(base);
+                }
             }
         }
+
+
     }
 
     /**
@@ -181,6 +190,7 @@ public class GameMap {
         st.start();
 
     }
+
 
     public class SpawnThread extends Thread{
         private List<Enemy> spawn;

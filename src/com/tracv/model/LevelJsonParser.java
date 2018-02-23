@@ -47,10 +47,16 @@ public class LevelJsonParser {
 
     }
 
+
+    public String getFile() {
+        return map;
+    }
+
+
     private void parseJson(String contents){
         try {
             JSONObject jo = new JSONObject(contents);
-            JSONObject sub = jo.getJSONObject("level1");
+            JSONObject sub = jo.getJSONObject("level");
 
             this.name = sub.getString("name");
             this.map = sub.getString("map");

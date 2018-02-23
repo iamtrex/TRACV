@@ -48,6 +48,9 @@ public class HUDStatePane extends Pane implements Observer {
 
         this.setBackground(Color.WHITE);
         this.setBorder(new LineBorder(Color.YELLOW, 1));
+
+        this.setMinimumSize(Constants.HUD_STATE_SIZE);
+        this.setPreferredSize(Constants.HUD_STATE_SIZE);
     }
 
     @Override

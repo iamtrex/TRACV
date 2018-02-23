@@ -1,10 +1,7 @@
 package com.tracv.ui.game;
 
 import com.tracv.directional.PointToPointDistance;
-import com.tracv.model.Enemy;
-import com.tracv.model.GameComponent;
-import com.tracv.model.GameState;
-import com.tracv.model.Terrain;
+import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.types.EnemyType;
@@ -55,14 +52,18 @@ public class GamePane extends JPanel implements Observer{
         return gs;
     }
 
-    public void attemptToBuildTower(Point point) {
+
+
+    private boolean attemptToBuildTower(Point point) {
         if(selectedTower != null) {
             System.out.println("Attempting to build tower of type " + selectedTower.getName() +
                     " on point " + point.getX() + "," + point.getY());
 
-            gs.attemptToBuildTower(point, selectedTower);
+            return gs.attemptToBuildTower(point, selectedTower);
+
         } else{
             System.out.println("No Tower selected, no build.");
+            return false;
         }
     }
 
@@ -172,7 +173,7 @@ public class GamePane extends JPanel implements Observer{
 
     private class MyKeyListener implements KeyListener{
 
-        //HACKS
+        //TODO REMOVE GOD MODE HACKS... HACKS
         @Override
         public void keyTyped(KeyEvent e) {
             //System.out.println("Key typed " + e.getKeyChar());
@@ -181,6 +182,9 @@ public class GamePane extends JPanel implements Observer{
                     //Spawn enemy.
                     //SwingUtilities.invokeLater(()-> gs.spawnEnemy(0, 0));
                     gs.getMap().addComponent(new Enemy(EnemyType.BASIC, 0, 0));
+                }else if(e.getKeyChar() == 'm'){
+                    System.out.println("Gold!");
+                    gs.gainGold(1000); //Money maker!
                 }
             }
         }
@@ -208,8 +212,13 @@ public class GamePane extends JPanel implements Observer{
         @Override
         public void mouseReleased(MouseEvent e) {
             if(click != null){
-                if(PointToPointDistance.withinDistance(e.getPoint(), click)) {
-                    attemptToBuildTower(e.getPoint());
+                Point p = e.getPoint();
+                if(PointToPointDistance.withinDistance(p, click)) {
+                    boolean b = attemptToBuildTower(p);
+
+                    if(!b){ //Attempt to select tower if applicable
+                        gs.attemptToSelectTower(p);
+                    }
                 }
                 //Set to null regardless
                 click = null;
@@ -227,8 +236,6 @@ public class GamePane extends JPanel implements Observer{
             SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }
-
-
 
 
     private class MyMouseMotionListener implements MouseMotionListener {

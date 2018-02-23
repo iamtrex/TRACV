@@ -14,7 +14,7 @@ public class Base extends GameComponent{
     private int health;
     private int maxHealth;
 
-    private int width, height;
+    //private int width, height;
 
     /**
      * Constructor for the Base
@@ -48,7 +48,7 @@ public class Base extends GameComponent{
         */
 
         g.setColor(Color.BLUE);
-        g.fillRect((int)x, (int)y, width, height);
+        g.fillRect((int)x, (int)y, (int)width, (int)height);
 
         g.setColor(Color.GREEN);
 
@@ -66,6 +66,18 @@ public class Base extends GameComponent{
         g.drawRect(healthX, healthY, (int)maxWidth, Constants.HEALTH_BAR_HEIGHT_BASE);
 
     }
+
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
 
     /**
      * Returns true if nexus explodes (out of hp);

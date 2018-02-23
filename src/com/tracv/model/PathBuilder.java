@@ -50,7 +50,7 @@ public class PathBuilder {
             curr = getLowestInSet(gScore.get(curr), curr, open, destination);
 
             if (curr == destination) {
-                System.out.println("Proper Path found");
+                //System.out.println("Proper Path found");
                 return generatePath(cameFrom, start, destination);
             }
 

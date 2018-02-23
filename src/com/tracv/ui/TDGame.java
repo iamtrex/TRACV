@@ -39,8 +39,12 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
         gamePane = new GamePane();
         gs = gamePane.getGameState();
+
         hudPane = new HUDPane(gs);
+
+
         gs.addObserver(this);
+        gs.addObserver(hudPane.getHUDStatsPane());
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
         gs.addObserver(hudPane.getHUDStatePane());
@@ -69,41 +73,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         gs.newGame(level);
         gs.setGameRunning(true);
     }
-
-    /* //DONE - Move to GameState (UI should not control model)
-    public void setGameRunning(boolean b) {
-        if(gameTimer != null){
-            if(running != b){
-                if(b){
-                    lastUpdateTimeNano = System.nanoTime();
-                    gameTimer.start();
-                    System.out.println("Starting/Resuming Game");
-                }else{
-                    gameTimer.stop();
-                    System.out.println("Stopping Game");
-                }
-                running = b;
-            }
-        }
-    }
-
-    private boolean running = false;
-    private javax.swing.Timer gameTimer;
-
-    private long lastUpdateTimeNano;
-
-
-    private void createGameTimer(){
-       gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
-           long nowTime = System.nanoTime();
-           gs.update((int) Math.round((nowTime-lastUpdateTimeNano)/1000000.0)); //send millisecond delay to update.
-           lastUpdateTimeNano = nowTime;
-           gamePane.repaint();
-       });
-    }
-
-    */
-
 
     @Override
     public void update(Observable o, String msg) {

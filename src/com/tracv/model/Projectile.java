@@ -12,11 +12,15 @@ public class Projectile extends MoveableComponent {
         this.target = target;
         this.dmg = dmg;
         this.speed = speed;
+
+        width = 10;
+        height = 10;
+
     }
 
     public void draw(Graphics g) {
         g.setColor(Color.ORANGE);
-        g.fillOval((int) x, (int) y, 10, 10);
+        g.fillOval((int) x, (int) y, (int) width, (int) height);
     }
 
     public Enemy getTarget() {return target;}
