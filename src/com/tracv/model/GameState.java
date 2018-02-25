@@ -382,6 +382,9 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public String getWave(){
         return spawner.getWave();
     }
+    public int getTimeToNextWave() {
+        return spawner.getTimeToNextWave();
+    }
 
     public void updateWave() {
         notifyObservers(Constants.OBSERVER_WAVE_SPAWNED);
@@ -410,7 +413,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
     }
 
-    public int getBaseHealth() {
+    public String getBaseHealth() {
         return map.getBase().getHealth();
+    }
+
+    public boolean isDoneSpawn() {
+        return doneSpawn;
     }
 }

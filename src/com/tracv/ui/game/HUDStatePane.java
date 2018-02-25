@@ -25,6 +25,7 @@ public class HUDStatePane extends Pane implements Observer {
     private Label lTime;
     private Label lLevel;
     private Label lWave;
+    private Label lNextWave;
     private Label lHealth;
 
 
@@ -38,18 +39,21 @@ public class HUDStatePane extends Pane implements Observer {
 
         lLevel = new Label("Level ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
         lWave = new Label("Wave ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lNextWave = new Label("Next Wave In ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
 
         lHealth = new Label("Health ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
 
-        Comp.add(lGold, this, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+        Comp.add(lGold, this, 0, 0, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
-        Comp.add(lTime, this, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+        Comp.add(lTime, this, 0, 1, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
-        Comp.add(lLevel, this, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+        Comp.add(lLevel, this, 0, 2, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
         Comp.add(lWave, this, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
-        Comp.add(lHealth, this, 0, 4, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+        Comp.add(lNextWave, this, 1, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
+                Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
+        Comp.add(lHealth, this, 0, 4, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
                 Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE, Constants.INSETS_BETWEEN, Constants.INSETS_OUTSIDE);
 
         this.setBackground(Color.WHITE);
@@ -95,7 +99,14 @@ public class HUDStatePane extends Pane implements Observer {
             sSec = String.valueOf(seconds);
         }
 
-        SwingUtilities.invokeLater(()->lTime.setText("Time " + sMin + ":" + sSec));
+        SwingUtilities.invokeLater(()->{
+            lTime.setText("Time " + sMin + ":" + sSec);
+            if(!gs.isDoneSpawn()){
+                lNextWave.setText("Next Wave " + gs.getTimeToNextWave());
+            }else{
+                lNextWave.setText("");
+            }
+        });
 
     }
     private void updateGold(){

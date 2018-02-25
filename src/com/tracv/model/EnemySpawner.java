@@ -100,4 +100,7 @@ public class EnemySpawner{
 
     }
 
+    public int getTimeToNextWave() {
+        return timeToSpawn.get(next) - (int)(millisFromLastSpawn/1000.0);
+    }
 }

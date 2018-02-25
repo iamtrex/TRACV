@@ -86,7 +86,7 @@ public class Base extends GameComponent{
         health -= dmg;
         return health <= 0;
     }
-    public int getHealth() {
-        return health;
+    public String getHealth() {
+        return health + "/" + maxHealth;
     }
 }

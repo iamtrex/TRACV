@@ -27,7 +27,7 @@ public enum TowerType {
             2.5, 10.0, 100.0,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    BASE_TOWER("Base Tower", "BaseSprite", "TestIcon2", 35, 35, 100,
+    BASE_TOWER("Base Tower", "BaseSprite", "TestIcon1", 35, 35, 100,
             1.5, 10.0, 100.0,
             ProjectileType.BASIC, new TowerType[]{RAPID_TOWER, FAR_SHOT_TOWER, MEGA_HIT_TOWER}),
 
@@ -40,6 +40,7 @@ public enum TowerType {
             ProjectileType.MAGIC, new TowerType[]{MAGE_TOWER_2});
 
     public static final TowerType[] BASIC_TOWERS =  {BASE_TOWER, MAGE_TOWER};
+
     private String name;
     private String iconPath;
     private Image sprite;
