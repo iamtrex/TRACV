@@ -4,9 +4,6 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * The Window containing all other components to the program
@@ -54,7 +51,7 @@ public class TDFrame extends JFrame {
 
     //Create new game and swap to the game panel.
     public void newGame() {
-        tdGame.startNewGame();
+        tdGame.startNewGame(2); //TODO FIX
         if(this.getContentPane() != tdGame) {
             switchToGamePanel();
         }
@@ -62,6 +59,7 @@ public class TDFrame extends JFrame {
 
     public void switchToGamePanel() {
         switchPanel(tdGame);
+        tdGame.grabFocus(); // Give panel focus.
     }
 
     private void switchPanel(JComponent panel){
@@ -74,20 +72,24 @@ public class TDFrame extends JFrame {
     /**
      * Bit hacky rn... Maybe do it a better way?
      * @param b - show menu if true, hide if false
+     * @param msg
      */
-    public void toggleMenu(boolean b) {
+    public void toggleMenu(boolean b, String msg) {
         if(b){
-            menuPane.showMenu((JComponent) this.getContentPane());
+            menuPane.showMenu((JComponent) this.getContentPane(), msg);
         }else {
             menuPane.setVisible(false);
         }
 
         //If resuming game, resume game. // should be in else lol.
         if(this.getContentPane() == tdGame && !b){
-            tdGame.setGameRunning(true);
+            tdGame.getGameState().setGameRunning(true);
         }
 
         SwingUtilities.invokeLater(()-> this.validate());
     }
 
+    public void toggleMenu(boolean b) {
+        toggleMenu(b, null);
+    }
 }

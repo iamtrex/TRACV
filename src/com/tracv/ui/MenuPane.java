@@ -1,6 +1,7 @@
 package com.tracv.ui;
 
 import com.tracv.swing.Button;
+import com.tracv.swing.Label;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
@@ -23,30 +24,35 @@ public class MenuPane extends JPanel implements ActionListener {
     private TDFrame tdf;
 
 
+    private Label displayMessage;
     private Button newGame;
     private Button continueGame;
     private Button returnToMain;
     private Button settings;
+
+    private boolean returnEnabled = false;
 
     public MenuPane(TDFrame tdf) {
         this.tdf = tdf;
         //    this.setBorder(new LineBorder(Color.RED, 3));
         this.addMouseListener(new MyMouseListener());
 
-
+        displayMessage = new Label("", Label.LARGE);
         continueGame = new Button("Resume");
         newGame = new Button("Restart");
         returnToMain = new Button("Return to Main");
         settings = new Button("Settings");
 
+        Comp.add(displayMessage, this, 0, 0, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER, 0, 0, 10, 0); //Add 10 spacer to bottom
 
-        Comp.add(continueGame, this, 0, 0, 1, 1, 1, 0,
+        Comp.add(continueGame, this, 0, 1, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(newGame, this, 0, 1, 1, 1, 1, 0,
+        Comp.add(newGame, this, 0, 2, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(returnToMain, this, 0, 2, 1, 1, 1, 0,
+        Comp.add(returnToMain, this, 0, 3, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(settings, this, 0, 3, 1, 1, 1, 0,
+        Comp.add(settings, this, 0, 4, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
         continueGame.addActionListener(this);
@@ -62,14 +68,32 @@ public class MenuPane extends JPanel implements ActionListener {
     /**
      * Show different menus based off of where the source is from.
      * @param source
+     * @param msg
      */
-    public void showMenu(JComponent source){
+    public void showMenu(JComponent source, String msg){
         if(source instanceof TDGame){
-            continueGame.setVisible(true);
+            if(msg == null){
+                displayMessage.setVisible(false);
+                continueGame.setVisible(true);
+                returnEnabled = true;
+            }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
+                displayMessage.setText("Level Complete! :)");
+                displayMessage.setVisible(true);
+                continueGame.setVisible(false);
+                returnEnabled = false;
+            }else if(msg.equals(Constants.OBSERVER_GAME_OVER)){
+                displayMessage.setText("Game Over! :(");
+                displayMessage.setVisible(true);
+                continueGame.setVisible(false);
+                returnEnabled = false;
+            }
+
             newGame.setVisible(true);
             returnToMain.setVisible(true);
             settings.setVisible(true);
         }else if(source instanceof MainPane){
+            returnEnabled = true;
+            displayMessage.setVisible(false);
             continueGame.setVisible(false);
             newGame.setVisible(false);
             returnToMain.setVisible(true);
@@ -129,7 +153,7 @@ public class MenuPane extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == continueGame){
-            tdf.toggleMenu(false);
+            tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
         }else if(source == newGame){
             tdf.newGame();
         }else if (source == returnToMain) {
@@ -160,7 +184,9 @@ public class MenuPane extends JPanel implements ActionListener {
         @Override
         public void mouseReleased(MouseEvent e) {
             if (down) {
-                tdf.toggleMenu(false);
+                if(returnEnabled) { //Only allow cancel if continueGame is visible...
+                    tdf.toggleMenu(false);
+                }
                 down = false;
             }
         }

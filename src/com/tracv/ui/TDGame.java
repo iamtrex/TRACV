@@ -1,6 +1,5 @@
 package com.tracv.ui;
 
-import com.tracv.directional.PointToPointDistance;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -13,17 +12,16 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.TimerTask;
 
 /**
  * The Game.
  */
-public class TDGame extends JLayeredPane implements ActionListener, Observer{
+public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     private TDFrame tdf;
 
@@ -39,12 +37,17 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
     public TDGame(TDFrame tdf){
         this.tdf = tdf;
 
-        hudPane = new HUDPane();
         gamePane = new GamePane();
         gs = gamePane.getGameState();
+
+        hudPane = new HUDPane(gs);
+
+
         gs.addObserver(this);
+        gs.addObserver(hudPane.getHUDStatsPane());
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
+        gs.addObserver(hudPane.getHUDStatePane());
 
         menuPane = new MenuPane();
 
@@ -61,59 +64,45 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
-        createGameTimer();
     }
 
-    public void startNewGame(){
-        gs.newGame();
-        setGameRunning(true);
-    }
-
-    public void setGameRunning(boolean b) {
-        if(gameTimer != null){
-            if(running != b){
-                if(b){
-                    gameTimer.start();
-                    System.out.println("Starting/Resuming Game");
-                }else{
-                    gameTimer.stop();
-                    System.out.println("Stopping Game");
-                }
-                running = b;
-            }
-        }
-    }
-
-    private boolean running = false;
-    private javax.swing.Timer gameTimer;
-    private void createGameTimer(){
-       gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
-           gs.update();
-           gamePane.repaint();
-       });
+    /*
+    Map determines level to load.
+     */
+    public void startNewGame(int level){
+        gs.newGame(level);
+        gs.setGameRunning(true);
     }
 
     @Override
-    public void update(Observable o) {
-        GameState gs = gamePane.getGameState();
+    public void update(Observable o, String msg) {
         if(o == gs){
-            if(gs.isGameOver()){
-                tdf.toggleMenu(true);
+            if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
+                tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
+            }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
+                tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //DONE - ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
+
             }
         }
     }
+
+    public GameState getGameState() {
+        return gs;
+    }
+
 
     /**
      * Menu that lies on top of the game in order to pause hte game/sounds etc...
      */
     private class MenuPane extends JPanel{
         public MenuPane(){
-            this.setPreferredSize(Constants.ICON_SIZE); //TODO REMOVE TEMP.
-            this.setBorder(new LineBorder(Color.BLUE, 3));
+            this.setPreferredSize(Constants.ICON_SIZE);
+            //this.setBorder(new LineBorder(Color.BLUE, 3));
             pause = new IconButton("Pause"); //Show menu;
             pause.addActionListener(TDGame.this::actionPerformed);
             Comp.add(pause, this, 0, 0, 1, 1, 0, 0,
                     GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
+
         }
     }
 
@@ -121,8 +110,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer{
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == pause){
-            gamePane.getGameState().pause();
-            setGameRunning(false);
+            gs.setGameRunning(false);
             tdf.toggleMenu(true);
         }
 

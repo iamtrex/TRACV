@@ -23,6 +23,11 @@ public class Button extends JButton {
         setLook();
     }
 
+    public Button(Image sprite) {
+        super(new ImageIcon(sprite));
+        setLook();
+    }
+
     private void setLook() {
         this.setContentAreaFilled(false);
         this.setBorderPainted(false);

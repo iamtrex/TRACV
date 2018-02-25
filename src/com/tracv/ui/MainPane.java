@@ -73,7 +73,7 @@ public class MainPane extends JPanel
         if(source == start){
             tdf.newGame();
         }else if(source == menu){
-            tdf.toggleMenu(true);
+            tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
         }else if(source == quit){
             System.exit(0);
         }

@@ -2,7 +2,7 @@ package com.tracv.observerpattern;
 
 public interface Observer {
 
-    void update(Observable o);
+    void update(Observable o, String msg);
 
 
 }

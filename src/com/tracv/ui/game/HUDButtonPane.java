@@ -1,6 +1,8 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameState;
 import com.tracv.swing.HUDTowerButton;
+import com.tracv.swing.Label;
 import com.tracv.swing.Pane;
 import com.tracv.types.TowerType;
 import com.tracv.util.Comp;
@@ -20,19 +22,31 @@ import java.util.List;
 public class HUDButtonPane extends Pane
                                 implements ActionListener{
     private HUDPane hudPane;
-    public static final String TOWER_CHANGED = "Tower Changed";
+    public static final String TOWER_CHANGED = "Tower Changed"; //TODO move these to constants?
 
 
     private List<HUDTowerButton> buttons;
 
-    public HUDButtonPane(HUDPane hudPane) {
+    private Pane buttonsPane;
+    private Label lTower;
+
+    public HUDButtonPane(HUDPane hudPane, GameState gs) {
         this.hudPane = hudPane;
+        buttonsPane = new Pane();
+
+        lTower = new Label("Towers", Label.MEDIUM, Label.CENTER, Label.INVISIBLE);
+
+
+        Comp.add(lTower, this,  0, 0, 1, 1, 1, 0,
+                GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, 10, 0, 0, 0);
+        Comp.add(buttonsPane, this, 0, 1, 1, 1, 1, 1,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
         buttons = new ArrayList<>();
         makeAndAddButtons();
 
-        //TODO remove debug
-        this.setBorder(new LineBorder(Color.ORANGE, 1));
-
+        this.setPreferredSize(Constants.HUD_BUTTON_SIZE);
+        this.setMinimumSize(Constants.HUD_BUTTON_SIZE);
     }
 
     /**
@@ -41,16 +55,18 @@ public class HUDButtonPane extends Pane
      */
     private void makeAndAddButtons(){
         //TODO read buttons from some sort of file or lazily just make them staticlaly in some other file and copy them over
-        HUDTowerButton temp = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 100);
-        HUDTowerButton temp2 = new HUDTowerButton(TowerType.BASE_TOWER, "TestIcon2", 500);
-        buttons.add(temp);
-        buttons.add(temp2);
+
+        TowerType[] basicTowers = TowerType.BASIC_TOWERS;
+        for(TowerType tt : basicTowers){
+            HUDTowerButton temp = new HUDTowerButton(tt, tt.getIcon(), tt.getCost());
+            buttons.add(temp);
+        }
 
 
         int x = Constants.HUD_BUTTONS_PER_ROW;
         for(int i=0; i<buttons.size(); i++){
             Insets insets = getInsetsFor(i);
-            Comp.add(buttons.get(i), this,  i%x, i/x, 1, 1, 1, 1,
+            Comp.add(buttons.get(i), buttonsPane,  i%x, i/x, 1, 1, 1, 1,
                        GridBagConstraints.NONE, GridBagConstraints.CENTER, insets);
             buttons.get(i).addActionListener(this);
         }
@@ -86,9 +102,12 @@ public class HUDButtonPane extends Pane
         for(HUDTowerButton b : buttons){
             if(b == source){
                 //hudPane.setSelectedTowerType(b.getType());
-                firePropertyChange(TOWER_CHANGED, null, b.getType());
                 if(!b.isSelected()) {
+                    firePropertyChange(TOWER_CHANGED, null, b.getType());
                     b.setSelected(true);
+                }else{
+                    firePropertyChange(TOWER_CHANGED, null, null);
+                    b.setSelected(false);
                 }
             }else{
                 if(b.isSelected()) {

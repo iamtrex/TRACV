@@ -1,6 +1,6 @@
-package com.tracv.util;
+package com.tracv.model;
 
-import com.tracv.model.Terrain;
+import com.tracv.types.TerrainType;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,24 +9,28 @@ import java.util.List;
 public class TerrainParser {
 
 
-    public static Terrain[][] parseTerrainFile(String s){
+    public static TerrainType[][] parseTerrainFile(String s){
+        System.out.println("Parsed TerrainType File");
         String[][] data = parseCSVFile(s);
 
-        List<Terrain[]> terrains = new ArrayList<>();
+        List<TerrainType[]> terrainTypes = new ArrayList<>();
 
         for(int i=0; i<data.length; i++){
-            List<Terrain> tetPart = new ArrayList<>();
+            List<TerrainType> tetPart = new ArrayList<>();
 
             for(int j=0; j<data[i].length; j++){
-                for(Terrain t : Terrain.getTerrains()){
+                for(TerrainType t : TerrainType.getTerrains()){
                     if(t.getType().equals(data[i][j])){
                         tetPart.add(t);
+                        System.out.print(t.getType());
+                        break;
                     }
                 }
             }
-            terrains.add(tetPart.toArray(new Terrain[tetPart.size()]));
+            System.out.println();
+            terrainTypes.add(tetPart.toArray(new TerrainType[tetPart.size()]));
         }
-        return terrains.toArray(new Terrain[terrains.size()][]);
+        return terrainTypes.toArray(new TerrainType[terrainTypes.size()][]);
 
     }
     private static String[][] parseCSVFile(String s){
