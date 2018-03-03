@@ -23,6 +23,8 @@ public class MainPane extends JPanel
     private Button start;
     private Button menu;
     private Button quit;
+    private Button settings;
+
 
 
     private TDFrame tdf;
@@ -31,7 +33,7 @@ public class MainPane extends JPanel
         this.tdf = tdf;
 
 
-        title = new Label("TRACV Tower Defense Game", Label.LARGE);
+        title = new Label(Constants.GAME_NAME, Label.LARGE);
         version = new Label("Version - " + Constants.VERSION_NUMBER, Label.MEDIUM);
 
         start = new Button("Start Game");
@@ -39,6 +41,9 @@ public class MainPane extends JPanel
 
         menu = new Button("Menu");
         menu.addActionListener(this);
+
+        settings = new Button("Settings");
+        settings.addActionListener(this);
 
         quit = new Button("Quit");
         quit.addActionListener(this);
@@ -58,10 +63,13 @@ public class MainPane extends JPanel
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         Comp.add(menu, this, 0, 5, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(quit, this, 0, 6, 1, 1, 1, 0,
+        Comp.add(settings, this, 0, 6, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
-        Comp.add(new Spacer(), this, 0, 7, 1, 1, 1, 2,
+        Comp.add(quit, this, 0, 7, 1, 1, 1, 0,
+                GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
+        Comp.add(new Spacer(), this, 0, 8, 1, 1, 1, 2,
                 GridBagConstraints.BOTH, GridBagConstraints.PAGE_END);
 
     }
@@ -74,6 +82,8 @@ public class MainPane extends JPanel
             tdf.newGame();
         }else if(source == menu){
             tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
+        }else if(source == settings){
+            System.out.println("Settings");
         }else if(source == quit){
             System.exit(0);
         }
