@@ -9,7 +9,7 @@ public class Constants {
 
     //Names
     public static final String GAME_NAME = "TRACV Tower Defense";
-    public static final String VERSION_NUMBER = "ALPHA 0.1";
+    public static final String VERSION_NUMBER = "ALPHA 0.2";
 
     //Scaling and Dimensions
     public static final Double HUD_VERTICAL_SCALE = 0.2;
