@@ -30,6 +30,9 @@ public class GameMap {
     private List<Projectile> projectiles;
     private List<Base> bases;
 
+    private List<GameComponent> toAdd;
+    private List<GameComponent> toDel;
+
 
     private PathBuilder pathBuilder;
 
@@ -45,7 +48,9 @@ public class GameMap {
         projectiles = new ArrayList<>();
         bases = new ArrayList<>();
 
-
+        //Switch to using hashset?
+        toAdd = new ArrayList<>();
+        toDel = new ArrayList<>();
 
 
 
@@ -184,6 +189,10 @@ public class GameMap {
         return towers;
     }
 
+    public List<GameComponent> getToAdd(){return toAdd;}
+
+    public List<GameComponent> getToDel(){return toDel;}
+
     public void addEnemies(List<Enemy> spawn) {
         //TODO FIX- TOO TIRED TO DO SO RN
         SpawnThread st = new SpawnThread(spawn);
@@ -206,9 +215,7 @@ public class GameMap {
         public void run(){
             for(Enemy e : spawn){
                 e.setPath(pathBuilder.generatePath(start, destination));
-                enemies.add(e);
-                gameComponents.add(e);
-
+                toAdd.add(e);
                 try{
                     int randomFactor = r.nextInt(10);
                     Thread.sleep(100*randomFactor); //0.1 sec delay between spawns
