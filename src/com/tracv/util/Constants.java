@@ -50,6 +50,9 @@ public class Constants {
         public static final String TOWER_ICON_FILETYPE = ".png";
         public static final String TOWER_SPRITE_FILETYPE = ".png";
 
+        //TODO FILL OUT
+        public static final String SETTINGS_FILE = null;
+
 
     //Fonts
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
@@ -97,3 +100,4 @@ public class Constants {
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
 }
+
