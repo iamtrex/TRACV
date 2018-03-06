@@ -51,7 +51,7 @@ public class Constants {
         public static final String TOWER_SPRITE_FILETYPE = ".png";
 
         //TODO FILL OUT
-        public static final String SETTINGS_FILE = null;
+        public static final String SETTINGS_FILE = "/TRACV/preferences.json";
 
 
     //Fonts

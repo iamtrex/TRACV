@@ -31,7 +31,7 @@ public class SettingsPane extends Pane implements ActionListener {
         back = new Button("Back");
         Comp.add(back, this, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
-
+        back.addActionListener(this);
     }
 
     @Override
