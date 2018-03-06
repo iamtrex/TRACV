@@ -79,7 +79,8 @@ public class MainPane extends JPanel
         Object source = e.getSource();
 
         if(source == start){
-            tdf.newGame();
+            //tdf.newGame();
+            tdf.switchToLevelSelectPanel();
         }else if(source == menu){
             tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
         }else if(source == settings){

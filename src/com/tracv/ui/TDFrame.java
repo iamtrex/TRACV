@@ -13,6 +13,7 @@ public class TDFrame extends JFrame {
     //The various content panels.
     private MainPane mainPane;
     private TDGame tdGame;
+    private LevelSelectPane levelSelectPane;
 
     //GlassPane
     private MenuPane menuPane;
@@ -24,6 +25,8 @@ public class TDFrame extends JFrame {
         mainPane.setOpaque(false);
         tdGame = new TDGame(this);
         tdGame.setOpaque(false);
+
+        levelSelectPane = new LevelSelectPane(this);
 
         menuPane = new MenuPane(this);
 
@@ -51,12 +54,18 @@ public class TDFrame extends JFrame {
 
     //Create new game and swap to the game panel.
     public void newGame() {
-        tdGame.startNewGame(2); //TODO FIX
+        newGame(1); //Default
+    }
+    public void newGame(int i){
+        tdGame.startNewGame(i);
         if(this.getContentPane() != tdGame) {
             switchToGamePanel();
         }
     }
 
+    public void switchToLevelSelectPanel(){
+        switchPanel(levelSelectPane);
+    }
     public void switchToGamePanel() {
         switchPanel(tdGame);
         tdGame.grabFocus(); // Give panel focus.
