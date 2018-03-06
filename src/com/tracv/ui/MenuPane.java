@@ -159,7 +159,7 @@ public class MenuPane extends JPanel implements ActionListener {
         }else if (source == returnToMain) {
             tdf.switchToMainPanel();
         }else if(source == settings){
-
+            tdf.switchToSettingsPanel();
         }
         this.setVisible(false);
     }
