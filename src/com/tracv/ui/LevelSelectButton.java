@@ -8,7 +8,6 @@ public class LevelSelectButton extends Button {
         this.setText(s);
 
 
-
     }
 
 }
