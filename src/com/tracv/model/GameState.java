@@ -27,9 +27,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private Tower selectedTower; //Selected by user.
 
 
-    List<GameComponent> toAdd;
-    List<GameComponent> toDel;
-
 
     private int gold;
     private int score;
@@ -47,9 +44,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         parser = new LevelJsonParser();
         map = new GameMap();
         spawner = new EnemySpawner(parser, this);
-
-        toAdd = new ArrayList<>();
-        toDel = new ArrayList<>();
     }
 
     /**
@@ -119,13 +113,18 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         //System.out.println(actualTimeMS);
 
         List<Enemy> needToRetarget = new ArrayList<>();
+        List<GameComponent> toDel = map.getToDel();
+        List<GameComponent> toAdd = map.getToAdd();
 
         for(Enemy e : map.getEnemies()){
+            if(toDel.contains(e)) {
+                continue; // Skip.
+            }
             boolean reachedBase = EnemyMotion.updateEnemy(e);
 
             //Delete e if it reaches base
             if(reachedBase){
-                //TODO update Health of base since it crashed.
+                //DONE -  update Health of base since it crashed.
                 System.out.println("CRASHED!");
                 if(map.getBase().takeDmg(e.getDmg())){
                     //Base exploded.
@@ -134,11 +133,15 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
                 notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
 
+                needToRetarget.add(e);
                 toDel.add(e);
             }
         }
 
         for(Projectile p : map.getProjectiles()){
+            if(toDel.contains(p)){
+                continue; // Skip.
+            }
             boolean crashed = ProjectileMotion.updateProjectile(p);
             if(crashed){
                 Enemy e = p.getTarget();
@@ -181,6 +184,23 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             }
         }
 
+        for(Enemy e : needToRetarget){
+            for(Projectile p : map.getProjectiles()){
+                if(p.getTarget().equals(e)){
+                    System.out.println("Retargetting for dead enemy");
+                    if(map.getEnemies().size() > 0) {
+                        for(Enemy e2 : map.getEnemies()){
+                            if(!needToRetarget.contains(e2)){
+                                p.setTarget(e2);
+                            }
+                        }
+                    }else{
+                        toDel.add(p);
+                    }
+                }
+            }
+        }
+
         for(GameComponent gc : toAdd){
             map.addComponent(gc);
         }
@@ -192,24 +212,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         toDel.clear();
         toAdd.clear();
 
-        for(Enemy e : needToRetarget){
-            for(Projectile p : map.getProjectiles()){
-                if(p.getTarget().equals(e)){
-                    System.out.println("Retargetting for dead enemy");
-                    if(map.getEnemies().size() > 0) {
-                        p.setTarget(map.getEnemies().get(0)); //Retarget first enemy.
-                    }else{
-                        toDel.add(p);
-                    }
-                }
-            }
-        }
-
-        //Delete the projectiles since they no longer have targets.
-        for(GameComponent gc : toDel){
-            map.removeComponent(gc);
-        }
-
+        //Update spawner time
         if(!doneSpawn){
             if(spawner.update(actualTimeMS)){
                 doneSpawn = true; //End spawns
@@ -408,7 +411,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         if(t == selectedTower){
             selectedTower = null;
         }
-        toDel.add(t);
+        map.getToDel().add(t);
         gainGold((int)t.getSellPrice());
         notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
     }
