@@ -16,6 +16,7 @@ import java.util.List;
 public class LevelSelectPane extends JPanel implements ActionListener {
 
     private Label title;
+  
     private TDFrame tdf;
 
     private List<LevelSelectButton> buttons;
@@ -60,6 +61,7 @@ public class LevelSelectPane extends JPanel implements ActionListener {
             if(b == source){
                 //Load level
                 //TODO - Change how level name is read in case we want to change that in the future
+
                 tdf.newGame(Integer.parseInt(b.getText()));
                 return;
             }

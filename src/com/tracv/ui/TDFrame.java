@@ -29,6 +29,8 @@ public class TDFrame extends JFrame {
 
         levelSelectPane = new LevelSelectPane(this);
 
+        levelSelectPane = new LevelSelectPane(this);
+
         menuPane = new MenuPane(this);
 
         settingsPane = new SettingsPane(this);
