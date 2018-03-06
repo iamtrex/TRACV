@@ -84,7 +84,7 @@ public class MainPane extends JPanel
         }else if(source == menu){
             tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
         }else if(source == settings){
-            System.out.println("Settings");
+            tdf.switchToSettingsPanel();
         }else if(source == quit){
             System.exit(0);
         }

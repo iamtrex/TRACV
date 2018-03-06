@@ -1,6 +1,5 @@
 package com.tracv.settings;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tracv.util.Constants;
 
@@ -9,12 +8,10 @@ import java.io.IOException;
 
 public class SettingsIO {
 
-    private JsonFactory factory;
     private ObjectMapper mapper;
     private Settings settings;
 
     public SettingsIO(){
-        factory = new JsonFactory();
         mapper = new ObjectMapper();
 
         setupSaveFile();

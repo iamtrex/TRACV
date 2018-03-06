@@ -14,21 +14,24 @@ public class TDFrame extends JFrame {
     private MainPane mainPane;
     private TDGame tdGame;
     private LevelSelectPane levelSelectPane;
+    private SettingsPane settingsPane;
 
     //GlassPane
     private MenuPane menuPane;
+
+    private JComponent last;
 
 
     public TDFrame() {
         //Create Content Panes.
         mainPane = new MainPane(this);
-        mainPane.setOpaque(false);
         tdGame = new TDGame(this);
-        tdGame.setOpaque(false);
 
         levelSelectPane = new LevelSelectPane(this);
 
         menuPane = new MenuPane(this);
+
+        settingsPane = new SettingsPane(this);
 
         this.setUndecorated(true);
         //this.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.8f));
@@ -71,7 +74,11 @@ public class TDFrame extends JFrame {
         tdGame.grabFocus(); // Give panel focus.
     }
 
+    public void switchToSettingsPanel(){
+        switchPanel(settingsPane);
+    }
     private void switchPanel(JComponent panel){
+        last = (JComponent) this.getContentPane();
         this.setContentPane(panel);
         SwingUtilities.invokeLater(() -> this.validate());
 
@@ -100,5 +107,9 @@ public class TDFrame extends JFrame {
 
     public void toggleMenu(boolean b) {
         toggleMenu(b, null);
+    }
+
+    public void returnToLast() {
+        switchPanel(last);
     }
 }
