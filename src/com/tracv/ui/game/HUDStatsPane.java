@@ -31,7 +31,7 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
     private List<TowerUpgradeButton> towerUpgrades;
     private Label type;
     private Button sellTower;
-    private Pane upgradesPane;
+    private JPanel upgradesPane;
 
 
 
@@ -50,7 +50,7 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
         sellTower = new Button("Sell ()");
         sellTower.setFont(Constants.MEDIUM_LABEL_FONT); //Override fonta
 
-        upgradesPane = new Pane();
+        upgradesPane = new JPanel();
 
         sellTower.addActionListener(this);
         //this.setPreferredSize(Constants.HUD_STATS_SIZE);
