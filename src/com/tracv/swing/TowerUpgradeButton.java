@@ -1,6 +1,5 @@
 package com.tracv.swing;
 
-import com.tracv.swing.Button;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
@@ -27,6 +26,9 @@ public class TowerUpgradeButton extends Button {
         this.setFont(Constants.SMALL_LABEL_FONT);
 
         upgradeType = tt;
+
+        //WEIRD BUG MAKES UI DISAPPEAR?
+        //this.setToolTipText("<html><body><strong>" + tt.getName() + "</strong></body></html>");
 
     }
 
