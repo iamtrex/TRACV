@@ -40,6 +40,7 @@ public class SettingsIO {
         System.out.println("Checking save file");
         saveFile = new File(Constants.SETTINGS_FILE);
         if(!saveFile.exists()){
+            System.out.println("File not found");
             saveFile.getParentFile().mkdirs();
             try{
                 saveFile.createNewFile();
@@ -49,6 +50,8 @@ public class SettingsIO {
                 e.printStackTrace();
             }
             saveFile.setWritable(true);
+        }else{
+            System.out.println("File found");
         }
     }
 
