@@ -64,8 +64,8 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
         upgradesPane.setPreferredSize(
                 new Dimension((int)this.getPreferredSize().getWidth(), (int)(this.getPreferredSize().getHeight()*0.5)));
 
-
         this.setVisible(false);
+
 
     }
 
