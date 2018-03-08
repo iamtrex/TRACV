@@ -12,7 +12,9 @@ public class CustomToolTip extends JFrame {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setUndecorated(true);
         content = new Pane();
+        content.setOpaque(false); //TODO FIX OTHER UIS SO PANE CAN BE TRANSPARENT
         setContentPane(content);
-        setSize(new Dimension(100, 100));
+        setBackground(Color.WHITE);
+        //setSize(new Dimension(100, 100));
     }
 }

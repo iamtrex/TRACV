@@ -80,10 +80,12 @@ public class TDFrame extends JFrame {
         switchPanel(settingsPane);
     }
     private void switchPanel(JComponent panel){
+        if(last == tdGame){
+            tdGame.resumeGame();
+        }
         last = (JComponent) this.getContentPane();
         this.setContentPane(panel);
         SwingUtilities.invokeLater(() -> this.validate());
-
     }
 
 
