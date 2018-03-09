@@ -56,12 +56,16 @@ public class Constants {
 
 
     //Fonts
+        public static final String FONT_FAMILY = "Calibri";
+        //TODO FIX FONTS. 
         public static final Font DEFAULT_FONT = new Font("Calibri", Font.BOLD, 24);
         public static final Font HUD_TOWER_GOLD_FONT = new Font("Calibri", Font.PLAIN, 10);
 
         public static final Font LARGE_LABEL_FONT = new Font("Calibri", Font.BOLD, 36);
         public static final Font MEDIUM_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
         public static final Font SMALL_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
+
+    public static final int DEFAULT_SIZE = 14;
 
     //Default colours of selected vs unselected buttons
         public static final Color BUTTON_SELECTED_COLOR = new Color(150, 150, 150, 150);
@@ -100,5 +104,6 @@ public class Constants {
     public static final String OBSERVER_TOWER_SELECTED = "tower sel";
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
+
 }
 
