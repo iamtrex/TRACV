@@ -3,7 +3,7 @@ package com.tracv.swing;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import java.awt.GridBagConstraints;
+import java.awt.*;
 
 public class Label extends JLabel {
 
@@ -16,6 +16,18 @@ public class Label extends JLabel {
 
     public static final int INVISIBLE = 21;
 
+    public static final int BOLD = 31;
+
+    public static final Font SMALL_BOLD_FONT = new Font(Constants.FONT_FAMILY, Font.BOLD, Constants.DEFAULT_SIZE);
+
+
+
+    public Label(String name, Font font){
+        super(name);
+        setup();
+        this.setFont(font);
+
+    }
     public Label(String name, int size, int align, int style) {
         super(name);
         setup();

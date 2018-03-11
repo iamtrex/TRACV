@@ -90,6 +90,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         return gs;
     }
 
+    public void resumeGame() {
+        gs.setGameRunning(true);
+    }
+
 
     /**
      * Menu that lies on top of the game in order to pause hte game/sounds etc...

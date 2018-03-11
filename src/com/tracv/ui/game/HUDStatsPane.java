@@ -64,8 +64,8 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
         upgradesPane.setPreferredSize(
                 new Dimension((int)this.getPreferredSize().getWidth(), (int)(this.getPreferredSize().getHeight()*0.5)));
 
-
         this.setVisible(false);
+
 
     }
 
@@ -106,7 +106,7 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
     }
 
     private TowerUpgradeButton createUpgradeButton(TowerType tt) {
-        TowerUpgradeButton b = new TowerUpgradeButton(tt);
+        TowerUpgradeButton b = new TowerUpgradeButton(tt, selectedTower);
         b.addActionListener(this);
         return b;
     }

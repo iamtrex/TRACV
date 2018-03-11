@@ -3,7 +3,7 @@ package com.tracv.ui.game;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
-import com.tracv.swing.BlankPane;
+import com.tracv.swing.Pane;
 import com.tracv.types.TowerType;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
@@ -32,51 +32,22 @@ public class HUDPane extends JPanel implements Observer{
         hudStatsPane = new HUDStatsPane(this, gs);
         hudStatePane = new HUDStatePane(this, gs);
 
-        Comp.add(new BlankPane(Constants.HUD_STATE_SIZE), this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.BOTH, GridBagConstraints.WEST);
+        Pane statsSpaceHolderPane = new Pane();
 
-        Comp.add(hudStatsPane, this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.BOTH, GridBagConstraints.WEST);
+        Comp.add(hudStatsPane, statsSpaceHolderPane, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
-        Comp.add(hudButtonPane, this, 1, 0, 1, 1, 1, 1,
+
+        Comp.add(hudButtonPane, this, 0, 0, 1, 1, 1, 1,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
+        Comp.add(statsSpaceHolderPane, this, 1, 0, 1, 1, 1, 1,
+                GridBagConstraints.BOTH, GridBagConstraints.WEST);
 
         Comp.add(hudStatePane, this, 2, 0, 1, 1, 1, 1,
                 GridBagConstraints.BOTH, GridBagConstraints.EAST);
 
-        /*
-        Comp.add(new BlankPane(Constants.HUD_STATE_SIZE), this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.WEST, 0, 10, 0, 5);
+        statsSpaceHolderPane.setPreferredSize(Constants.HUD_STATS_SIZE);
 
-        Comp.add(hudStatsPane, this, 0, 0, 1, 1, 1, 1,
-                GridBagConstraints.BOTH, GridBagConstraints.WEST, 0, 10, 0, 5);
-
-        Comp.add(hudButtonPane, this, 1, 0, 1, 1, 1, 1,
-                GridBagConstraints.BOTH, GridBagConstraints.CENTER, 0, 5, 0, 5);
-
-        Comp.add(hudStatePane, this, 2, 0, 1, 1, 1, 1,
-                      GridBagConstraints.BOTH, GridBagConstraints.EAST, 0, 5, 0, 10);
-
-        */
-        /*
-        this.add(hudButtonPane);
-        this.add(hudStatsPane);
-        this.add(hudStatePane);
-        */
-        //Using absolute positioning because can't think of easier way
-        /*
-        int x = this.getX();
-        hudStatsPane.setBounds(x, this.getY(),
-                (int)hudStatsPane.getPreferredSize().getWidth(), (int)hudStatsPane.getPreferredSize().getHeight());
-
-        x += (int)hudStatsPane.getPreferredSize().getWidth();
-        hudButtonPane.setBounds(x, this.getY(),
-                (int) hudButtonPane.getPreferredSize().getWidth(), (int)hudButtonPane.getPreferredSize().getHeight());
-
-        x += (int) hudStatePane.getPreferredSize().getWidth();
-        hudStatePane.setBounds(x, this.getY(),
-                (int)hudStatePane.getPreferredSize().getWidth(), (int)hudStatePane.getPreferredSize().getHeight());
-        */
     }
 
     public TowerType getSelectedTowerType(){

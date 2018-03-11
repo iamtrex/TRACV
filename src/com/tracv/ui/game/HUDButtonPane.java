@@ -8,7 +8,6 @@ import com.tracv.types.TowerType;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,7 +57,7 @@ public class HUDButtonPane extends Pane
 
         TowerType[] basicTowers = TowerType.BASIC_TOWERS;
         for(TowerType tt : basicTowers){
-            HUDTowerButton temp = new HUDTowerButton(tt, tt.getIcon(), tt.getCost());
+            HUDTowerButton temp = new HUDTowerButton(tt);
             buttons.add(temp);
         }
 

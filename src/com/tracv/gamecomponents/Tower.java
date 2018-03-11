@@ -106,6 +106,9 @@ public class Tower extends GameComponent {
     public String getTypeName() {
         return type.getName();
     }
+    public TowerType getType(){
+        return type;
+    }
 
     public double getSellPrice() {
         return type.getSellPrice();

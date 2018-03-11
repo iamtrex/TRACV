@@ -15,22 +15,22 @@ public class HUDTowerButton extends JButton{
 
     private TowerType type;
 
+
     private Border lineBorder, emptyBorder;
 
-    public HUDTowerButton(TowerType type, String iconPath, int cost){
+    public HUDTowerButton(TowerType type){
         lineBorder = new LineBorder(Color.BLUE, 1);
         emptyBorder = new EmptyBorder(1, 1, 1, 1);
 
-        Icon i = getIcon(iconPath);
+        Icon i = getIcon(type.getIcon());
         this.type = type;
-
         if(i != null){
             this.setIcon(i);
         }else{
             System.out.println("No Icon designated for this tower");
         }
 
-        this.setText(String.valueOf(cost));
+        this.setText(String.valueOf(type.getCost()));
 
         setLook();
     }
