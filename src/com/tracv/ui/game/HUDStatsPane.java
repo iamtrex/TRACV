@@ -106,7 +106,7 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
     }
 
     private TowerUpgradeButton createUpgradeButton(TowerType tt) {
-        TowerUpgradeButton b = new TowerUpgradeButton(tt);
+        TowerUpgradeButton b = new TowerUpgradeButton(tt, selectedTower);
         b.addActionListener(this);
         return b;
     }

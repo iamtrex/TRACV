@@ -1,5 +1,6 @@
 package com.tracv.swing;
 
+import com.tracv.gamecomponents.Tower;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
@@ -12,10 +13,11 @@ import java.awt.event.MouseMotionListener;
 public class TowerUpgradeButton extends Button implements MouseListener, MouseMotionListener {
 
     private TowerType upgradeType;
+    private TowerType prevType;
 
 
 
-    public TowerUpgradeButton(TowerType tt){
+    public TowerUpgradeButton(TowerType tt, Tower selectedTower){
         super();
 
         this.setIcon(new ImageIcon(tt.getSprite()));
@@ -31,7 +33,7 @@ public class TowerUpgradeButton extends Button implements MouseListener, MouseMo
 
         upgradeType = tt;
 
-        tool = new TowerToolTip(tt);
+        tool = new TowerToolTip(tt, selectedTower);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         this.addActionListener((e)->{
