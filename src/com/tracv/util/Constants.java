@@ -41,6 +41,7 @@ public class Constants {
     //Directory Locations
 
         public static final String LEVEL_DIR = "/Levels/";
+        public static final String MAP_DIR = "Levels/LevelMap/";
 
         public static final String ICON_DIR = "/Icons/";
         public static final String ICON_FILE_TYPE = ".png";

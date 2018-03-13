@@ -38,7 +38,9 @@ public class TerrainParser {
         List<String[]> data = new ArrayList<>();
 
         try {
+            System.out.println("Loading file " + s);
             InputStream in = TerrainParser.class.getClassLoader().getResourceAsStream(s);
+
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
             String line;

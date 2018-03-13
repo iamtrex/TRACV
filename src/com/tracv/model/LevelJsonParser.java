@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
 import java.util.*;
 
 public class LevelJsonParser {
@@ -27,7 +26,7 @@ public class LevelJsonParser {
 
 
     public String getFile() {
-        return map;
+        return Constants.MAP_DIR + map;
     }
 
 
@@ -67,7 +66,7 @@ public class LevelJsonParser {
         return wave;
     }
 
-    String name, map;
+    private String name, map;
     private Map<List<EnemyType>, Integer> spawnTimer;
     private Queue<List<EnemyType>> spawnQueue;
 
