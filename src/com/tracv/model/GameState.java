@@ -26,8 +26,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private Timer gameTimer;
     private Tower selectedTower; //Selected by user.
 
-
-
     private int gold;
     private int score;
     private int timeElapsed;
@@ -59,6 +57,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         gold = 500; // temp value, 500 cuz league
         score = 0;
         timeElapsed = 0;
+        selectedTower = null;
+
 
         //Load level based on inputted string.
         this.level = level;
@@ -231,6 +231,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private void setLevelSuccess(){
         notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
         setGameRunning(false);
+
     }
     private void setLevelFailure() {
         notifyObservers(Constants.OBSERVER_GAME_OVER);

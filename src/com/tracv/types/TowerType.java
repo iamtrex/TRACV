@@ -11,32 +11,32 @@ import java.util.List;
 
 public enum TowerType {
 
-    FAR_SHOT_TOWER_2("Far Shot 2 Tower", "FarSprite", "TestIcon2", 35, 35, 200,
-            1.5, 12.0, 500.0,
+    FAR_SHOT_TOWER_2("Far Shot 2 Tower", "FarSprite", "TestIcon2", TowerClass.SNIPER,
+            35, 35, 200, 1.5, 12.0, 500.0,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    MEGA_HIT_TOWER("Mega Hit Tower", "MegaSprite","TestIcon2", 35, 35, 200,
-            1.5, 40.0, 150,
+    MEGA_HIT_TOWER("Mega Hit Tower", "MegaSprite","TestIcon2", TowerClass.ARTILLARY,
+            35, 35, 200, 1.5, 40.0, 150,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    FAR_SHOT_TOWER("Far Shot Tower", "FarSprite", "TestIcon2", 35, 35, 200,
-            1.5, 10.0, 300.0,
+    FAR_SHOT_TOWER("Far Shot Tower", "FarSprite", "TestIcon2", TowerClass.SNIPER,
+            35, 35, 200, 1.5, 10.0, 300.0,
             ProjectileType.BASIC, new TowerType[]{FAR_SHOT_TOWER_2}),
 
-    RAPID_TOWER("Rapid Tower", "RapidSprite", "TestIcon2", 35, 35, 100,
-            2.5, 10.0, 100.0,
+    RAPID_TOWER("Rapid Tower", "RapidSprite", "TestIcon2", TowerClass.RAPID_FIRE,
+            35, 35, 100, 2.5, 10.0, 100.0,
             ProjectileType.BASIC, new TowerType[]{}),
 
-    BASE_TOWER("Base Tower", "BaseSprite", "TestIcon1", 35, 35, 100,
-            1.5, 10.0, 100.0,
+    BASE_TOWER("Base Tower", "BaseSprite", "TestIcon1", TowerClass.BASIC,
+            35, 35, 100, 1.5, 10.0, 100.0,
             ProjectileType.BASIC, new TowerType[]{RAPID_TOWER, FAR_SHOT_TOWER, MEGA_HIT_TOWER}),
 
-    MAGE_TOWER_2("Mage Tower 2", "Mage2Sprite", "TestIcon2", 35, 35, 100,
-                       0.5, 20.0, 250.0,
+    MAGE_TOWER_2("Mage Tower 2", "Mage2Sprite", "TestIcon2", TowerClass.MAGE,
+            35, 35, 100, 0.5, 20.0, 250.0,
                ProjectileType.MAGIC, new TowerType[]{}),
 
-    MAGE_TOWER("Mage Tower", "MageSprite", "TestIcon2", 35, 35, 100,
-            0.5, 10.0, 250.0,
+    MAGE_TOWER("Mage Tower", "MageSprite", "TestIcon2", TowerClass.MAGE,
+            35, 35, 100, 0.5, 10.0, 250.0,
             ProjectileType.MAGIC, new TowerType[]{MAGE_TOWER_2});
 
     public static final TowerType[] BASIC_TOWERS =  {BASE_TOWER, MAGE_TOWER};
@@ -57,8 +57,10 @@ public enum TowerType {
     private List<TowerType> upgrades;
 
 
+    private TowerClass classType;
 
-    TowerType(String name, String spritePath, String iconPath, int width, int height, int cost,
+    TowerType(String name, String spritePath, String iconPath, TowerClass classType,
+              int width, int height, int cost,
               double fireRate, double dmg, double range,
               ProjectileType projType, TowerType[] ups){
         this.name = name;
@@ -70,6 +72,8 @@ public enum TowerType {
         this.projType = projType;
         this.cost = cost;
         this.iconPath = iconPath;
+
+        this.classType = classType;
 
         this.upgrades = new ArrayList<>();
         upgrades.addAll(Arrays.asList(ups));
@@ -134,5 +138,9 @@ public enum TowerType {
 
     public String getIcon() {
         return iconPath;
+    }
+
+    public String getType() {
+        return classType.getName();
     }
 }

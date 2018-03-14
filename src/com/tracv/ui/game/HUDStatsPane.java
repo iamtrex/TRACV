@@ -72,13 +72,17 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
 
     @Override
     public void update(Observable o, String msg) {
-        if(msg.equals(Constants.OBSERVER_TOWER_SELECTED) || msg.equals(Constants.OBSERVER_UPGRADED_TOWER)){
+        if(msg.equals(Constants.OBSERVER_TOWER_SELECTED) ||
+                msg.equals(Constants.OBSERVER_UPGRADED_TOWER) ||
+                msg.equals(Constants.OBSERVER_NEW_GAME)){
+            System.out.println("Refresh Tower");
             displayTowerInfo(gs.getSelectedTower());
         }
     }
 
     private void displayTowerInfo(Tower selectedTower) {
         this.selectedTower = selectedTower;
+
 
         System.out.println("Updating Stats Pane");
 
