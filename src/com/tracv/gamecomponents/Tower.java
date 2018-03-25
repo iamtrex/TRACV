@@ -1,5 +1,6 @@
 package com.tracv.gamecomponents;
 
+import com.tracv.types.ProjectileType;
 import com.tracv.types.TowerType;
 
 import java.awt.*;
@@ -114,4 +115,7 @@ public class Tower extends GameComponent {
         return type.getSellPrice();
     }
 
+    public ProjectileType getProjectileType() {
+        return ProjectileType.BASIC; //TODO FIX.
+    }
 }

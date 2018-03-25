@@ -173,7 +173,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                             //Create new projectile with this Enemy as targe
                             // TODO FIX TEMP LINE
                             // TODO STILL HAVE TO MODIFY...
-                            Projectile proj = new Projectile(e, (int)t.getAtkDmg(), 5, t.getX(), t.getY(), null);
+                            Projectile proj = new Projectile(e, t, t.getProjectileType());
                             toAdd.add(proj);
                             t.setFired();
                             break;
@@ -190,8 +190,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                     System.out.println("Retargetting for dead enemy");
                     if(map.getEnemies().size() > 0) {
                         for(Enemy e2 : map.getEnemies()){
-                            if(!needToRetarget.contains(e2)){
-                                p.setTarget(e2);
+                            if(e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
+                                if (!needToRetarget.contains(e2)) {
+                                    if (PointToPointDistance.withinRange(e2, p.getTower(), p.getTower().getRange())) {
+                                        p.setTarget(e2);
+                                    }
+                                }
                             }
                         }
                     }else{

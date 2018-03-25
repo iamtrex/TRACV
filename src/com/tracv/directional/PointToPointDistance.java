@@ -19,4 +19,8 @@ public class PointToPointDistance {
         return point.getX() >= gc.getX() && point.getX() <= gc.getX() + gc.getWidth() &&
             point.getY() >= gc.getY() && point.getY() <= gc.getY() + gc.getHeight();
     }
+
+    public static boolean withinRange(GameComponent g1, GameComponent g2, double range){
+        return range >= Math.sqrt(Math.pow(g1.getX()-g2.getX(), 2) + Math.pow(g1.getY()-g2.getY(), 2));
+    }
 }

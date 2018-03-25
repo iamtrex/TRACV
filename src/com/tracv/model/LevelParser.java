@@ -8,6 +8,7 @@ public class LevelParser {
         List<String> levelNames = new ArrayList<>();
         levelNames.add("1");
         levelNames.add("2");
+        levelNames.add("3"); //TODO GOTTA FIX THIS LOL.
 
         return levelNames;
     }
