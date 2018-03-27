@@ -32,17 +32,20 @@ public class Enemy extends MoveableComponent {
         height = 25; //TODO remove temp.
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, Rectangle selectedRegion) {
         //TODO remove temp
         if(type == EnemyType.BASIC) {
             g.setColor(Color.WHITE);
         }else{
             g.setColor(Color.lightGray);
         }
-        g.fillOval((int)x, (int)y, (int)width, (int)height);
+        int screenX = (int) Math.round(x - selectedRegion.getX());
+        int screenY = (int) Math.round(y - selectedRegion.getY());
 
-        int healthX = (int) x;
-        int healthY = (int) y - 15;
+        g.fillOval(screenX, screenY, (int)width, (int)height);
+
+        int healthX = screenX;
+        int healthY = screenY - 15;
         int width = (int)((double)health/(double)totalHealth * 25);
 
         // Draw Health bar

@@ -31,7 +31,7 @@ public abstract class GameComponent {
      * Abstract method with specific implementation in subtypes
      * @param g Swing Graphics
      */
-    public abstract void draw(Graphics g);
+    public abstract void draw(Graphics g, Rectangle selectedRegion);
 
     public double getWidth(){
         return width;

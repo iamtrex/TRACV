@@ -2,13 +2,16 @@ package com.tracv.ui;
 
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
+import com.tracv.util.MouseHooker;
 
 import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 /**
  * The Window containing all other components to the program
  */
-public class TDFrame extends JFrame {
+public class TDFrame extends JFrame implements WindowFocusListener {
 
     //The various content panels.
     private MainPane mainPane;
@@ -21,8 +24,12 @@ public class TDFrame extends JFrame {
 
     private JComponent last;
 
+    private MouseHooker mouseHooker;
 
     public TDFrame() {
+        mouseHooker = new MouseHooker(this);
+
+
         //Create Content Panes.
         mainPane = new MainPane(this);
         tdGame = new TDGame(this);
@@ -44,6 +51,8 @@ public class TDFrame extends JFrame {
         this.setSize(Constants.FRAME_DEFAULT_SIZE);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //this.addFocusListener(this);
+        this.addWindowFocusListener(this);
         Comp.center(this);
         this.setVisible(true);
     }
@@ -59,6 +68,7 @@ public class TDFrame extends JFrame {
 
     //Create new game and swap to the game panel.
     public void newGame() {
+        //TODO REMOVE THIS
         newGame(1); //Default
     }
     public void newGame(int i){
@@ -80,8 +90,12 @@ public class TDFrame extends JFrame {
         switchPanel(settingsPane);
     }
     private void switchPanel(JComponent panel){
-        if(last == tdGame){
+        if(panel == tdGame){
+            System.out.println("Resuming game???");
             tdGame.resumeGame();
+            mouseHooker.setActive(true);
+        }else{
+            mouseHooker.setActive(false);
         }
         last = (JComponent) this.getContentPane();
         this.setContentPane(panel);
@@ -97,13 +111,16 @@ public class TDFrame extends JFrame {
     public void toggleMenu(boolean b, String msg) {
         if(b){
             menuPane.showMenu((JComponent) this.getContentPane(), msg);
+            mouseHooker.setActive(false);
         }else {
             menuPane.setVisible(false);
         }
 
         //If resuming game, resume game. // should be in else lol.
         if(this.getContentPane() == tdGame && !b){
-            tdGame.getGameState().setGameRunning(true);
+            //tdGame.getGameState().setGameRunning(true);
+            tdGame.resumeGame(); //New and improved
+            mouseHooker.setActive(true);
         }
 
         SwingUtilities.invokeLater(()-> this.validate());
@@ -115,5 +132,21 @@ public class TDFrame extends JFrame {
 
     public void returnToLast() {
         switchPanel(last);
+    }
+
+
+    @Override
+    public void windowGainedFocus(WindowEvent e) {
+        if(TDFrame.this.getContentPane() == tdGame){
+            mouseHooker.setActive(true);
+        }
+        //System.out.println("Fcous gained");
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent e) {
+
+        mouseHooker.setActive(false);
+        //System.out.println("Fcous lost");
     }
 }

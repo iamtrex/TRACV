@@ -1,7 +1,5 @@
 package com.tracv.gamecomponents;
 
-import java.awt.*;
-
 public abstract class MoveableComponent extends GameComponent {
     protected double speed;
 
@@ -9,7 +7,7 @@ public abstract class MoveableComponent extends GameComponent {
         super(x, y, iconPath);
         this.speed = speed;
     }
-    public abstract void draw(Graphics g);
+    //public abstract void draw(Graphics g, Rectangle selectedRegion);
 
     public double getSpeed() {
         return speed;

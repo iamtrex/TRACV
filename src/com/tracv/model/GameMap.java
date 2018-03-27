@@ -83,8 +83,10 @@ public class GameMap {
 
     private void buildTerrain(TerrainType[][] terrainTypes) {
 
-        int width = Constants.GAME_DIMENSION.width / terrainTypes[0].length;
-        int height = Constants.GAME_DIMENSION.height / terrainTypes.length;
+        //int width = Constants.GAME_DIMENSION.width / terrainTypes[0].length;
+        //int height = Constants.GAME_DIMENSION.height / terrainTypes.length;
+        int width = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
+        int height = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
         terrains = new Terrain[terrainTypes.length][terrainTypes[0].length];
         for(int i=0; i<terrainTypes.length; i++){
             for(int j=0; j<terrainTypes[i].length; j++){

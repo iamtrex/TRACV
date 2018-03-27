@@ -26,6 +26,8 @@ import java.awt.event.*;
 public class GamePane extends JPanel implements Observer{
 
 
+    private Rectangle selectedRegion;
+
     private Point mouse;
 
     private GameState gs;
@@ -74,6 +76,10 @@ public class GamePane extends JPanel implements Observer{
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
 
+        //TODO -- Remove this hack
+        selectedRegion = new Rectangle(0,0,
+                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
+
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
@@ -85,14 +91,21 @@ public class GamePane extends JPanel implements Observer{
 
         Terrain[][] terrains = getGameState().getTerrain();
 
-        int blockSizeX = this.getWidth() / terrains[0].length;
-        int blockSizeY = this.getHeight() / terrains.length;
+        //int blockSizeX = this.getWidth() / terrains[0].length;
+        //int blockSizeY = this.getHeight() / terrains.length;
+        double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
+        double blockSizeY = Constants.DEFAULT_BLOCK_SIZE;
+
 
         //double blockSize;
 
         //Draw TerrainType
         for(int y = 0; y< terrains.length; y++){
             for(int x = 0; x< terrains[y].length; x++){
+                if(!PointToPointDistance.isObjectInsideRegion(terrains[y][x], selectedRegion)){
+                    continue; // Skip object.
+                }
+
                 for(TerrainType t : TerrainType.getTerrains()){
                     if(t.equals(terrains[y][x].getType())){
                         g.setColor(t.getColor());
@@ -105,12 +118,13 @@ public class GamePane extends JPanel implements Observer{
                 //  The +1 works because drawn from top left to bottom right, so the top and left borders
                 //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
 
-                g.fillRect(x*blockSizeX+1, y*blockSizeY+1, blockSizeX, blockSizeY);
-                //Draw Border
+                g.fillRect((int)(x*blockSizeX+1), (int)(y*blockSizeY+1), (int)blockSizeX, (int)blockSizeY);
 
+
+                //Draw Border if buildable
                 if(terrains[y][x].getType() == TerrainType.BUILDABLE) {
                     g.setColor(Color.BLACK);
-                    g.drawRect(x * blockSizeX, y * blockSizeY, blockSizeX, blockSizeY);
+                    g.drawRect((int)(x * blockSizeX),(int)(y * blockSizeY), (int)blockSizeX, (int)blockSizeY);
                 }
 
             }
@@ -118,7 +132,9 @@ public class GamePane extends JPanel implements Observer{
 
 
         for(GameComponent gc : gs){
-            gc.draw(g);
+            if(PointToPointDistance.isObjectInsideRegion(gc, selectedRegion)) {
+                gc.draw(g, selectedRegion);
+            }
         }
 
 
@@ -165,7 +181,6 @@ public class GamePane extends JPanel implements Observer{
     public void update(Observable o, String msg) {
         if(msg.equals(Constants.OBSERVER_GAME_TICK)){
             this.repaint();
-
         }
     }
 

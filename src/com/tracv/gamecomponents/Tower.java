@@ -46,21 +46,23 @@ public class Tower extends GameComponent {
     /**
      * @param g Swing Graphics
      */
-    public void draw(Graphics g) {
-        int xPos = (int) (x);
-        int yPos = (int) (y);
-        g.drawImage(type.getSprite(), xPos, yPos, null);
+    public void draw(Graphics g, Rectangle selectedRegion) {
+        int screenX = (int) Math.round(x - selectedRegion.getX());
+        int screenY = (int) Math.round(y - selectedRegion.getY());
+
+        g.drawImage(type.getSprite(), screenX, screenY, null);
 
         int range = (int) type.getRange();
 
         if(selected){
             g.setColor(Color.BLACK);
-            g.drawRect(xPos, yPos, (int)width, (int)height);
-            g.drawRect(xPos+1, yPos+1, (int)(width-1), (int) (height-1));
+            g.drawRect(screenX, screenY, (int)width, (int)height);
+            g.drawRect(screenX+1, screenY+1, (int)(width-1), (int) (height-1));
 
             //Draw range of selectd tower only
             g.setColor(Color.CYAN);
-            g.drawOval((int)(x-range+width/2), (int)(y-range+width/2), 2*range, 2*range);
+            g.drawOval((int)(screenX-range+width/2), (int)(screenY-range+width/2), 2*range, 2*range);
+
 
         }
 
