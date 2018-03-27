@@ -91,7 +91,7 @@ public class TDFrame extends JFrame implements WindowFocusListener {
     }
     private void switchPanel(JComponent panel){
         if(panel == tdGame){
-            System.out.println("Resuming game???");
+            //System.out.println("Resuming game???");
             tdGame.resumeGame();
             mouseHooker.setActive(true);
         }else{

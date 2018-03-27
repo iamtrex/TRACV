@@ -1,5 +1,6 @@
 package com.tracv.ui;
 
+import com.tracv.directional.PointToPointDistance;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -15,6 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -34,7 +37,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     private GameState gs;
 
 
-    public TDGame(TDFrame tdf){
+    public TDGame(TDFrame tdf) {
         this.tdf = tdf;
 
         gamePane = new GamePane();
@@ -64,22 +67,23 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
+        this.addMouseMotionListener(new MapMovementListener());
     }
 
     /*
     Map determines level to load.
      */
-    public void startNewGame(int level){
+    public void startNewGame(int level) {
         gs.newGame(level);
         gs.setGameRunning(true);
     }
 
     @Override
     public void update(Observable o, String msg) {
-        if(o == gs){
+        if (o == gs) {
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
-            }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
+            } else if (msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //DONE - ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
 
             }
@@ -98,8 +102,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     /**
      * Menu that lies on top of the game in order to pause hte game/sounds etc...
      */
-    private class MenuPane extends JPanel{
-        public MenuPane(){
+    private class MenuPane extends JPanel {
+        public MenuPane() {
             this.setPreferredSize(Constants.ICON_SIZE);
             //this.setBorder(new LineBorder(Color.BLUE, 3));
             pause = new IconButton("Pause"); //Show menu;
@@ -113,7 +117,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if(source == pause){
+        if (source == pause) {
             gs.setGameRunning(false);
             tdf.toggleMenu(true);
         }
@@ -121,13 +125,50 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     }
 
 
-
     private class TowerChangeListener implements PropertyChangeListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if(evt.getPropertyName().equals(HUDButtonPane.TOWER_CHANGED)){
+            if (evt.getPropertyName().equals(HUDButtonPane.TOWER_CHANGED)) {
                 gamePane.setSelectedTower((TowerType) evt.getNewValue());
             }
+        }
+    }
+
+
+    private class MapMovementListener implements MouseMotionListener {
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            handle(e);
+            TDGame.this.getParent().dispatchEvent(e);
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            handle(e);
+            TDGame.this.getParent().dispatchEvent(e);
+        }
+
+        private void handle(MouseEvent e) {
+            Point p = TDGame.this.getLocationOnScreen();
+            Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
+                    TDGame.this.getWidth(), TDGame.this.getHeight());
+
+            /*
+            if (PointToPointDistance.isPointInRegion(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING)) {
+                return;
+            }*/
+
+            //Find edge
+            boolean top = PointToPointDistance.isPointInTop(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean bot = PointToPointDistance.isPointInBot(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean left = PointToPointDistance.isPointInLeft(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean right = PointToPointDistance.isPointInRight(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
+
+            //System.out.println("Moving");
+            gamePane.setMapMove(top, bot, left, right);
+
+
         }
     }
 

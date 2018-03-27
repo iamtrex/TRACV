@@ -17,6 +17,8 @@ public class MouseHooker {
 
     private boolean active = false;
     private boolean registered = false;
+
+
     public MouseHooker(JFrame frame) {
         window = frame;
 
@@ -47,11 +49,14 @@ public class MouseHooker {
 
         if(registered){
             if(active){
-                if(!wasActive)
+                if(!wasActive) {
+                    System.out.println("REG!!!!");
                     GlobalScreen.getInstance().addNativeMouseMotionListener(gb);
+                }
             }else{
-                if(wasActive)
+                if(wasActive) {
                     GlobalScreen.getInstance().removeNativeMouseMotionListener(gb);
+                }
             }
         }
     }
@@ -59,7 +64,9 @@ public class MouseHooker {
     private class GameBinder implements NativeMouseMotionListener {
 
         private void handle(NativeMouseEvent e) {
+            System.out.println("Camer here");
             if (!active) {
+                System.out.println("bugged");
                 return;
             }
             Point p = window.getLocationOnScreen();
@@ -102,4 +109,5 @@ public class MouseHooker {
             handle(nativeMouseEvent);
         }
     }
+
 }

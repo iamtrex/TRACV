@@ -38,6 +38,10 @@ public class GamePane extends JPanel implements Observer{
 
     public GamePane(){
         gs = new GameState();
+        //TODO -- Remove this hack
+        selectedRegion = new Rectangle(0,0,
+                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
+
 
         this.setPreferredSize(Constants.GAME_DIMENSION);
         this.setBackground(Color.BLUE);
@@ -76,9 +80,36 @@ public class GamePane extends JPanel implements Observer{
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        //TODO -- Remove this hack
-        selectedRegion = new Rectangle(0,0,
-                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
+        //TODO MOVE MOUSECHECK TO BE ITERATIVE AND IN METHOD.
+        if(top){
+            selectedRegion.setLocation(
+                    (int)selectedRegion.getX(),
+                    (int)selectedRegion.getY() - Constants.MAP_MOVE_SPEED);
+
+        }else if(bot){
+            selectedRegion.setLocation(
+                    (int)selectedRegion.getX(),
+                    (int)selectedRegion.getY() + Constants.MAP_MOVE_SPEED);
+        }
+        if (left){
+            selectedRegion.setLocation(
+                    (int)selectedRegion.getX() - Constants.MAP_MOVE_SPEED,
+                    (int)selectedRegion.getY());
+        }else if(right){
+            selectedRegion.setLocation(
+                    (int)selectedRegion.getX() + Constants.MAP_MOVE_SPEED,
+                    (int)selectedRegion.getY());
+        }
+
+        //TODO ADD MORE CHECKS
+        if(selectedRegion.getX() < 0){
+            selectedRegion.setLocation(0, (int)selectedRegion.getY());
+        }
+        if(selectedRegion.getY() < 0){
+            selectedRegion.setLocation((int)selectedRegion.getX(), 00);
+
+        }
+
 
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
@@ -118,13 +149,13 @@ public class GamePane extends JPanel implements Observer{
                 //  The +1 works because drawn from top left to bottom right, so the top and left borders
                 //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
 
-                g.fillRect((int)(x*blockSizeX+1), (int)(y*blockSizeY+1), (int)blockSizeX, (int)blockSizeY);
+                g.fillRect((int)(x*blockSizeX+1- selectedRegion.getX()), (int)(y*blockSizeY+1- selectedRegion.getY()), (int)blockSizeX, (int)blockSizeY);
 
 
                 //Draw Border if buildable
                 if(terrains[y][x].getType() == TerrainType.BUILDABLE) {
                     g.setColor(Color.BLACK);
-                    g.drawRect((int)(x * blockSizeX),(int)(y * blockSizeY), (int)blockSizeX, (int)blockSizeY);
+                    g.drawRect((int)(x * blockSizeX - selectedRegion.getX()),(int)(y * blockSizeY - selectedRegion.getY()), (int)blockSizeX, (int)blockSizeY);
                 }
 
             }
@@ -186,6 +217,15 @@ public class GamePane extends JPanel implements Observer{
 
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
+    }
+
+    boolean top = false, bot = false, left = false, right = false;
+    public void setMapMove(boolean top, boolean bot, boolean left, boolean right) {
+        //System.out.println(top + " " + bot + " "  + left + " " + right );
+        this.top = top;
+        this.bot = bot;
+        this.left = left;
+        this.right = right;
     }
 
 
@@ -258,12 +298,15 @@ public class GamePane extends JPanel implements Observer{
 
     private class MyMouseMotionListener implements MouseMotionListener {
         @Override
-        public void mouseDragged(MouseEvent e) {}
+        public void mouseDragged(MouseEvent e) {
+            dispatchEvent(e);
+        }
 
         //Creates a hover image of where to build the tower...
         @Override
         public void mouseMoved(MouseEvent e) {
             mouse = e.getPoint();
+            GamePane.this.getParent().dispatchEvent(e);
             SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }

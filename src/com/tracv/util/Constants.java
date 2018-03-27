@@ -106,5 +106,7 @@ public class Constants {
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
 
+    public static final int MOVEMENT_PIXEL_PADDING = 10;
+    public static final int MAP_MOVE_SPEED = 15;
 }
 
