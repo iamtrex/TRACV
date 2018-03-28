@@ -9,6 +9,8 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MouseHooker {
     private JFrame window;
@@ -27,6 +29,9 @@ public class MouseHooker {
             mouseRobot = new Robot();
             gb = new GameBinder();
 
+
+            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(Level.OFF);
             GlobalScreen.registerNativeHook();
             //GlobalScreen.getInstance().addNativeMouseMotionListener(gb);
 
@@ -51,11 +56,12 @@ public class MouseHooker {
             if(active){
                 if(!wasActive) {
                     System.out.println("REG!!!!");
-                    GlobalScreen.getInstance().addNativeMouseMotionListener(gb);
+                    GlobalScreen.addNativeMouseMotionListener(gb);
+
                 }
             }else{
                 if(wasActive) {
-                    GlobalScreen.getInstance().removeNativeMouseMotionListener(gb);
+                    GlobalScreen.removeNativeMouseMotionListener(gb);
                 }
             }
         }
@@ -64,7 +70,6 @@ public class MouseHooker {
     private class GameBinder implements NativeMouseMotionListener {
 
         private void handle(NativeMouseEvent e) {
-            System.out.println("Camer here");
             if (!active) {
                 System.out.println("bugged");
                 return;
