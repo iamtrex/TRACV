@@ -109,6 +109,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      */
     public void update(int actualTimeMS) {
         //timeElapsed += Constants.REFRESH_DELAY;
+        System.out.println("Update Rate " + actualTimeMS);
         timeElapsed += actualTimeMS;
         //System.out.println(actualTimeMS);
 
@@ -249,8 +250,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         try {
             Terrain[][] terrains = map.getTerrains();
 
-            int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrains[0].length);
-            int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrains.length);
+            //int blockSizeX = (int) (Constants.GAME_DIMENSION.getWidth() / terrains[0].length);
+            //int blockSizeY = (int) (Constants.GAME_DIMENSION.getHeight() / terrains.length);
+            int blockSizeX = (int) Math.round(Constants.DEFAULT_BLOCK_SIZE);
+            int blockSizeY = (int) Math.round(Constants.DEFAULT_BLOCK_SIZE);
 
 
             TerrainType ter = terrains[(p.y - selectedTower.getHeight() / 2) / blockSizeY]

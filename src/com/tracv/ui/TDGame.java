@@ -16,8 +16,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -35,6 +33,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     private IconButton pause;
 
     private GameState gs;
+
+
 
 
     public TDGame(TDFrame tdf) {
@@ -67,7 +67,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
 
-        this.addMouseMotionListener(new MapMovementListener());
     }
 
     /*
@@ -76,6 +75,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     public void startNewGame(int level) {
         gs.newGame(level);
         gs.setGameRunning(true);
+
     }
 
     @Override
@@ -86,6 +86,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
             } else if (msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //DONE - ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
 
+            } else if (msg.equals(Constants.OBSERVER_GAME_TICK)) {
+                handle();
             }
         }
     }
@@ -135,41 +137,27 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     }
 
 
-    private class MapMovementListener implements MouseMotionListener {
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            handle(e);
-            TDGame.this.getParent().dispatchEvent(e);
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            handle(e);
-            TDGame.this.getParent().dispatchEvent(e);
-        }
-
-        private void handle(MouseEvent e) {
-            Point p = TDGame.this.getLocationOnScreen();
-            Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
-                    TDGame.this.getWidth(), TDGame.this.getHeight());
+    private void handle() {
+        Point mouse = MouseInfo.getPointerInfo().getLocation();
+        Point p = TDGame.this.getLocationOnScreen();
+        Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
+                TDGame.this.getWidth(), TDGame.this.getHeight());
 
             /*
             if (PointToPointDistance.isPointInRegion(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING)) {
                 return;
             }*/
 
-            //Find edge
-            boolean top = PointToPointDistance.isPointInTop(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean bot = PointToPointDistance.isPointInBot(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean left = PointToPointDistance.isPointInLeft(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean right = PointToPointDistance.isPointInRight(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING);
+        //Find edge
+        boolean top = PointToPointDistance.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+        boolean bot = PointToPointDistance.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+        boolean left = PointToPointDistance.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+        boolean right = PointToPointDistance.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
 
-            //System.out.println("Moving");
-            gamePane.setMapMove(top, bot, left, right);
+        //System.out.println("Moving");
+        gamePane.setMapMove(top, bot, left, right);
 
 
-        }
     }
 
 }

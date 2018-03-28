@@ -299,7 +299,7 @@ public class GamePane extends JPanel implements Observer{
     private class MyMouseMotionListener implements MouseMotionListener {
         @Override
         public void mouseDragged(MouseEvent e) {
-            dispatchEvent(e);
+            GamePane.this.getParent().dispatchEvent(e);
         }
 
         //Creates a hover image of where to build the tower...

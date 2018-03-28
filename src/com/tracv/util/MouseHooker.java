@@ -89,15 +89,15 @@ public class MouseHooker {
 
             //move it back to the edge...
             if (mouse.getX() <= r.getX()) {
-                x = r.getX();
+                x = r.getX() + 1;
             } else if (mouse.getX() >= r.getX() + r.getWidth()) {
-                x = r.getX() + r.getWidth();
+                x = r.getX() + r.getWidth() - 1;
             }
 
             if (mouse.getY() <= r.getY()) {
-                y = r.getY();
+                y = r.getY() + 1;
             } else if (mouse.getY() >= r.getY() + r.getHeight()) {
-                y = r.getY() + r.getHeight();
+                y = r.getY() + r.getHeight() - 1;
             }
 
             mouseRobot.mouseMove((int) x, (int) y);

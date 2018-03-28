@@ -14,6 +14,7 @@ public class Constants {
     //Scaling and Dimensions
     public static final Double HUD_VERTICAL_SCALE = 0.2;
     public static final Double GAME_VERTICAL_SCALE = 1-HUD_VERTICAL_SCALE;
+    public static final long MOUSE_TRACKING_DELAY = 10; //Wait 10 ms between checking mouse
 
 
     //Size of Frame, game and HUD
@@ -79,7 +80,7 @@ public class Constants {
         // The distance between click and release to still build a tower... Makes for comfortable UI feel...
         public static final double CLICK_VAR_DISTANCE = 50;
 
-    public static final int REFRESH_RATE = 60; //FPS
+    public static final int REFRESH_RATE =  120; //FPS
     public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
 
     public static final Double DEFAULT_BLOCK_SIZE = 50.0;
@@ -106,7 +107,7 @@ public class Constants {
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
 
-    public static final int MOVEMENT_PIXEL_PADDING = 10;
-    public static final int MAP_MOVE_SPEED = 15;
+    public static final int MOVEMENT_PIXEL_PADDING = 15;
+    public static final int MAP_MOVE_SPEED = 8;
 }
 
