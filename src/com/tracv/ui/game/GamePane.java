@@ -15,6 +15,7 @@ import com.tracv.util.Constants;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The 'game' portion of the interface (not including hud).
@@ -26,12 +27,16 @@ import java.awt.event.*;
 public class GamePane extends JPanel implements Observer{
 
 
-    private Rectangle selectedRegion;
 
     private Point mouse;
 
     private GameState gs;
     private TowerType selectedTower;
+
+    private Rectangle selectedRegion;
+    private MapThread mapThread;
+    private boolean mapActive = true;
+
 
     // Acts as layers, so not the entire UI has to refresh on each iteration
     //private Rectangle mobLayer, towerLayer, projectileLayer, terrainLayer;
@@ -54,13 +59,64 @@ public class GamePane extends JPanel implements Observer{
         //this.add(new JTextField("Hello World"));
         //setupKeyListeners(this);
 
-
+        mapThread = new MapThread();
+        mapThread.start();
     }
 
     public GameState getGameState(){
         return gs;
     }
 
+    boolean top = false, bot = false, left = false, right = false;
+
+    public void setMapMove(boolean top, boolean bot, boolean left, boolean right) {
+        //System.out.println(top + " " + bot + " "  + left + " " + right );
+        this.top = top;
+        this.bot = bot;
+        this.left = left;
+        this.right = right;
+    }
+
+
+    private class MapThread extends Thread{
+        public void run(){
+            while(mapActive){
+                if(top){
+                    selectedRegion.setLocation(
+                            (int)selectedRegion.getX(),
+                            (int)selectedRegion.getY() - Constants.MAP_MOVE_SPEED);
+
+                }else if(bot){
+                    selectedRegion.setLocation(
+                            (int)selectedRegion.getX(),
+                            (int)selectedRegion.getY() + Constants.MAP_MOVE_SPEED);
+                }
+                if (left){
+                    selectedRegion.setLocation(
+                            (int)selectedRegion.getX() - Constants.MAP_MOVE_SPEED,
+                            (int)selectedRegion.getY());
+                }else if(right){
+                    selectedRegion.setLocation(
+                            (int)selectedRegion.getX() + Constants.MAP_MOVE_SPEED,
+                            (int)selectedRegion.getY());
+                }
+
+                //TODO ADD MORE CHECKS
+                if(selectedRegion.getX() < 0){
+                    selectedRegion.setLocation(0, (int)selectedRegion.getY());
+                }
+                if(selectedRegion.getY() < 0){
+                    selectedRegion.setLocation((int)selectedRegion.getX(), 00);
+                }
+
+                try{
+                    Thread.sleep(Constants.MAP_MOVE_REFRESH);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 
     private boolean attemptToBuildTower(Point point) {
@@ -79,56 +135,17 @@ public class GamePane extends JPanel implements Observer{
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
-
-        //TODO MOVE MOUSECHECK TO BE ITERATIVE AND IN METHOD.
-        if(top){
-            selectedRegion.setLocation(
-                    (int)selectedRegion.getX(),
-                    (int)selectedRegion.getY() - Constants.MAP_MOVE_SPEED);
-
-        }else if(bot){
-            selectedRegion.setLocation(
-                    (int)selectedRegion.getX(),
-                    (int)selectedRegion.getY() + Constants.MAP_MOVE_SPEED);
-        }
-        if (left){
-            selectedRegion.setLocation(
-                    (int)selectedRegion.getX() - Constants.MAP_MOVE_SPEED,
-                    (int)selectedRegion.getY());
-        }else if(right){
-            selectedRegion.setLocation(
-                    (int)selectedRegion.getX() + Constants.MAP_MOVE_SPEED,
-                    (int)selectedRegion.getY());
-        }
-
-        //TODO ADD MORE CHECKS
-        if(selectedRegion.getX() < 0){
-            selectedRegion.setLocation(0, (int)selectedRegion.getY());
-        }
-        if(selectedRegion.getY() < 0){
-            selectedRegion.setLocation((int)selectedRegion.getX(), 00);
-
-        }
-
-
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
         //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
         //TODO -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
-
-
         //Draw TerrainType
 
         Terrain[][] terrains = getGameState().getTerrain();
 
-        //int blockSizeX = this.getWidth() / terrains[0].length;
-        //int blockSizeY = this.getHeight() / terrains.length;
         double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
         double blockSizeY = Constants.DEFAULT_BLOCK_SIZE;
-
-
-        //double blockSize;
 
         //Draw TerrainType
         for(int y = 0; y< terrains.length; y++){
@@ -136,7 +153,6 @@ public class GamePane extends JPanel implements Observer{
                 if(!PointToPointDistance.isObjectInsideRegion(terrains[y][x], selectedRegion)){
                     continue; // Skip object.
                 }
-
                 for(TerrainType t : TerrainType.getTerrains()){
                     if(t.equals(terrains[y][x].getType())){
                         g.setColor(t.getColor());
@@ -149,13 +165,18 @@ public class GamePane extends JPanel implements Observer{
                 //  The +1 works because drawn from top left to bottom right, so the top and left borders
                 //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
 
-                g.fillRect((int)(x*blockSizeX+1- selectedRegion.getX()), (int)(y*blockSizeY+1- selectedRegion.getY()), (int)blockSizeX, (int)blockSizeY);
-
+                g.fillRect((int)(x*blockSizeX+1- selectedRegion.getX()),
+                        (int)(y*blockSizeY+1- selectedRegion.getY()),
+                        (int)blockSizeX,
+                        (int)blockSizeY);
 
                 //Draw Border if buildable
                 if(terrains[y][x].getType() == TerrainType.BUILDABLE) {
                     g.setColor(Color.BLACK);
-                    g.drawRect((int)(x * blockSizeX - selectedRegion.getX()),(int)(y * blockSizeY - selectedRegion.getY()), (int)blockSizeX, (int)blockSizeY);
+                    g.drawRect((int)(x * blockSizeX - selectedRegion.getX()),
+                            (int)(y * blockSizeY - selectedRegion.getY()),
+                            (int)blockSizeX,
+                            (int)blockSizeY);
                 }
 
             }
@@ -184,27 +205,21 @@ public class GamePane extends JPanel implements Observer{
     private void drawTowerHighlightOnMouse(Graphics g){
         //TODO - Ask GameState if the current position is legal. (Determine red or green shade on the object)
 
-            /* //Old testing code to draw a red dot.
-            g.setColor(Color.RED);
-            int r = 5; //5 pixel radius.
-            int x = (int) Math.round(this.mouse.getX() - r);
-            int y = (int) Math.round(this.mouse.getY() - r);
-
-            g.fillOval(x, y, 2*r, 2*r);
-            */
-
         //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
         //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
+
         if(selectedTower != null) { // Only draw if currently has selected tower!
+
+            Image img;
             if(gs.isTowerBuildValid(mouse.getLocation(), selectedTower)){
-                g.setColor(Color.BLUE);
+                img = selectedTower.getSpriteActive();
             }else{
-                g.setColor(Color.RED);
+                img = selectedTower.getSpriteDeactive();
             }
             int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
             int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
-            //g.drawImage(selectedTower.getSprite(), x, y, null);
-            g.fillRect(x, y, selectedTower.getWidth(), selectedTower.getHeight());
+            g.drawImage(img, x, y, null);
+            //g.fillRect(x, y, selectedTower.getWidth(), selectedTower.getHeight());
         }
     }
 
@@ -217,15 +232,6 @@ public class GamePane extends JPanel implements Observer{
 
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
-    }
-
-    boolean top = false, bot = false, left = false, right = false;
-    public void setMapMove(boolean top, boolean bot, boolean left, boolean right) {
-        //System.out.println(top + " " + bot + " "  + left + " " + right );
-        this.top = top;
-        this.bot = bot;
-        this.left = left;
-        this.right = right;
     }
 
 

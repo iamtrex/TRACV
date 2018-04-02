@@ -3,8 +3,10 @@ package com.tracv.types;
 import com.tracv.util.Constants;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +45,9 @@ public enum TowerType {
 
     private String name;
     private String iconPath;
-    private Image sprite;
+    private BufferedImage sprite;
+    private Image spriteActive, spriteDeactive;
+
     private int width;
     private int height;
 
@@ -80,11 +84,40 @@ public enum TowerType {
 
         if(spritePath != null){
             try{
-                BufferedImage i = ImageIO.read(getClass().getResource(
+                BufferedImage img = ImageIO.read(getClass().getResource(
                         Constants.TOWER_SPRITE_DIR + spritePath + Constants.TOWER_SPRITE_FILETYPE));
-                sprite = i.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                int w = img.getWidth();
+                int h = img.getHeight();
+
+                sprite = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                AffineTransform at = new AffineTransform();
+                at.scale(((double)width/w), ((double)height/h));
+
+                AffineTransformOp scaleOp =
+                        new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+                sprite = scaleOp.filter(img, sprite);
+
+                //Add border...
+                ColorModel cm = sprite.getColorModel();
+                boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+                WritableRaster raster = sprite.copyData(null);
+                BufferedImage tmpActive = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+
+                Graphics g = tmpActive.getGraphics();
+                g.setColor(Color.RED);
+                g.drawRect(0, 0, tmpActive.getWidth()-1, tmpActive.getHeight()-1);
+                g.dispose();
+                spriteActive = tmpActive;
+
+                //Grayscale deactive.
+                ImageFilter filter = new GrayFilter(true, 50);
+                ImageProducer producer = new FilteredImageSource(sprite.getSource(), filter);
+                spriteDeactive = Toolkit.getDefaultToolkit().createImage(producer);
+
+
 
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("Tower of type " + name + " unable to read sprite of name " + spritePath);
                 sprite = null;
             }
@@ -142,5 +175,12 @@ public enum TowerType {
 
     public String getType() {
         return classType.getName();
+    }
+
+    public Image getSpriteActive(){
+        return spriteActive;
+    }
+    public Image getSpriteDeactive() {
+        return spriteDeactive;
     }
 }

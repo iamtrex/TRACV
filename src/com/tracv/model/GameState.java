@@ -31,7 +31,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private int timeElapsed;
     private int level;
 
-    private boolean doneSpawn; //Keeps track of if there are still anymore enemy waves left to spawn (used to check if level complete)
+    //private boolean doneSpawn; //Keeps track of if there are still anymore enemy waves left to spawn (used to check if level complete)
 
     //Keeps track of game running state/refresh
     private long lastTimeNano;
@@ -46,13 +46,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     /**
      * Initiates a new game.
-     * (victor) restores all the field back to basic values
      */
     public void newGame(int level) {
         gameTimer = null; //reset the timer (tbh won't really change much since refresh rate is so fast, but why not.. :P)
 
         System.out.println("Starting new game");
-        //TODO temporarily loads a default map.. In future, can load different types of maps
         
         gold = 500; // temp value, 500 cuz league
         score = 0;
@@ -67,12 +65,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         map.reset();
         map.loadLevel(parser.getFile());
 
-        doneSpawn = false;
         notifyObservers(Constants.OBSERVER_NEW_GAME);
     }
 
 
-
+    /**
+     * Start or stop game running
+     * @param b - true = start, false = pause.
+     */
     public void setGameRunning(boolean b){
         if(gameTimer == null){
             createGameTimer();
@@ -87,14 +87,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 gameTimer.stop();
                 System.out.println("Pausing/Stopping game");
             }
-
             running = b;
         }
     }
+
     public void createGameTimer(){
         gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
             long nowTime = System.nanoTime();
-            update((int)Math.round((nowTime-lastTimeNano)/1000000.0));
+            updateState((int)Math.round((nowTime-lastTimeNano)/1000000.0));
             notifyObservers(Constants.OBSERVER_GAME_TICK); //Call UI to redraw
             lastTimeNano = nowTime;
         });
@@ -102,21 +102,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
 
-
-    /**
-     * Updates the position of everything
-     * //TODO make system update to actualTimeMS
-     */
-    public void update(int actualTimeMS) {
-        //timeElapsed += Constants.REFRESH_DELAY;
-        System.out.println("Update Rate " + actualTimeMS);
-        timeElapsed += actualTimeMS;
-        //System.out.println(actualTimeMS);
-
-        List<Enemy> needToRetarget = new ArrayList<>();
-        List<GameComponent> toDel = map.getToDel();
-        List<GameComponent> toAdd = map.getToAdd();
-
+    private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget){
         for(Enemy e : map.getEnemies()){
             if(toDel.contains(e)) {
                 continue; // Skip.
@@ -127,7 +113,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             if(reachedBase){
                 //DONE -  update Health of base since it crashed.
                 System.out.println("CRASHED!");
-                if(map.getBase().takeDmg(e.getDmg())){
+                map.getBase().takeDmg(e.getDmg());
+                if(map.getBase().isExploded()){
                     //Base exploded.
                     setLevelFailure();
                 }
@@ -138,27 +125,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 toDel.add(e);
             }
         }
-
-        for(Projectile p : map.getProjectiles()){
-            if(toDel.contains(p)){
-                continue; // Skip.
-            }
-            boolean crashed = ProjectileMotion.updateProjectile(p);
-            if(crashed){
-                Enemy e = p.getTarget();
-                boolean dead = e.takeDmg(p.getDmg());
-                toDel.add(p);
-                if(dead){
-                    toDel.add(e);
-                    needToRetarget.add(e);
-
-                    gainGold(e.getKillGold());
-
-                }
-            }
-        }
-
-
+    }
+    private void updateTowers(List<GameComponent> toDel, List<GameComponent> toAdd){
         for(Tower t : map.getTowers()){
             t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
             boolean fire = t.canFire();
@@ -184,7 +152,29 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 }
             }
         }
+    }
+    private void updateProjectiles(List<GameComponent> toDel, List<Enemy> needToRetarget){
+        for(Projectile p : map.getProjectiles()){
+            if(toDel.contains(p)){
+                continue; // Skip.
+            }
+            boolean crashed = ProjectileMotion.updateProjectile(p);
+            if(crashed){
+                Enemy e = p.getTarget();
+                boolean dead = e.takeDmg(p.getDmg());
+                toDel.add(p);
+                if(dead){
+                    toDel.add(e);
+                    needToRetarget.add(e);
 
+                    gainGold(e.getKillGold());
+
+                }
+            }
+        }
+    }
+
+    private void updateRetargetEnemies(List<Enemy> needToRetarget, List<GameComponent> toDel){
         for(Enemy e : needToRetarget){
             for(Projectile p : map.getProjectiles()){
                 if(p.getTarget().equals(e)){
@@ -195,6 +185,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                                 if (!needToRetarget.contains(e2)) {
                                     if (PointToPointDistance.withinRange(e2, p.getTower(), p.getTower().getRange())) {
                                         p.setTarget(e2);
+                                        break;
                                     }
                                 }
                             }
@@ -205,10 +196,30 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 }
             }
         }
+    }
+
+    /**
+     * Updates the position of everything
+     * //TODO make system update to actualTimeMS
+     */
+    public void updateState(int actualTimeMS) {
+        System.out.println("Update Rate " + actualTimeMS);
+        timeElapsed += actualTimeMS;
+
+        List<Enemy> needToRetarget = new ArrayList<>();
+        List<GameComponent> toDel = map.getToDel();
+        List<GameComponent> toAdd = map.getToAdd();
+
+        updateEnemies(toDel, needToRetarget);
+        updateProjectiles(toDel, needToRetarget);
+        updateTowers(toDel, toAdd);
 
         for(GameComponent gc : toAdd){
             map.addComponent(gc);
         }
+
+        updateRetargetEnemies(needToRetarget, toDel);
+
 
         for(GameComponent gc : toDel){
             map.removeComponent(gc);
@@ -218,12 +229,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         toAdd.clear();
 
         //Update spawner time
-        if(!doneSpawn){
-            if(spawner.update(actualTimeMS)){
-                doneSpawn = true; //End spawns
-            }
+        if(!spawner.isDoneSpawn()){
+            spawner.update(actualTimeMS);
         }else{
-            if(map.getEnemies().isEmpty()){
+            if(map.getEnemies().isEmpty() && !map.getBase().isExploded()){
                 //Beat level!
                 setLevelSuccess();
             }
@@ -429,6 +438,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
     public boolean isDoneSpawn() {
-        return doneSpawn;
+        return spawner.isDoneSpawn();
     }
 }

@@ -38,7 +38,7 @@ public class EnemySpawner{
      * @param timeMillis
      * @return - True if level is complete with spawning
      */
-    public boolean update(int timeMillis){
+    public void update(int timeMillis){
         millisFromLastSpawn += timeMillis;
 
         boolean spawnRepeat = true;
@@ -54,16 +54,13 @@ public class EnemySpawner{
                 millisFromLastSpawn -= timeToNext*1000;
                 map.addEnemies(spawn(next)); // Saves some time with Casting of all the comps to enemies...?
                 timeToSpawn.remove(next);
-                if(toSpawn.isEmpty()){
-                    return true;
-                }
+
                 next = toSpawn.poll(); //get ready next wave!
             }else{
                 spawnRepeat = false;
             }
         }
 
-        return false;
     }
 
 
@@ -102,5 +99,9 @@ public class EnemySpawner{
 
     public int getTimeToNextWave() {
         return timeToSpawn.get(next) - (int)(millisFromLastSpawn/1000.0);
+    }
+
+    public boolean isDoneSpawn() {
+        return toSpawn.isEmpty();
     }
 }

@@ -91,4 +91,8 @@ public class Base extends GameComponent{
     public String getHealth() {
         return health + "/" + maxHealth;
     }
+
+    public boolean isExploded() {
+        return health <= 0;
+    }
 }

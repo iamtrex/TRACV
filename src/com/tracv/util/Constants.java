@@ -15,6 +15,8 @@ public class Constants {
     public static final Double HUD_VERTICAL_SCALE = 0.2;
     public static final Double GAME_VERTICAL_SCALE = 1-HUD_VERTICAL_SCALE;
     public static final long MOUSE_TRACKING_DELAY = 10; //Wait 10 ms between checking mouse
+    public static final long MAP_MOVE_REFRESH = 10;
+    public static final float DIM_FACTOR = 0.5f;
 
 
     //Size of Frame, game and HUD
