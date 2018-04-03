@@ -21,12 +21,15 @@ public class Logger extends JFrame {
 
 
     public void log(String message, LoggerLevel level){
+
         LogMessage logMsg = new LogMessage(message, level);
         logs.add(logMsg);
         if(this.isVisible()){
-            logWindow.append(logMsg.getText() + "\n");
-            scroll.scrollDown();
-            this.validate();
+            SwingUtilities.invokeLater(()->{
+                logWindow.append(logMsg.getText() + "\n");
+                scroll.scrollDown();
+                this.validate();
+            });
         }
     }
 
