@@ -66,11 +66,6 @@ public class TDFrame extends JFrame implements WindowFocusListener {
         switchPanel(mainPane);
     }
 
-    //Create new game and swap to the game panel.
-    public void newGame() {
-        //TODO REMOVE THIS
-        newGame(1); //Default
-    }
     public void newGame(int i){
         tdGame.startNewGame(i);
         if(this.getContentPane() != tdGame) {
@@ -91,8 +86,6 @@ public class TDFrame extends JFrame implements WindowFocusListener {
     }
     private void switchPanel(JComponent panel){
         if(panel == tdGame){
-            //System.out.println("Resuming game???");
-            tdGame.resumeGame();
             mouseHooker.setActive(true);
         }else{
             mouseHooker.setActive(false);
@@ -114,14 +107,16 @@ public class TDFrame extends JFrame implements WindowFocusListener {
             mouseHooker.setActive(false);
         }else {
             menuPane.setVisible(false);
+
+            //If resuming game, resume game.
+            if(this.getContentPane() == tdGame){
+                System.out.println("Rebinding hooker!!");
+                tdGame.resumeGame();
+                mouseHooker.setActive(true);
+            }
+
         }
 
-        //If resuming game, resume game. // should be in else lol.
-        if(this.getContentPane() == tdGame && !b){
-            //tdGame.getGameState().setGameRunning(true);
-            tdGame.resumeGame(); //New and improved
-            mouseHooker.setActive(true);
-        }
 
         SwingUtilities.invokeLater(()-> this.validate());
     }
@@ -148,5 +143,9 @@ public class TDFrame extends JFrame implements WindowFocusListener {
 
         mouseHooker.setActive(false);
         //System.out.println("Fcous lost");
+    }
+
+    public void restartGame() {
+        tdGame.restart();
     }
 }

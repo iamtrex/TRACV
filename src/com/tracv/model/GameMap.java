@@ -5,6 +5,7 @@ import com.tracv.gamecomponents.*;
 import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -200,6 +201,12 @@ public class GameMap {
         SpawnThread st = new SpawnThread(spawn);
         st.start();
 
+    }
+
+    public Dimension getMapDimensions() {
+        double width = Constants.DEFAULT_BLOCK_SIZE * terrains[0].length;
+        double height = Constants.DEFAULT_BLOCK_SIZE * terrains.length;
+        return new Dimension((int)width, (int)height);
     }
 
 

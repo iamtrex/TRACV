@@ -9,7 +9,7 @@ public class LevelParser {
         levelNames.add("1");
         levelNames.add("2");
         levelNames.add("3"); //TODO GOTTA FIX THIS LOL.
-
+        levelNames.add("4");
         return levelNames;
     }
 }

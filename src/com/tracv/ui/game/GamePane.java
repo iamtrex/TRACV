@@ -26,16 +26,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class GamePane extends JPanel implements Observer{
 
-
-
     private Point mouse;
 
     private GameState gs;
     private TowerType selectedTower;
 
     private Rectangle selectedRegion;
-    private MapThread mapThread;
-    private boolean mapActive = true;
 
 
     // Acts as layers, so not the entire UI has to refresh on each iteration
@@ -44,9 +40,7 @@ public class GamePane extends JPanel implements Observer{
     public GamePane(){
         gs = new GameState();
         //TODO -- Remove this hack
-        selectedRegion = new Rectangle(0,0,
-                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
-
+        resetRectangle();
 
         this.setPreferredSize(Constants.GAME_DIMENSION);
         this.setBackground(Color.BLUE);
@@ -59,70 +53,73 @@ public class GamePane extends JPanel implements Observer{
         //this.add(new JTextField("Hello World"));
         //setupKeyListeners(this);
 
-        mapThread = new MapThread();
-        mapThread.start();
     }
 
     public GameState getGameState(){
         return gs;
     }
 
-    boolean top = false, bot = false, left = false, right = false;
-
-    public void setMapMove(boolean top, boolean bot, boolean left, boolean right) {
-        //System.out.println(top + " " + bot + " "  + left + " " + right );
+    public void updateMapMove(boolean top, boolean bot, boolean left, boolean right) {
         this.top = top;
         this.bot = bot;
         this.left = left;
         this.right = right;
+
     }
 
+    private boolean top, bot, left, right;
 
-    private class MapThread extends Thread{
-        public void run(){
-            while(mapActive){
-                if(top){
-                    selectedRegion.setLocation(
-                            (int)selectedRegion.getX(),
-                            (int)selectedRegion.getY() - Constants.MAP_MOVE_SPEED);
 
-                }else if(bot){
-                    selectedRegion.setLocation(
-                            (int)selectedRegion.getX(),
-                            (int)selectedRegion.getY() + Constants.MAP_MOVE_SPEED);
-                }
-                if (left){
-                    selectedRegion.setLocation(
-                            (int)selectedRegion.getX() - Constants.MAP_MOVE_SPEED,
-                            (int)selectedRegion.getY());
-                }else if(right){
-                    selectedRegion.setLocation(
-                            (int)selectedRegion.getX() + Constants.MAP_MOVE_SPEED,
-                            (int)selectedRegion.getY());
-                }
+    private void handleMapMove() {
+        int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
+        if (top) {
+            selectedRegion.setLocation(
+                    (int) selectedRegion.getX(),
+                    (int) selectedRegion.getY() - speed);
 
-                //TODO ADD MORE CHECKS
-                if(selectedRegion.getX() < 0){
-                    selectedRegion.setLocation(0, (int)selectedRegion.getY());
-                }
-                if(selectedRegion.getY() < 0){
-                    selectedRegion.setLocation((int)selectedRegion.getX(), 00);
-                }
-
-                try{
-                    Thread.sleep(Constants.MAP_MOVE_REFRESH);
-                }catch(InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
+        } else if (bot) {
+            selectedRegion.setLocation(
+                    (int) selectedRegion.getX(),
+                    (int) selectedRegion.getY() + speed);
         }
+        if (left) {
+            selectedRegion.setLocation(
+                    (int) selectedRegion.getX() - speed,
+                    (int) selectedRegion.getY());
+        } else if (right) {
+            selectedRegion.setLocation(
+                    (int) selectedRegion.getX() + speed,
+                    (int) selectedRegion.getY());
+        }
+
+        //TODO ADD MORE CHECKS
+
+
+        int mapWidth = (int)gs.getMap().getMapDimensions().getWidth();
+        int mapHeight = (int)gs.getMap().getMapDimensions().getHeight();
+
+        if(selectedRegion.getX() + selectedRegion.getWidth() > mapWidth){
+            selectedRegion.setLocation(mapWidth - (int)selectedRegion.getWidth(), (int) selectedRegion.getY());
+        }
+        if(selectedRegion.getY() + selectedRegion.getHeight() > mapHeight){
+            selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int)selectedRegion.getHeight());
+        }
+        if (selectedRegion.getX() < 0) {
+            selectedRegion.setLocation(0, (int) selectedRegion.getY());
+        }
+        if (selectedRegion.getY() < 0) {
+            selectedRegion.setLocation((int) selectedRegion.getX(), 00);
+        }
+
     }
+
 
 
     private boolean attemptToBuildTower(Point point) {
         if(selectedTower != null) {
             System.out.println("Attempting to build tower of type " + selectedTower.getName() +
                     " on point " + point.getX() + "," + point.getY());
+            point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
 
             return gs.attemptToBuildTower(point, selectedTower);
 
@@ -135,13 +132,14 @@ public class GamePane extends JPanel implements Observer{
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
+
+        handleMapMove();
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
         //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
         //TODO -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
         //Draw TerrainType
-
         Terrain[][] terrains = getGameState().getTerrain();
 
         double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
@@ -182,7 +180,6 @@ public class GamePane extends JPanel implements Observer{
             }
         }
 
-
         for(GameComponent gc : gs){
             if(PointToPointDistance.isObjectInsideRegion(gc, selectedRegion)) {
                 gc.draw(g, selectedRegion);
@@ -194,6 +191,7 @@ public class GamePane extends JPanel implements Observer{
         if(mouse != null) {
             drawTowerHighlightOnMouse(g);
         }
+        //System.out.println("Draw Time Taken " + (System.nanoTime() - curr)/1000000);
     }
 
     /*
@@ -211,15 +209,18 @@ public class GamePane extends JPanel implements Observer{
         if(selectedTower != null) { // Only draw if currently has selected tower!
 
             Image img;
-            if(gs.isTowerBuildValid(mouse.getLocation(), selectedTower)){
+            Point point = mouse.getLocation();
+            point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
+
+            if(gs.isTowerBuildValid(point, selectedTower)){
                 img = selectedTower.getSpriteActive();
             }else{
                 img = selectedTower.getSpriteDeactive();
             }
+
             int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
             int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
             g.drawImage(img, x, y, null);
-            //g.fillRect(x, y, selectedTower.getWidth(), selectedTower.getHeight());
         }
     }
 
@@ -227,12 +228,24 @@ public class GamePane extends JPanel implements Observer{
     public void update(Observable o, String msg) {
         if(msg.equals(Constants.OBSERVER_GAME_TICK)){
             this.repaint();
+        }else if(msg.equals(Constants.OBSERVER_GAME_PAUSED)){
+            top = false;
+            bot = false;
+            left = false;
+            right = false;
+        }else if(msg.equals(Constants.OBSERVER_NEW_GAME)){
+            resetRectangle();
         }
     }
 
+    private void resetRectangle(){
+        selectedRegion = new Rectangle(0,0,
+                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
+    }
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
     }
+
 
 
     private class MyKeyListener implements KeyListener{

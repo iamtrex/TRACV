@@ -19,7 +19,7 @@ public class TextFileReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Response " + response);
+        //System.out.println("Response " + response);
         return response;
 
     }

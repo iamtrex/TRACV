@@ -57,7 +57,6 @@ public class MouseHooker {
                 if(!wasActive) {
                     System.out.println("REG!!!!");
                     GlobalScreen.addNativeMouseMotionListener(gb);
-
                 }
             }else{
                 if(wasActive) {
@@ -87,20 +86,22 @@ public class MouseHooker {
             double x = mouse.getX();
             double y = mouse.getY();
 
+            int move = 5;
             //move it back to the edge...
             if (mouse.getX() <= r.getX()) {
-                x = r.getX() + 1;
+                x = r.getX() + move;
             } else if (mouse.getX() >= r.getX() + r.getWidth()) {
-                x = r.getX() + r.getWidth() - 1;
+                x = r.getX() + r.getWidth() - move;
             }
 
             if (mouse.getY() <= r.getY()) {
-                y = r.getY() + 1;
+                y = r.getY() + move;
             } else if (mouse.getY() >= r.getY() + r.getHeight()) {
-                y = r.getY() + r.getHeight() - 1;
+                y = r.getY() + r.getHeight() - move;
             }
 
             mouseRobot.mouseMove((int) x, (int) y);
+
 
         }
 

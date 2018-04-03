@@ -35,22 +35,22 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     private GameState gs;
 
 
-
+    private MapThread mapThread;
 
     public TDGame(TDFrame tdf) {
         this.tdf = tdf;
+        mapThread = new MapThread();
 
         gamePane = new GamePane();
         gs = gamePane.getGameState();
 
         hudPane = new HUDPane(gs);
 
-
         gs.addObserver(this);
         gs.addObserver(hudPane.getHUDStatsPane());
+        gs.addObserver(hudPane.getHUDStatePane());
         gs.addObserver(hudPane);
         gs.addObserver(gamePane);
-        gs.addObserver(hudPane.getHUDStatePane());
 
         menuPane = new MenuPane();
 
@@ -73,9 +73,33 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     Map determines level to load.
      */
     public void startNewGame(int level) {
-        gs.newGame(level);
+        gs.loadNewGame(level);
         gs.setGameRunning(true);
+    }
 
+    public void resumeGame() {
+        gs.setGameRunning(true);
+    }
+
+    public void restart() {
+        gs.restartLevel();
+    }
+
+    public void pauseGame(){
+        gs.setGameRunning(false);
+    }
+
+    private void startMapThread(){
+        if(mapThread == null){
+            mapThread = new MapThread();
+        }
+
+        if(mapThread.isAlive()){
+            System.out.println("lol");
+        }else {
+            mapThread = new MapThread();
+            mapThread.start();
+        }
     }
 
     @Override
@@ -85,19 +109,12 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
                 tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
             } else if (msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_LEVEL_COMPLETE); //DONE - ADD ARGUMENTS TO MENU TOGGLE (FOR EXAMPLE SHOW STATS...)
+            } else if(msg.equals(Constants.OBSERVER_GAME_RESUMED)){
+                startMapThread();
+            } else if(msg.equals(Constants.OBSERVER_GAME_PAUSED)){
 
-            } else if (msg.equals(Constants.OBSERVER_GAME_TICK)) {
-                handle();
             }
         }
-    }
-
-    public GameState getGameState() {
-        return gs;
-    }
-
-    public void resumeGame() {
-        gs.setGameRunning(true);
     }
 
 
@@ -137,27 +154,42 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     }
 
 
-    private void handle() {
-        Point mouse = MouseInfo.getPointerInfo().getLocation();
-        Point p = TDGame.this.getLocationOnScreen();
-        Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
-                TDGame.this.getWidth(), TDGame.this.getHeight());
+    /**
+     * Listens for mouse position allowing movement of the screen around the map if the mouse is close to edge.
+     */
+    private class MapThread extends Thread{
+        public void run(){
+            while(gs.isRunning()){
+                try{
+                    handle();
+                    Thread.sleep(Constants.MAP_MOVE_REFRESH);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("Exiting MapThread");
+        }
 
-            /*
-            if (PointToPointDistance.isPointInRegion(e.getLocationOnScreen(), r, Constants.MOVEMENT_PIXEL_PADDING)) {
+        private void handle() {
+            if(!TDGame.this.isVisible() || !tdf.isVisible())
                 return;
-            }*/
 
-        //Find edge
-        boolean top = PointToPointDistance.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-        boolean bot = PointToPointDistance.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-        boolean left = PointToPointDistance.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-        boolean right = PointToPointDistance.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            Point mouse = MouseInfo.getPointerInfo().getLocation();
+            Point p = TDGame.this.getLocationOnScreen();
+            Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
+                    TDGame.this.getWidth(), TDGame.this.getHeight());
 
-        //System.out.println("Moving");
-        gamePane.setMapMove(top, bot, left, right);
-
-
+            //Find edge
+            boolean top = PointToPointDistance.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean bot = PointToPointDistance.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean left = PointToPointDistance.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean right = PointToPointDistance.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            gamePane.updateMapMove(top, bot, left, right);
+            //gamePane.handleMapMove(top, bot, left, right);
+        }
     }
+
 
 }

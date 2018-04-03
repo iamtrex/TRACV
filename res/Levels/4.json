@@ -1,0 +1,21 @@
+{
+    "level": {
+      "name": "BuildPathTest",
+      "map": "TerrainMapTest4.csv",
+      "enemy-spawn": [
+        {
+          "Duration": "6",
+          "spawn": "B,B,B,B,B,B,B"
+        },
+        {
+          "Duration": "6",
+          "spawn": "F,F,F,B,B,F,F"
+        },
+        {
+          "Duration": "10",
+          "spawn": "F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,B,B,B,B,B"
+        }
+      ]
+    }
+
+}

@@ -153,15 +153,15 @@ public class MenuPane extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == continueGame){
-            tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
+            //tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
         }else if(source == newGame){
-            tdf.newGame();
+            tdf.restartGame();
         }else if (source == returnToMain) {
             tdf.switchToMainPanel();
         }else if(source == settings){
             tdf.switchToSettingsPanel();
         }
-        this.setVisible(false);
+        tdf.toggleMenu(false, null);
     }
 
 

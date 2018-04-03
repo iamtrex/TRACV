@@ -23,7 +23,8 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private LevelJsonParser parser;
     private EnemySpawner spawner;
 
-    private Timer gameTimer;
+    private GameThread gameThread;
+
     private Tower selectedTower; //Selected by user.
 
     private int gold;
@@ -47,11 +48,20 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     /**
      * Initiates a new game.
      */
-    public void newGame(int level) {
-        gameTimer = null; //reset the timer (tbh won't really change much since refresh rate is so fast, but why not.. :P)
-
+    public void loadNewGame(int level) {
         System.out.println("Starting new game");
-        
+
+        running = false;
+        if(gameThread != null){
+            try {
+                gameThread.join();
+            }catch(Exception e){
+                e.printStackTrace();
+            }finally{
+                gameThread = null; //reset the timer (tbh won't really change much since refresh rate is so fast, but why not.. :P)
+            }
+        }
+
         gold = 500; // temp value, 500 cuz league
         score = 0;
         timeElapsed = 0;
@@ -74,30 +84,72 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * @param b - true = start, false = pause.
      */
     public void setGameRunning(boolean b){
-        if(gameTimer == null){
-            createGameTimer();
+        if(gameThread == null){
+            gameThread = new GameThread();
         }
 
-        if(running != b){
+        //if(running != b){
+            running = b;
             if(b){
                 lastTimeNano = System.nanoTime();
-                gameTimer.start();
+                gameThread.start();
                 System.out.println("Start/resume Game");
+                notifyObservers(Constants.OBSERVER_GAME_RESUMED);
             }else{
-                gameTimer.stop();
+                try {
+                    gameThread.join();
+                }catch(InterruptedException e) {
+                    e.printStackTrace();
+                }finally{
+                    gameThread = null;
+                }
+                notifyObservers(Constants.OBSERVER_GAME_PAUSED);
                 System.out.println("Pausing/Stopping game");
             }
-            running = b;
-        }
+        //}else{
+        //    System.out.println("Running already same as change state");
+        //}
     }
 
-    public void createGameTimer(){
-        gameTimer = new Timer(Constants.REFRESH_DELAY, (e)->{
-            long nowTime = System.nanoTime();
-            updateState((int)Math.round((nowTime-lastTimeNano)/1000000.0));
-            notifyObservers(Constants.OBSERVER_GAME_TICK); //Call UI to redraw
-            lastTimeNano = nowTime;
-        });
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void restartLevel() {
+        System.out.println("Restarting Level");
+        loadNewGame(this.level);
+        //setGameRunning(true);
+    }
+
+    private class GameThread extends Thread{
+        public void run(){
+            while(running) {
+                long nowTime = System.nanoTime();
+                long delay = Math.round((nowTime - lastTimeNano) / 1000000.0);
+                lastTimeNano = nowTime;
+
+                updateState(delay);
+
+                long loadDelay = Math.round((System.nanoTime() - nowTime)/1000000.0);
+
+                notifyObservers(Constants.OBSERVER_GAME_TICK); //Call UI to redraw
+
+                //Want sleep to be approx REFRESH_DELAY...
+                long sleepTime = Constants.REFRESH_DELAY - loadDelay;
+                if(sleepTime <= 0){
+                    System.out.println("no sleep");
+                }
+
+                if(sleepTime > 0) {
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }
     }
 
 
@@ -105,19 +157,19 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget){
         for(Enemy e : map.getEnemies()){
             if(toDel.contains(e)) {
-                continue; // Skip.
-            }
-            boolean reachedBase = EnemyMotion.updateEnemy(e);
-
-            //Delete e if it reaches base
-            if(reachedBase){
-                //DONE -  update Health of base since it crashed.
-                System.out.println("CRASHED!");
-                map.getBase().takeDmg(e.getDmg());
-                if(map.getBase().isExploded()){
-                    //Base exploded.
-                    setLevelFailure();
+                    continue; // Skip.
                 }
+                boolean reachedBase = EnemyMotion.updateEnemy(e);
+
+                //Delete e if it reaches base
+                if(reachedBase){
+                    //DONE -  update Health of base since it crashed.
+                    System.out.println("CRASHED!");
+                    map.getBase().takeDmg(e.getDmg());
+                    if(map.getBase().isExploded()){
+                        //Base exploded.
+                        setLevelFailure();
+                    }
 
                 notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
 
@@ -202,7 +254,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * Updates the position of everything
      * //TODO make system update to actualTimeMS
      */
-    public void updateState(int actualTimeMS) {
+    public void updateState(long actualTimeMS) {
         System.out.println("Update Rate " + actualTimeMS);
         timeElapsed += actualTimeMS;
 
@@ -230,7 +282,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
         //Update spawner time
         if(!spawner.isDoneSpawn()){
-            spawner.update(actualTimeMS);
+            spawner.update((int)actualTimeMS);
         }else{
             if(map.getEnemies().isEmpty() && !map.getBase().isExploded()){
                 //Beat level!
@@ -239,7 +291,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
 
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
-
     }
 
     private void setLevelSuccess(){

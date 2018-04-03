@@ -39,6 +39,10 @@ public class EnemySpawner{
      * @return - True if level is complete with spawning
      */
     public void update(int timeMillis){
+        if(next == null){
+            System.out.println("ALREADY DONE SPAWN WTF R U DOING");
+            return; //Done spawn
+        }
         millisFromLastSpawn += timeMillis;
 
         boolean spawnRepeat = true;
