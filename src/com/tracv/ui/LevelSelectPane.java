@@ -16,13 +16,9 @@ import java.util.List;
 public class LevelSelectPane extends JPanel implements ActionListener {
 
     private Label title;
-  
     private TDFrame tdf;
-
     private List<LevelSelectButton> buttons;
-
     private Pane buttonsPane;
-
     private Button back;
 
     public LevelSelectPane(TDFrame tdf){

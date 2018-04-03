@@ -1,10 +1,9 @@
 package com.tracv.ui;
 
-import com.tracv.util.Comp;
-import com.tracv.util.Constants;
-import com.tracv.util.MouseHooker;
+import com.tracv.util.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
@@ -29,17 +28,11 @@ public class TDFrame extends JFrame implements WindowFocusListener {
     public TDFrame() {
         mouseHooker = new MouseHooker(this);
 
-
         //Create Content Panes.
         mainPane = new MainPane(this);
         tdGame = new TDGame(this);
-
         levelSelectPane = new LevelSelectPane(this);
-
-        levelSelectPane = new LevelSelectPane(this);
-
         menuPane = new MenuPane(this);
-
         settingsPane = new SettingsPane(this);
 
         this.setUndecorated(true);
@@ -49,21 +42,20 @@ public class TDFrame extends JFrame implements WindowFocusListener {
         this.setGlassPane(menuPane);
 
         this.setSize(Constants.FRAME_DEFAULT_SIZE);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //this.addFocusListener(this);
-        this.addWindowFocusListener(this);
         Comp.center(this);
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.addWindowFocusListener(this);
         this.setVisible(true);
     }
 
     public static void main(String args[]) {
         new TDFrame(); //Starts the program by calling TDFrame's constructor
+        Logger.getInstance().log("Program Startup Complete", LoggerLevel.STATUS);
     }
 
-
-    public void switchToMainPanel() {
-        switchPanel(mainPane);
+    public void restartGame() {
+        tdGame.restart();
     }
 
     public void newGame(int i){
@@ -73,6 +65,9 @@ public class TDFrame extends JFrame implements WindowFocusListener {
         }
     }
 
+    public void switchToMainPanel() {
+        switchPanel(mainPane);
+    }
     public void switchToLevelSelectPanel(){
         switchPanel(levelSelectPane);
     }
@@ -80,10 +75,10 @@ public class TDFrame extends JFrame implements WindowFocusListener {
         switchPanel(tdGame);
         tdGame.grabFocus(); // Give panel focus.
     }
-
     public void switchToSettingsPanel(){
         switchPanel(settingsPane);
     }
+
     private void switchPanel(JComponent panel){
         if(panel == tdGame){
             mouseHooker.setActive(true);
@@ -116,8 +111,6 @@ public class TDFrame extends JFrame implements WindowFocusListener {
             }
 
         }
-
-
         SwingUtilities.invokeLater(()-> this.validate());
     }
 
@@ -135,17 +128,10 @@ public class TDFrame extends JFrame implements WindowFocusListener {
         if(TDFrame.this.getContentPane() == tdGame){
             mouseHooker.setActive(true);
         }
-        //System.out.println("Fcous gained");
     }
-
     @Override
     public void windowLostFocus(WindowEvent e) {
-
         mouseHooker.setActive(false);
-        //System.out.println("Fcous lost");
     }
 
-    public void restartGame() {
-        tdGame.restart();
-    }
 }

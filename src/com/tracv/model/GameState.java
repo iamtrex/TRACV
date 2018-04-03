@@ -1,13 +1,12 @@
 package com.tracv.model;
 
-import com.tracv.directional.PointToPointDistance;
+import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -154,12 +153,12 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
 
 
-    private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget){
+    private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget, long updateTime){
         for(Enemy e : map.getEnemies()){
             if(toDel.contains(e)) {
                     continue; // Skip.
                 }
-                boolean reachedBase = EnemyMotion.updateEnemy(e);
+                boolean reachedBase = EnemyMotion.updateEnemy(e, updateTime);
 
                 //Delete e if it reaches base
                 if(reachedBase){
@@ -190,7 +189,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                 for(Enemy e : map.getEnemies()){
                     if(!toDel.contains(e)) {
                         Point enemyPt = new Point((int) e.getX(), (int) e.getY());
-                        if (PointToPointDistance.getDistance(towerPt, enemyPt) < range) {
+                        if (Geometry.getDistance(towerPt, enemyPt) < range) {
                             //Create new projectile with this Enemy as targe
                             // TODO FIX TEMP LINE
                             // TODO STILL HAVE TO MODIFY...
@@ -235,7 +234,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                         for(Enemy e2 : map.getEnemies()){
                             if(e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
                                 if (!needToRetarget.contains(e2)) {
-                                    if (PointToPointDistance.withinRange(e2, p.getTower(), p.getTower().getRange())) {
+                                    if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
                                         p.setTarget(e2);
                                         break;
                                     }
@@ -254,15 +253,15 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * Updates the position of everything
      * //TODO make system update to actualTimeMS
      */
-    public void updateState(long actualTimeMS) {
-        System.out.println("Update Rate " + actualTimeMS);
-        timeElapsed += actualTimeMS;
+    public void updateState(long updateTimeMS) {
+        System.out.println("Update Rate " + updateTimeMS);
+        timeElapsed += updateTimeMS;
 
         List<Enemy> needToRetarget = new ArrayList<>();
         List<GameComponent> toDel = map.getToDel();
         List<GameComponent> toAdd = map.getToAdd();
 
-        updateEnemies(toDel, needToRetarget);
+        updateEnemies(toDel, needToRetarget, updateTimeMS);
         updateProjectiles(toDel, needToRetarget);
         updateTowers(toDel, toAdd);
 
@@ -282,7 +281,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
         //Update spawner time
         if(!spawner.isDoneSpawn()){
-            spawner.update((int)actualTimeMS);
+            spawner.update((int)updateTimeMS);
         }else{
             if(map.getEnemies().isEmpty() && !map.getBase().isExploded()){
                 //Beat level!
@@ -356,7 +355,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
 
         for(Tower t : map.getTowers()){
-            if(PointToPointDistance.isPointInObject(point, t)){
+            if(Geometry.isPointInObject(point, t)){
                 t.setSelected(true);
                 selectedTower = t;
                 notify = true;

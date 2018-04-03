@@ -20,6 +20,7 @@ public class EnemySpawner{
 
     private int wave;
     private int maxWave;
+
     public EnemySpawner(LevelJsonParser parser, GameState gs){
         this.parser = parser;
         this.map = gs.getMap();

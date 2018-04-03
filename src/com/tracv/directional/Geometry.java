@@ -6,21 +6,50 @@ import com.tracv.util.Constants;
 
 import java.awt.*;
 
-public class PointToPointDistance {
+/**
+ * Some geometric maths.
+ *
+ */
+public class Geometry {
 
+    /**
+     *
+     * @param a
+     * @param b
+     * @return - if points a and b are within Constants.CLICK_VAR_DISTANCE of each other
+     */
     public static boolean withinDistance(Point a, Point b){
         return getDistance(a, b) < Constants.CLICK_VAR_DISTANCE;
     }
 
+    /**
+     * Get distance between two points
+     * @param a
+     * @param b
+     * @return double representation of double
+     */
     public static double getDistance(Point a, Point b){
         return Math.sqrt(Math.pow(a.getX()-b.getX(), 2) + Math.pow(a.getY()-b.getY(), 2));
     }
 
+    /**
+     *
+     * @param point
+     * @param gc
+     * @return
+     */
     public static boolean isPointInObject(Point point, GameComponent gc) {
         return point.getX() >= gc.getX() && point.getX() <= gc.getX() + gc.getWidth() &&
             point.getY() >= gc.getY() && point.getY() <= gc.getY() + gc.getHeight();
     }
 
+    /**
+     * REturns whether two objects are within a range of each other.
+     * @param g1
+     * @param g2
+     * @param range
+     * @return
+     */
     public static boolean withinRange(GameComponent g1, GameComponent g2, double range){
         return range >= Math.sqrt(Math.pow(g1.getX()-g2.getX(), 2) + Math.pow(g1.getY()-g2.getY(), 2));
     }
@@ -46,17 +75,6 @@ public class PointToPointDistance {
                 p.getY() <= r.getY() + r.getHeight());
     }
 
-    /*
-    Padding is the extra restraints on all 4 edges.
-     */
-
-    //TODO make this more optimal? or make it scale off how close to the edge it is?
-    public static boolean isPointInRegion(Point p, Rectangle r, int pad) {
-        return (p.getX() >= r.getX() + pad &&
-                p.getX() <= r.getX() + r.getWidth() - pad &&
-                p.getY() >= r.getY() + pad &&
-                p.getY() <= r.getY() + r.getHeight() - pad);
-    }
 
     public static boolean isPointInTop(Point p, Rectangle r, int pad) {
         return p.getY() <= r.getY() + pad && p.getY() >= r.getY();
@@ -69,7 +87,6 @@ public class PointToPointDistance {
     public static boolean isPointInLeft(Point p, Rectangle r, int pad) {
         return p.getX() <= r.getX() + pad && p.getX() >= r.getX();
     }
-
 
     public static boolean isPointInRight(Point p, Rectangle r, int pad) {
         return p.getX() >= r.getX() + r.getWidth() - pad && p.getX() <= r.getX() + r.getWidth();

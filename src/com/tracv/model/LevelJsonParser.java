@@ -14,7 +14,6 @@ public class LevelJsonParser {
     public LevelJsonParser(){
         spawnTimer = new HashMap<>();
         spawnQueue = new LinkedList<>();
-
     }
 
 

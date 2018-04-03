@@ -1,21 +1,23 @@
 package com.tracv.ui.game;
 
-import com.tracv.directional.PointToPointDistance;
+import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.Enemy;
 import com.tracv.gamecomponents.GameComponent;
 import com.tracv.gamecomponents.Terrain;
 import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
+import com.tracv.swing.Pane;
 import com.tracv.types.EnemyType;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
+import com.tracv.util.Logger;
+import com.tracv.util.LoggerLevel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The 'game' portion of the interface (not including hud).
@@ -24,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *      a. Not interfere
  *      b. Redraw faster?
  */
-public class GamePane extends JPanel implements Observer{
+public class GamePane extends Pane implements Observer{
 
     private Point mouse;
 
@@ -33,26 +35,19 @@ public class GamePane extends JPanel implements Observer{
 
     private Rectangle selectedRegion;
 
-
-    // Acts as layers, so not the entire UI has to refresh on each iteration
-    //private Rectangle mobLayer, towerLayer, projectileLayer, terrainLayer;
+    private boolean top, bot, left, right;
 
     public GamePane(){
         gs = new GameState();
-        //TODO -- Remove this hack
+
         resetRectangle();
 
         this.setPreferredSize(Constants.GAME_DIMENSION);
-        this.setBackground(Color.BLUE);
-        //this.setOpaque(false);
+        this.setBackground(Color.BLACK);
         this.addMouseListener(new MyMouseListener());
         this.addMouseMotionListener(new MyMouseMotionListener());
-
-        this.setFocusable(true);
         this.addKeyListener(new MyKeyListener());
-        //this.add(new JTextField("Hello World"));
-        //setupKeyListeners(this);
-
+        this.setFocusable(true);
     }
 
     public GameState getGameState(){
@@ -64,11 +59,7 @@ public class GamePane extends JPanel implements Observer{
         this.bot = bot;
         this.left = left;
         this.right = right;
-
     }
-
-    private boolean top, bot, left, right;
-
 
     private void handleMapMove() {
         int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
@@ -92,9 +83,6 @@ public class GamePane extends JPanel implements Observer{
                     (int) selectedRegion.getY());
         }
 
-        //TODO ADD MORE CHECKS
-
-
         int mapWidth = (int)gs.getMap().getMapDimensions().getWidth();
         int mapHeight = (int)gs.getMap().getMapDimensions().getHeight();
 
@@ -110,21 +98,21 @@ public class GamePane extends JPanel implements Observer{
         if (selectedRegion.getY() < 0) {
             selectedRegion.setLocation((int) selectedRegion.getX(), 00);
         }
-
     }
 
 
 
     private boolean attemptToBuildTower(Point point) {
         if(selectedTower != null) {
-            System.out.println("Attempting to build tower of type " + selectedTower.getName() +
-                    " on point " + point.getX() + "," + point.getY());
+            Logger.getInstance().log("Attempting to build tower of type " + selectedTower.getName() +
+                    " on point " + point.getX() + "," + point.getY(), LoggerLevel.STATUS);
+
             point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
 
             return gs.attemptToBuildTower(point, selectedTower);
 
         } else{
-            System.out.println("No Tower selected, no build.");
+            Logger.getInstance().log("No Tower selected, no build.", LoggerLevel.STATUS);
             return false;
         }
     }
@@ -148,7 +136,7 @@ public class GamePane extends JPanel implements Observer{
         //Draw TerrainType
         for(int y = 0; y< terrains.length; y++){
             for(int x = 0; x< terrains[y].length; x++){
-                if(!PointToPointDistance.isObjectInsideRegion(terrains[y][x], selectedRegion)){
+                if(!Geometry.isObjectInsideRegion(terrains[y][x], selectedRegion)){
                     continue; // Skip object.
                 }
                 for(TerrainType t : TerrainType.getTerrains()){
@@ -181,7 +169,7 @@ public class GamePane extends JPanel implements Observer{
         }
 
         for(GameComponent gc : gs){
-            if(PointToPointDistance.isObjectInsideRegion(gc, selectedRegion)) {
+            if(Geometry.isObjectInsideRegion(gc, selectedRegion)) {
                 gc.draw(g, selectedRegion);
             }
         }
@@ -290,7 +278,7 @@ public class GamePane extends JPanel implements Observer{
         public void mouseReleased(MouseEvent e) {
             if(click != null){
                 Point p = e.getPoint();
-                if(PointToPointDistance.withinDistance(p, click)) {
+                if(Geometry.withinDistance(p, click)) {
                     boolean b = attemptToBuildTower(p);
 
                     if(!b){ //Attempt to select tower if applicable

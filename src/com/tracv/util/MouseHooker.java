@@ -1,7 +1,7 @@
 package com.tracv.util;
 
 
-import com.tracv.directional.PointToPointDistance;
+import com.tracv.directional.Geometry;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -79,7 +79,7 @@ public class MouseHooker {
                     window.getWidth(), window.getHeight());
 
             Point mouse = e.getPoint();
-            if (PointToPointDistance.isPointInRegion(mouse, r)) {
+            if (Geometry.isPointInRegion(mouse, r)) {
                 return;
             }
 

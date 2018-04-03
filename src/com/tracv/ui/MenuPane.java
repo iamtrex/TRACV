@@ -161,7 +161,7 @@ public class MenuPane extends JPanel implements ActionListener {
         }else if(source == settings){
             tdf.switchToSettingsPanel();
         }
-        tdf.toggleMenu(false, null);
+        tdf.toggleMenu(false);
     }
 
 

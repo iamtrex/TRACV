@@ -1,6 +1,6 @@
 package com.tracv.ui;
 
-import com.tracv.directional.PointToPointDistance;
+import com.tracv.directional.Geometry;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -11,6 +11,8 @@ import com.tracv.ui.game.HUDButtonPane;
 import com.tracv.ui.game.HUDPane;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
+import com.tracv.util.Logger;
+import com.tracv.util.LoggerLevel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,15 +27,13 @@ import java.beans.PropertyChangeListener;
 public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     private TDFrame tdf;
+    private GameState gs;
 
     private HUDPane hudPane;
     private GamePane gamePane;
     private MenuPane menuPane;
 
     private IconButton pause;
-
-    private GameState gs;
-
 
     private MapThread mapThread;
 
@@ -89,18 +89,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         gs.setGameRunning(false);
     }
 
-    private void startMapThread(){
-        if(mapThread == null){
-            mapThread = new MapThread();
-        }
-
-        if(mapThread.isAlive()){
-            System.out.println("lol");
-        }else {
-            mapThread = new MapThread();
-            mapThread.start();
-        }
-    }
 
     @Override
     public void update(Observable o, String msg) {
@@ -129,7 +117,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
             pause.addActionListener(TDGame.this::actionPerformed);
             Comp.add(pause, this, 0, 0, 1, 1, 0, 0,
                     GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
-
         }
     }
 
@@ -153,6 +140,17 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         }
     }
 
+    private void startMapThread(){
+        if(mapThread == null){
+            mapThread = new MapThread();
+        }
+        if(mapThread.isAlive()){
+            Logger.getInstance().log("MapThread not properly terminated", LoggerLevel.ERROR);
+        }else {
+            mapThread = new MapThread();
+            mapThread.start();
+        }
+    }
 
     /**
      * Listens for mouse position allowing movement of the screen around the map if the mouse is close to edge.
@@ -182,10 +180,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
                     TDGame.this.getWidth(), TDGame.this.getHeight());
 
             //Find edge
-            boolean top = PointToPointDistance.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean bot = PointToPointDistance.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean left = PointToPointDistance.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
-            boolean right = PointToPointDistance.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean top = Geometry.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean bot = Geometry.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean left = Geometry.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+            boolean right = Geometry.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
             gamePane.updateMapMove(top, bot, left, right);
             //gamePane.handleMapMove(top, bot, left, right);
         }

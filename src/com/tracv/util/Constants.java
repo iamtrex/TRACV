@@ -63,6 +63,7 @@ public class Constants {
         public static final String EXTERNAL_ROOT_DIR = "TRACV/";
         public static final String SETTINGS_FILE = EXTERNAL_ROOT_DIR + "preferences.json";
 
+    public static final int DEFAULT_SIZE = 14;
 
     //Fonts
         public static final String FONT_FAMILY = "Calibri";
@@ -74,7 +75,8 @@ public class Constants {
         public static final Font MEDIUM_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
         public static final Font SMALL_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
 
-    public static final int DEFAULT_SIZE = 14;
+        public static final Font LOGGER_FONT = new Font(FONT_FAMILY, Font.PLAIN, DEFAULT_SIZE);
+
 
     //Default colours of selected vs unselected buttons
         public static final Color BUTTON_SELECTED_COLOR = new Color(150, 150, 150, 150);

@@ -9,6 +9,9 @@ public abstract class MoveableComponent extends GameComponent {
     }
     //public abstract void draw(Graphics g, Rectangle selectedRegion);
 
+    /**
+        Speed in pixels per second
+     */
     public double getSpeed() {
         return speed;
     }
