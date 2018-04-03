@@ -18,6 +18,9 @@ public class LevelJsonParser {
 
 
     public void readLevel(int level) {
+        spawnTimer.clear();
+        spawnQueue.clear();
+
         String contents = TextFileReader.readFile(Constants.LEVEL_DIR + String.valueOf(level) + ".json");
         parseJson(contents);
     }

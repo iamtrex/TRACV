@@ -1,9 +1,12 @@
 package com.tracv.util;
 
+import com.tracv.swing.Pane;
 import com.tracv.swing.TextArea;
 import com.tracv.swing.ScrollPane;
+import com.tracv.swing.Label;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,9 @@ public class Logger extends JFrame {
 
     private TextArea logWindow;
     private ScrollPane scroll;
+    private Pane panel;
+
+    private Label delay, loadDelay;
 
     private Logger(){
         logs = new ArrayList<>();
@@ -37,8 +43,18 @@ public class Logger extends JFrame {
         scroll = new ScrollPane();
         scroll.setViewportView(logWindow);
 
+        panel = new Pane();
 
-        this.setContentPane(scroll);
+        delay = new Label("Delay Time " , Label.SMALL);
+        loadDelay = new Label("Load Time " , Label.SMALL);
+
+        Comp.add(scroll, panel, 0, 0, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(delay, panel, 0, 1, 1, 1, 1, 0, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(loadDelay, panel, 1, 1, 1, 1, 1, 0, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+
+
+
+        this.setContentPane(panel);
 
         this.setSize(300, 600);
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -49,6 +65,16 @@ public class Logger extends JFrame {
         this.setVisible(true);
     }
 
+    public void updateLoadDelay(long time) {
+        loadDelay.setText("Load Time " + time + "ms");
+        loadDelay.repaint();
+    }
+
+    public void updateDelay(long time) {
+        delay.setText("Frame Time " + time + "ms");
+        delay.repaint();
+    }
+
     private class LogMessage{
         private String message;
         private LoggerLevel level;
@@ -57,8 +83,9 @@ public class Logger extends JFrame {
             this.message = message;
             this.level = level;
         }
+        //TODO ADD TIME
         public String getText(){
-            return level.getName() + "- " + message;
+            return "[" + level.getName() + "]" + "- " + message;
 
         }
     }

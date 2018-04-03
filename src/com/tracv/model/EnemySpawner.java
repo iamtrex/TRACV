@@ -41,7 +41,11 @@ public class EnemySpawner{
      */
     public void update(int timeMillis){
         if(next == null){
-            System.out.println("ALREADY DONE SPAWN WTF R U DOING");
+            if(toSpawn.isEmpty()){
+                System.err.println("Calling update when spawn empty");
+            }else{
+                System.err.println("Somehow next is null??");
+            }
             return; //Done spawn
         }
         millisFromLastSpawn += timeMillis;
@@ -72,6 +76,7 @@ public class EnemySpawner{
     public String getWave(){
         return String.valueOf(wave) + "/" + String.valueOf(maxWave);
     }
+
     //TODO - I dont' like this implementation, but can't think of a better way.
     public void updateGSWave(){
         gs.updateWave();
@@ -95,8 +100,8 @@ public class EnemySpawner{
 
         millisFromLastSpawn = 0;
         toSpawn = parser.getSpawnQueue();
-        wave = 0;
         maxWave = toSpawn.size();
+        wave = 0;
         timeToSpawn = parser.getSpawnTime();
         next = toSpawn.poll();
 

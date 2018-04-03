@@ -122,13 +122,14 @@ public class GamePane extends Pane implements Observer{
         super.paintComponent(g);
 
         handleMapMove();
+
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
 
         //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
         //TODO -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
         //Draw TerrainType
-        Terrain[][] terrains = getGameState().getTerrain();
+        Terrain[][] terrains = gs.getTerrain();
 
         double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
         double blockSizeY = Constants.DEFAULT_BLOCK_SIZE;
@@ -150,9 +151,8 @@ public class GamePane extends Pane implements Observer{
                 //  Either use preloaded image? or fix how the border looks
                 //  The +1 works because drawn from top left to bottom right, so the top and left borders
                 //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
-
-                g.fillRect((int)(x*blockSizeX+1- selectedRegion.getX()),
-                        (int)(y*blockSizeY+1- selectedRegion.getY()),
+                g.fillRect((int)(x*blockSizeX + 1 - selectedRegion.getX()),
+                        (int)(y*blockSizeY + 1 - selectedRegion.getY()),
                         (int)blockSizeX,
                         (int)blockSizeY);
 
@@ -189,13 +189,11 @@ public class GamePane extends Pane implements Observer{
 
      */
     private void drawTowerHighlightOnMouse(Graphics g){
-        //TODO - Ask GameState if the current position is legal. (Determine red or green shade on the object)
-
-        //TODO CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
+        //DONE - Ask GameState if the current position is legal. (Determine red or green shade on the object)
+        //DONE -- CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
         //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
 
         if(selectedTower != null) { // Only draw if currently has selected tower!
-
             Image img;
             Point point = mouse.getLocation();
             point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
@@ -216,7 +214,7 @@ public class GamePane extends Pane implements Observer{
     public void update(Observable o, String msg) {
         if(msg.equals(Constants.OBSERVER_GAME_TICK)){
             this.repaint();
-        }else if(msg.equals(Constants.OBSERVER_GAME_PAUSED)){
+        }else if(msg.equals(Constants.OBSERVER_GAME_PAUSED) || msg.equals(Constants.OBSERVER_GAME_OVER) || msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
             top = false;
             bot = false;
             left = false;
@@ -230,12 +228,13 @@ public class GamePane extends Pane implements Observer{
         selectedRegion = new Rectangle(0,0,
                 (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
     }
+
     public void setSelectedTower(TowerType selectedTower) {
         this.selectedTower = selectedTower;
     }
 
 
-
+    //Key and Mouse Listeners
     private class MyKeyListener implements KeyListener{
 
         //TODO REMOVE GOD MODE HACKS... HACKS
@@ -301,7 +300,6 @@ public class GamePane extends Pane implements Observer{
             SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }
-
 
     private class MyMouseMotionListener implements MouseMotionListener {
         @Override

@@ -6,6 +6,8 @@ import com.tracv.observerpattern.Observable;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
+import com.tracv.util.Logger;
+import com.tracv.util.LoggerLevel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class GameState extends Observable implements Iterable<GameComponent>{
+public class GameState extends Observable implements Iterable<GameComponent> {
 
 
     //private List<GameComponent> gameComponents;
@@ -36,9 +38,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     //Keeps track of game running state/refresh
     private long lastTimeNano;
 
-    private boolean running = false;
+    private boolean running;
 
     public GameState() {
+        running = false;
         parser = new LevelJsonParser();
         map = new GameMap();
         spawner = new EnemySpawner(parser, this);
@@ -48,24 +51,25 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * Initiates a new game.
      */
     public void loadNewGame(int level) {
-        System.out.println("Starting new game");
-
+        Logger.getInstance().log("Loading Level " + level, LoggerLevel.STATUS);
         running = false;
-        if(gameThread != null){
+
+        if (gameThread != null) {
+            Logger.getInstance().log("Game Thread not properly terminated", LoggerLevel.WARNING);
             try {
                 gameThread.join();
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
-            }finally{
+            } finally {
                 gameThread = null; //reset the timer (tbh won't really change much since refresh rate is so fast, but why not.. :P)
             }
         }
 
+        //Reset values.
         gold = 500; // temp value, 500 cuz league
         score = 0;
         timeElapsed = 0;
         selectedTower = null;
-
 
         //Load level based on inputted string.
         this.level = level;
@@ -74,39 +78,43 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         map.reset();
         map.loadLevel(parser.getFile());
 
+        //Reset other components such as selected rectangle in GamePane
         notifyObservers(Constants.OBSERVER_NEW_GAME);
     }
 
 
     /**
      * Start or stop game running
+     *
      * @param b - true = start, false = pause.
      */
-    public void setGameRunning(boolean b){
-        if(gameThread == null){
+    public void setGameRunning(boolean b) {
+        System.out.println("Setting game runnning " + b);
+
+        if (gameThread == null) {
             gameThread = new GameThread();
         }
 
-        //if(running != b){
+        //if (running != b) {
             running = b;
-            if(b){
+            if (b) {
                 lastTimeNano = System.nanoTime();
                 gameThread.start();
-                System.out.println("Start/resume Game");
+                Logger.getInstance().log("Starting/Resuming Game!", LoggerLevel.STATUS);
                 notifyObservers(Constants.OBSERVER_GAME_RESUMED);
-            }else{
+            } else {
                 try {
                     gameThread.join();
-                }catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                }finally{
+                } finally {
                     gameThread = null;
                 }
+                Logger.getInstance().log("Stopping/Pausing Game!", LoggerLevel.STATUS);
                 notifyObservers(Constants.OBSERVER_GAME_PAUSED);
-                System.out.println("Pausing/Stopping game");
             }
-        //}else{
-        //    System.out.println("Running already same as change state");
+        //} else {
+        //    Logger.getInstance().log("GameState was messed up, called running = " + b + " when running already " + running, LoggerLevel.WARNING);
         //}
     }
 
@@ -115,124 +123,119 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
     public void restartLevel() {
-        System.out.println("Restarting Level");
+        Logger.getInstance().log("Restarting Level", LoggerLevel.STATUS);
         loadNewGame(this.level);
         //setGameRunning(true);
     }
 
-    private class GameThread extends Thread{
-        public void run(){
-            while(running) {
+    private class GameThread extends Thread {
+        public void run() {
+            while (running) {
                 long nowTime = System.nanoTime();
                 long delay = Math.round((nowTime - lastTimeNano) / 1000000.0);
                 lastTimeNano = nowTime;
 
+                Logger.getInstance().updateDelay(delay);
                 updateState(delay);
-
-                long loadDelay = Math.round((System.nanoTime() - nowTime)/1000000.0);
-
                 notifyObservers(Constants.OBSERVER_GAME_TICK); //Call UI to redraw
+
+                long loadDelay = Math.round((System.nanoTime() - nowTime) / 1000000.0); //Include time for UI to redraw.
+                Logger.getInstance().updateLoadDelay(loadDelay);
+
 
                 //Want sleep to be approx REFRESH_DELAY...
                 long sleepTime = Constants.REFRESH_DELAY - loadDelay;
-                if(sleepTime <= 0){
-                    System.out.println("no sleep");
+                if (sleepTime <= 0) {
+                    Logger.getInstance().log("No Sleep!", LoggerLevel.WARNING);
                 }
-
-                if(sleepTime > 0) {
+                if (sleepTime > 0) {
                     try {
                         Thread.sleep(sleepTime);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-
             }
+            Logger.getInstance().log("Terminating Game Thread", LoggerLevel.STATUS);
         }
     }
 
 
+    private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget, long updateTime) {
+        for (Enemy e : map.getEnemies()) {
+            if (toDel.contains(e)) {
+                continue; // Skip.
+            }
+            boolean reachedBase = EnemyMotion.updateEnemy(e, updateTime);
 
-    private void updateEnemies(List<GameComponent> toDel, List<Enemy> needToRetarget, long updateTime){
-        for(Enemy e : map.getEnemies()){
-            if(toDel.contains(e)) {
-                    continue; // Skip.
+            //Delete e if it reaches base
+            if (reachedBase) {
+                Logger.getInstance().log("Enemy Crashed! Dealing " + e.getDmg() + " damage!", LoggerLevel.STATUS);
+                map.getBase().takeDmg(e.getDmg());
+
+                if (map.getBase().isExploded()) {
+                    //Base exploded.
+                    setLevelFailure();
                 }
-                boolean reachedBase = EnemyMotion.updateEnemy(e, updateTime);
-
-                //Delete e if it reaches base
-                if(reachedBase){
-                    //DONE -  update Health of base since it crashed.
-                    System.out.println("CRASHED!");
-                    map.getBase().takeDmg(e.getDmg());
-                    if(map.getBase().isExploded()){
-                        //Base exploded.
-                        setLevelFailure();
-                    }
 
                 notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
-
                 needToRetarget.add(e);
                 toDel.add(e);
             }
         }
     }
-    private void updateTowers(List<GameComponent> toDel, List<GameComponent> toAdd){
-        for(Tower t : map.getTowers()){
-            t.decrementCooldown(1000.0/Constants.REFRESH_RATE);
+
+    private void updateTowers(List<GameComponent> toDel, List<GameComponent> toAdd) {
+        for (Tower t : map.getTowers()) {
+            t.decrementCooldown(1000.0 / Constants.REFRESH_RATE);
             boolean fire = t.canFire();
-            if(fire){
+            if (fire) {
                 //Search enemies in range.
                 double range = t.getRange();
-                Point towerPt = new Point((int)t.getX(), (int)t.getY());
+                Point towerPt = new Point((int) t.getX(), (int) t.getY());
 
-                for(Enemy e : map.getEnemies()){
-                    if(!toDel.contains(e)) {
-                        Point enemyPt = new Point((int) e.getX(), (int) e.getY());
-                        if (Geometry.getDistance(towerPt, enemyPt) < range) {
-                            //Create new projectile with this Enemy as targe
-                            // TODO FIX TEMP LINE
-                            // TODO STILL HAVE TO MODIFY...
-                            Projectile proj = new Projectile(e, t, t.getProjectileType());
-                            toAdd.add(proj);
-                            t.setFired();
-                            break;
-                        }
+                for (Enemy e : map.getEnemies()) {
+                    if (toDel.contains(e)) {
+                        continue;
                     }
-
+                    Point enemyPt = new Point((int) e.getX(), (int) e.getY());
+                    if (Geometry.getDistance(towerPt, enemyPt) < range) {
+                        toAdd.add(new Projectile(e, t, t.getProjectileType()));
+                        t.setFired();
+                        break;
+                    }
                 }
             }
         }
     }
-    private void updateProjectiles(List<GameComponent> toDel, List<Enemy> needToRetarget){
-        for(Projectile p : map.getProjectiles()){
-            if(toDel.contains(p)){
+
+    private void updateProjectiles(List<GameComponent> toDel, List<Enemy> needToRetarget) {
+        for (Projectile p : map.getProjectiles()) {
+            if (toDel.contains(p)) {
                 continue; // Skip.
             }
             boolean crashed = ProjectileMotion.updateProjectile(p);
-            if(crashed){
+            if (crashed) {
                 Enemy e = p.getTarget();
                 boolean dead = e.takeDmg(p.getDmg());
                 toDel.add(p);
-                if(dead){
+                if (dead) {
                     toDel.add(e);
                     needToRetarget.add(e);
-
                     gainGold(e.getKillGold());
-
                 }
             }
         }
     }
 
-    private void updateRetargetEnemies(List<Enemy> needToRetarget, List<GameComponent> toDel){
-        for(Enemy e : needToRetarget){
-            for(Projectile p : map.getProjectiles()){
-                if(p.getTarget().equals(e)){
+    private void updateRetargetEnemies(List<Enemy> needToRetarget, List<GameComponent> toDel) {
+        for (Enemy e : needToRetarget) {
+            for (Projectile p : map.getProjectiles()) {
+                if (p.getTarget().equals(e)) {
                     System.out.println("Retargetting for dead enemy");
-                    if(map.getEnemies().size() > 0) {
-                        for(Enemy e2 : map.getEnemies()){
-                            if(e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
+                    if (map.getEnemies().size() > 0) {
+                        for (Enemy e2 : map.getEnemies()) {
+                            if (e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
                                 if (!needToRetarget.contains(e2)) {
                                     if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
                                         p.setTarget(e2);
@@ -241,7 +244,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         toDel.add(p);
                     }
                 }
@@ -254,25 +257,30 @@ public class GameState extends Observable implements Iterable<GameComponent>{
      * //TODO make system update to actualTimeMS
      */
     public void updateState(long updateTimeMS) {
-        System.out.println("Update Rate " + updateTimeMS);
+        //System.out.println("Update Rate " + updateTimeMS);
+
         timeElapsed += updateTimeMS;
 
         List<Enemy> needToRetarget = new ArrayList<>();
         List<GameComponent> toDel = map.getToDel();
         List<GameComponent> toAdd = map.getToAdd();
 
+        for (GameComponent gc : toAdd) {
+            map.addComponent(gc);
+        }
+        toAdd.clear();
+
         updateEnemies(toDel, needToRetarget, updateTimeMS);
         updateProjectiles(toDel, needToRetarget);
         updateTowers(toDel, toAdd);
 
-        for(GameComponent gc : toAdd){
+        for (GameComponent gc : toAdd) {
             map.addComponent(gc);
         }
 
         updateRetargetEnemies(needToRetarget, toDel);
 
-
-        for(GameComponent gc : toDel){
+        for (GameComponent gc : toDel) {
             map.removeComponent(gc);
         }
 
@@ -280,10 +288,10 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         toAdd.clear();
 
         //Update spawner time
-        if(!spawner.isDoneSpawn()){
-            spawner.update((int)updateTimeMS);
-        }else{
-            if(map.getEnemies().isEmpty() && !map.getBase().isExploded()){
+        if (!spawner.isDoneSpawn()) {
+            spawner.update((int) updateTimeMS);
+        } else {
+            if (map.getEnemies().isEmpty() && !map.getBase().isExploded()) {
                 //Beat level!
                 setLevelSuccess();
             }
@@ -292,18 +300,22 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
     }
 
-    private void setLevelSuccess(){
-        notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+    private void setLevelSuccess() {
+        Logger.getInstance().log("Game Win!", LoggerLevel.STATUS);
         setGameRunning(false);
+        notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+
 
     }
+
     private void setLevelFailure() {
+        Logger.getInstance().log("Game Lose!", LoggerLevel.STATUS);
         notifyObservers(Constants.OBSERVER_GAME_OVER);
         setGameRunning(false);
 
     }
 
-    public boolean isTowerBuildValid(Point p, TowerType selectedTower){
+    public boolean isTowerBuildValid(Point p, TowerType selectedTower) {
         //Draw TerrainType
         //TerrainType[][] terrainType = map.getTerrainTypes();
         try {
@@ -337,7 +349,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             }
 
             return true;
-        }catch(ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             //TODO decide if it's worth fixing this...
             //Silently ignore this bug... for now
             return false;
@@ -348,14 +360,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     public void attemptToSelectTower(Point point) {
         boolean notify = false;
 
-        if(selectedTower != null) {
+        if (selectedTower != null) {
             selectedTower.setSelected(false);
             selectedTower = null;
             notify = true;
         }
 
-        for(Tower t : map.getTowers()){
-            if(Geometry.isPointInObject(point, t)){
+        for (Tower t : map.getTowers()) {
+            if (Geometry.isPointInObject(point, t)) {
                 t.setSelected(true);
                 selectedTower = t;
                 notify = true;
@@ -363,14 +375,15 @@ public class GameState extends Observable implements Iterable<GameComponent>{
             }
         }
 
-        if(notify)
+        if (notify)
             notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
 
     }
 
     /**
      * Attempt to build tower at selected point and tower.
-     * @param point - The point to build the tower at
+     *
+     * @param point         - The point to build the tower at
      * @param selectedTower - The type of tower to build
      */
     public boolean attemptToBuildTower(Point point, TowerType selectedTower) {
@@ -387,7 +400,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
         //GameComponent construct = construction.buildTower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
 
-        Tower tower = new Tower(x-selectedTower.getWidth()/2, y-selectedTower.getHeight()/2, selectedTower);
+        Tower tower = new Tower(x - selectedTower.getWidth() / 2, y - selectedTower.getHeight() / 2, selectedTower);
 
         if (map.addComponent(tower)) {
             useGold(cost);
@@ -395,7 +408,6 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         }
         return false;
     }
-
 
 
     @Override
@@ -436,7 +448,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return map.getTerrains();
     }
 
-    public GameMap getMap(){
+    public GameMap getMap() {
         return map;
     }
 
@@ -445,13 +457,14 @@ public class GameState extends Observable implements Iterable<GameComponent>{
         return level;
     }
 
-    public int getTime(){
+    public int getTime() {
         return timeElapsed;
     }
 
-    public String getWave(){
+    public String getWave() {
         return spawner.getWave();
     }
+
     public int getTimeToNextWave() {
         return spawner.getTimeToNextWave();
     }
@@ -465,7 +478,7 @@ public class GameState extends Observable implements Iterable<GameComponent>{
     }
 
     public void attemptUpgradeTower(Tower selectedTower, TowerType upgradeType) {
-        if(gold >= upgradeType.getUpgradeCost()){
+        if (gold >= upgradeType.getUpgradeCost()) {
             useGold(upgradeType.getUpgradeCost());
             selectedTower.modifyType(upgradeType);
             notifyObservers(Constants.OBSERVER_UPGRADED_TOWER);
@@ -475,11 +488,11 @@ public class GameState extends Observable implements Iterable<GameComponent>{
 
     public void attemptSellTower(Tower t) {
         //map.removeComponent(selectedTower);
-        if(t == selectedTower){
+        if (t == selectedTower) {
             selectedTower = null;
         }
         map.getToDel().add(t);
-        gainGold((int)t.getSellPrice());
+        gainGold((int) t.getSellPrice());
         notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
     }
 
