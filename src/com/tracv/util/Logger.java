@@ -19,18 +19,28 @@ public class Logger extends JFrame {
     private List<LogMessage> logs;
 
 
+    public class LoggerThread extends Thread{
+        private String message;
+        private LoggerLevel level;
 
-    public void log(String message, LoggerLevel level){
-
-        LogMessage logMsg = new LogMessage(message, level);
-        logs.add(logMsg);
-        if(this.isVisible()){
-            SwingUtilities.invokeLater(()->{
-                logWindow.append(logMsg.getText() + "\n");
-                scroll.scrollDown();
-                this.validate();
-            });
+        public LoggerThread(String message, LoggerLevel level){
+            this.message = message;
+            this.level = level;
         }
+        public void run(){
+            LogMessage logMsg = new LogMessage(message, level);
+            logs.add(logMsg);
+            if(Logger.this.isVisible()){
+                SwingUtilities.invokeLater(()->{
+                    logWindow.append(logMsg.getText() + "\n");
+                    scroll.scrollDown();
+                    Logger.this.validate();
+                });
+            }
+        }
+    }
+    public void log(String message, LoggerLevel level){
+        (new LoggerThread(message, level)).start();
     }
 
     private TextArea logWindow;

@@ -103,6 +103,14 @@ public class GameState extends Observable implements Iterable<GameComponent> {
                 Logger.getInstance().log("Starting/Resuming Game!", LoggerLevel.STATUS);
                 notifyObservers(Constants.OBSERVER_GAME_RESUMED);
             } else {
+                /*
+                try{
+                    gameThread.join();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }finally{
+                    gameThread = null;
+                }*/
 
                 gameThread = null;
                 Logger.getInstance().log("Stopping/Pausing Game!", LoggerLevel.STATUS);
