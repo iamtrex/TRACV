@@ -10,10 +10,11 @@ import com.tracv.util.Logger;
 import com.tracv.util.LoggerLevel;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 
 public class GameState extends Observable implements Iterable<GameComponent> {
@@ -41,11 +42,14 @@ public class GameState extends Observable implements Iterable<GameComponent> {
 
     private volatile boolean running;
 
+    private List<SpawnThread> spawnThreads;
+
     public GameState() {
         running = false;
         parser = new LevelJsonParser();
         map = new GameMap();
         spawner = new EnemySpawner(parser, this);
+        spawnThreads = new ArrayList<>();
     }
 
     /**
@@ -66,6 +70,9 @@ public class GameState extends Observable implements Iterable<GameComponent> {
             }
         }
 
+        spawnThreads.forEach(SpawnThread::cancel);
+        spawnThreads.clear();
+
         //Reset values.
         gold = 500; // temp value, 500 cuz league
         score = 0;
@@ -78,6 +85,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         spawner.reset();
         map.reset();
         map.loadLevel(parser.getFile());
+        spawnThreads.clear();
 
         //Reset other components such as selected rectangle in GamePane
         notifyObservers(Constants.OBSERVER_NEW_GAME);
@@ -107,6 +115,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         } else {
             try {
                 gameThread.join();
+
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -128,7 +137,9 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     }
 
     public void addToSpawnQueue(List<Enemy> spawn) {
-        new SpawnThread(spawn).start();
+        SpawnThread st = new SpawnThread(spawn);
+        spawnThreads.add(st);
+        st.start();
     }
 
     private class GameThread extends Thread {
@@ -269,7 +280,8 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         if (!spawner.isDoneSpawn()) {
             spawner.update((int) updateTimeMS);
         } else {
-            if (map.getEnemies().isEmpty() && !map.getBase().isExploded()) {
+            if (map.getEnemies().isEmpty() && !map.getBase().isExploded()
+                    && isSpawnerEmpty()) {
                 //Beat level!
                 setLevelSuccess();
             }
@@ -298,12 +310,19 @@ public class GameState extends Observable implements Iterable<GameComponent> {
             map.removeComponent(gc);
         }
 
+        spawnThreads.removeIf(st -> st.isDone());
+
+
         toDel.clear();
         toAdd.clear();
 
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
     }
 
+
+    private boolean isSpawnerEmpty() {
+        return spawnThreads.isEmpty();
+    }
 
 
     public class SpawnThread extends Thread{
@@ -312,12 +331,25 @@ public class GameState extends Observable implements Iterable<GameComponent> {
             this.spawn = spawn;
             r = new Random();
         }
-
+        private final Lock lock = new ReentrantLock();
         private Random r;
-
+        private boolean terminated;
+        public void cancel(){
+            lock.lock();
+            terminated = true;
+            spawn.clear();
+            lock.unlock();
+        }
         @Override
         public void run(){
-            for(Enemy e : spawn){
+            ListIterator<Enemy> iter = spawn.listIterator();
+            while(iter.hasNext()){
+                lock.lock();
+                Enemy e = iter.next();
+                if(terminated){
+                    lock.unlock();
+                    return;
+                }
                 while(!running){ //Pause if game is paused.
                     try {
                         Thread.sleep(100);
@@ -334,7 +366,13 @@ public class GameState extends Observable implements Iterable<GameComponent> {
                 }catch(InterruptedException ex){
                     ex.printStackTrace();
                 }
+                iter.remove();
+                lock.unlock();
             }
+        }
+
+        public boolean isDone() {
+            return spawn.isEmpty();
         }
     }
     private void setLevelSuccess() {
@@ -349,7 +387,6 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         Logger.getInstance().log("Game Lose!", LoggerLevel.STATUS);
         notifyObservers(Constants.OBSERVER_GAME_OVER);
         setGameRunning(false);
-
     }
 
     public boolean isTowerBuildValid(Point p, TowerType selectedTower) {

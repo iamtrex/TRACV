@@ -88,7 +88,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
 
     @Override
     public void update(Observable o, String msg) {
-        System.out.println("O msg " + o + " " + msg);
+        //System.out.println("O msg " + o + " " + msg);
         if (o == gs) {
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);

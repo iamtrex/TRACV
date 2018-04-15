@@ -38,6 +38,8 @@ public class GameMap {
     private PathBuilder pathBuilder;
 
 
+
+
     public void reset() {
         long startT = System.nanoTime();
 
@@ -208,4 +210,5 @@ public class GameMap {
     public List<Terrain> generatePath() {
         return pathBuilder.generatePath(start, destination);
     }
+
 }
