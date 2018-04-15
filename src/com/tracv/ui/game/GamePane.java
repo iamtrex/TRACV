@@ -215,18 +215,20 @@ public class GamePane extends Pane implements Observer{
         if(msg.equals(Constants.OBSERVER_GAME_TICK)){
             this.repaint();
         }else if(msg.equals(Constants.OBSERVER_GAME_PAUSED) || msg.equals(Constants.OBSERVER_GAME_OVER) || msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
-            top = false;
-            bot = false;
-            left = false;
-            right = false;
+            resetRectangle();
         }else if(msg.equals(Constants.OBSERVER_NEW_GAME)){
             resetRectangle();
         }
     }
-
+    
     private void resetRectangle(){
         selectedRegion = new Rectangle(0,0,
                 (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
+
+        top = false;
+        bot = false;
+        left = false;
+        right = false;
     }
 
     public void setSelectedTower(TowerType selectedTower) {

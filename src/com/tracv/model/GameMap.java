@@ -153,6 +153,7 @@ public class GameMap {
         }else{
             System.out.println("Wrong component type");
         }
+        System.out.println("Removed " + gc);
         return gameComponents.remove(gc);
     }
 
@@ -196,12 +197,6 @@ public class GameMap {
 
     public List<GameComponent> getToDel(){return toDel;}
 
-    public void addEnemies(List<Enemy> spawn) {
-        //TODO FIX- TOO TIRED TO DO SO RN
-        SpawnThread st = new SpawnThread(spawn);
-        st.start();
-
-    }
 
     public Dimension getMapDimensions() {
         double width = Constants.DEFAULT_BLOCK_SIZE * terrains[0].length;
@@ -210,28 +205,7 @@ public class GameMap {
     }
 
 
-    public class SpawnThread extends Thread{
-        private List<Enemy> spawn;
-        public SpawnThread(List<Enemy> spawn){
-            super();
-            this.spawn = spawn;
-            r = new Random();
-        }
-
-        private Random r;
-
-        @Override
-        public void run(){
-            for(Enemy e : spawn){
-                e.setPath(pathBuilder.generatePath(start, destination));
-                toAdd.add(e);
-                try{
-                    int randomFactor = r.nextInt(10);
-                    Thread.sleep(100*randomFactor); //0.1 sec delay between spawns
-                }catch(InterruptedException ex){
-                    ex.printStackTrace();
-                }
-            }
-        }
+    public List<Terrain> generatePath() {
+        return pathBuilder.generatePath(start, destination);
     }
 }

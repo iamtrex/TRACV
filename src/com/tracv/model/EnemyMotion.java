@@ -46,7 +46,7 @@ public class EnemyMotion {
                 Vector v = new Vector((target.getCenX() - (e.getX() + e.getSize()/2)),
                         (target.getCenY() - (e.getY() + e.getSize()/2)));
 
-                double speed = e.getSpeed()/(double)refreshTime; 
+                double speed = e.getSpeed()*(double)refreshTime/1000.0;
                 e.addX(speed * v.getXRatio());
                 e.addY(speed * v.getYRatio());
             }

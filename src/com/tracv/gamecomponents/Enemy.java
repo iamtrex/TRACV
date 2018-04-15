@@ -33,12 +33,13 @@ public class Enemy extends MoveableComponent {
     }
 
     public void draw(Graphics g, Rectangle selectedRegion) {
-        //TODO remove temp
         if(type == EnemyType.BASIC) {
             g.setColor(Color.WHITE);
         }else{
             g.setColor(Color.lightGray);
         }
+
+
         int screenX = (int) Math.round(x - selectedRegion.getX());
         int screenY = (int) Math.round(y - selectedRegion.getY());
 

@@ -1,8 +1,8 @@
 package com.tracv.types;
 
 public enum EnemyType {
-    BASIC("B", 3, 50, 50, 15, "null"),
-    FAST("F", 4, 25, 20, 10, "null");
+    BASIC("B", 300, 50, 50, 15, "null"),
+    FAST("F", 400, 25, 20, 10, "null");
 
     //TODO IconPath??
 

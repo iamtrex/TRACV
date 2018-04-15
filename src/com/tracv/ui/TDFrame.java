@@ -97,6 +97,7 @@ public class TDFrame extends JFrame implements WindowFocusListener {
      * @param msg
      */
     public void toggleMenu(boolean b, String msg) {
+        System.out.println("Menu " + b);
         if(b){
             menuPane.showMenu((JComponent) this.getContentPane(), msg);
             mouseHooker.setActive(false);

@@ -111,7 +111,6 @@ public class MenuPane extends JPanel implements ActionListener {
         if(b){
             createBlurredImage();
         }
-
         super.setVisible(b);
     }
 

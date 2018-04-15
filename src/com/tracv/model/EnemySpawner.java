@@ -32,39 +32,39 @@ public class EnemySpawner{
     private Queue<List<EnemyType>> toSpawn;
     private Map<List<EnemyType>, Integer> timeToSpawn;
 
-    private List<EnemyType> next;
-
     /**
      *
      * @param timeMillis
      * @return - True if level is complete with spawning
      */
     public void update(int timeMillis){
-        if(next == null){
-            if(toSpawn.isEmpty()){
-                System.err.println("Calling update when spawn empty");
-            }else{
-                System.err.println("Somehow next is null??");
-            }
+        if(toSpawn.isEmpty()){
+            System.err.println("Calling update when spawn empty");
             return; //Done spawn
         }
+
         millisFromLastSpawn += timeMillis;
 
         boolean spawnRepeat = true;
 
         while(spawnRepeat) { //Can spawn multiple waves if lag... lol
 
-            int timeToNext = timeToSpawn.get(next);
+            int timeToNext = timeToSpawn.get(toSpawn.peek());
+
             if (timeToNext <= millisFromLastSpawn / 1000.0) { //Convert to seconds.
                 System.out.println("Spawning Wave");
                 wave++;
                 updateGSWave();
 
                 millisFromLastSpawn -= timeToNext*1000;
-                map.addEnemies(spawn(next)); // Saves some time with Casting of all the comps to enemies...?
-                timeToSpawn.remove(next);
 
-                next = toSpawn.poll(); //get ready next wave!
+                List<EnemyType> toSpawnTypes = toSpawn.poll();
+                gs.addToSpawnQueue(createMobs(toSpawnTypes)); // Saves some time with Casting of all the comps to enemies...?
+                timeToSpawn.remove(toSpawnTypes);
+
+                if(toSpawn.isEmpty()){
+                    spawnRepeat = false;
+                }
             }else{
                 spawnRepeat = false;
             }
@@ -72,6 +72,23 @@ public class EnemySpawner{
 
     }
 
+    /**
+     * Craete a list of enemies from a list of enemy types.
+     * @param next
+     * @return
+     */
+    private List<Enemy> createMobs(List<EnemyType> next) {
+        List<Enemy> enemies = new LinkedList<>();
+        Random random = new Random();
+        int x = 0, y = 0;
+
+        for(EnemyType type : next){
+            enemies.add(new Enemy(type, x, y));
+            x -= random.nextInt(10)*10;
+            y = random.nextInt(10) * 5;
+        }
+        return enemies;
+    }
 
     public String getWave(){
         return String.valueOf(wave) + "/" + String.valueOf(maxWave);
@@ -82,33 +99,17 @@ public class EnemySpawner{
         gs.updateWave();
     }
 
-    private List<Enemy> spawn(List<EnemyType> next) {
-        List<Enemy> enemies = new LinkedList<>();
-        Random random = new Random();
-        int x = 0, y = 0;
-
-        for(EnemyType type : next){
-            enemies.add(new Enemy(type, x, y));
-            x -= random.nextInt(10)*10;
-            y = random.nextInt(10) * 5;
-
-        }
-        return enemies;
-    }
 
     public void reset() {
-
         millisFromLastSpawn = 0;
         toSpawn = parser.getSpawnQueue();
         maxWave = toSpawn.size();
         wave = 0;
         timeToSpawn = parser.getSpawnTime();
-        next = toSpawn.poll();
-
     }
 
     public int getTimeToNextWave() {
-        return timeToSpawn.get(next) - (int)(millisFromLastSpawn/1000.0);
+        return timeToSpawn.get(toSpawn.peek()) - (int)(millisFromLastSpawn/1000.0);
     }
 
     public boolean isDoneSpawn() {

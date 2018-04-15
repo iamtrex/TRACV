@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 
 public class GameState extends Observable implements Iterable<GameComponent> {
@@ -38,7 +39,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     //Keeps track of game running state/refresh
     private long lastTimeNano;
 
-    private boolean running;
+    private volatile boolean running;
 
     public GameState() {
         running = false;
@@ -57,7 +58,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         if (gameThread != null) {
             Logger.getInstance().log("Game Thread not properly terminated", LoggerLevel.WARNING);
             try {
-                gameThread.join();
+                //gameThread.join();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -89,36 +90,32 @@ public class GameState extends Observable implements Iterable<GameComponent> {
      * @param b - true = start, false = pause.
      */
     public void setGameRunning(boolean b) {
-        System.out.println("Setting game runnning " + b);
+        System.out.println("Setting game running " + b);
+
 
         if (gameThread == null) {
             gameThread = new GameThread();
         }
 
-        //if (running != b) {
-            running = b;
-            if (b) {
-                lastTimeNano = System.nanoTime();
-                gameThread.start();
-                Logger.getInstance().log("Starting/Resuming Game!", LoggerLevel.STATUS);
-                notifyObservers(Constants.OBSERVER_GAME_RESUMED);
-            } else {
-                /*
-                try{
-                    gameThread.join();
-                }catch(Exception e){
-                    e.printStackTrace();
-                }finally{
-                    gameThread = null;
-                }*/
-
-                gameThread = null;
-                Logger.getInstance().log("Stopping/Pausing Game!", LoggerLevel.STATUS);
-                notifyObservers(Constants.OBSERVER_GAME_PAUSED);
+        running = b;
+        if (b) {
+            lastTimeNano = System.nanoTime();
+            gameThread = new GameThread();
+            gameThread.start();
+            Logger.getInstance().log("Starting/Resuming Game!", LoggerLevel.STATUS);
+            notifyObservers(Constants.OBSERVER_GAME_RESUMED);
+        } else {
+            try {
+                gameThread.join();
+            }catch(Exception e){
+                e.printStackTrace();
             }
-        //} else {
-        //    Logger.getInstance().log("GameState was messed up, called running = " + b + " when running already " + running, LoggerLevel.WARNING);
-        //}
+
+            gameThread = null;
+            Logger.getInstance().log("Stopping/Pausing Game!", LoggerLevel.STATUS);
+
+            notifyObservers(Constants.OBSERVER_GAME_PAUSED);
+        }
     }
 
     public boolean isRunning() {
@@ -128,10 +125,14 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     public void restartLevel() {
         Logger.getInstance().log("Restarting Level", LoggerLevel.STATUS);
         loadNewGame(this.level);
-        //setGameRunning(true);
+    }
+
+    public void addToSpawnQueue(List<Enemy> spawn) {
+        new SpawnThread(spawn).start();
     }
 
     private class GameThread extends Thread {
+
         public void run() {
             while (running) {
                 long nowTime = System.nanoTime();
@@ -264,6 +265,16 @@ public class GameState extends Observable implements Iterable<GameComponent> {
 
         timeElapsed += updateTimeMS;
 
+        //Update spawner time
+        if (!spawner.isDoneSpawn()) {
+            spawner.update((int) updateTimeMS);
+        } else {
+            if (map.getEnemies().isEmpty() && !map.getBase().isExploded()) {
+                //Beat level!
+                setLevelSuccess();
+            }
+        }
+
         List<Enemy> needToRetarget = new ArrayList<>();
         List<GameComponent> toDel = map.getToDel();
         List<GameComponent> toAdd = map.getToAdd();
@@ -290,23 +301,46 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         toDel.clear();
         toAdd.clear();
 
-        //Update spawner time
-        if (!spawner.isDoneSpawn()) {
-            spawner.update((int) updateTimeMS);
-        } else {
-            if (map.getEnemies().isEmpty() && !map.getBase().isExploded()) {
-                //Beat level!
-                setLevelSuccess();
-            }
-        }
-
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
     }
 
+
+
+    public class SpawnThread extends Thread{
+        private List<Enemy> spawn;
+        public SpawnThread(List<Enemy> spawn){
+            this.spawn = spawn;
+            r = new Random();
+        }
+
+        private Random r;
+
+        @Override
+        public void run(){
+            for(Enemy e : spawn){
+                while(!running){ //Pause if game is paused.
+                    try {
+                        Thread.sleep(100);
+                    }catch(InterruptedException ie){
+                        ie.printStackTrace();
+                    }
+                }
+
+                e.setPath(map.generatePath());
+                map.getToAdd().add(e);
+                try{
+                    int randomFactor = r.nextInt(10);
+                    Thread.sleep(100*randomFactor); //0.1 sec delay between spawns
+                }catch(InterruptedException ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
     private void setLevelSuccess() {
         Logger.getInstance().log("Game Win!", LoggerLevel.STATUS);
-        setGameRunning(false);
         notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
+        setGameRunning(false);
 
 
     }
@@ -405,7 +439,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
 
         Tower tower = new Tower(x - selectedTower.getWidth() / 2, y - selectedTower.getHeight() / 2, selectedTower);
 
-        if (map.addComponent(tower)) {
+        if(map.getToAdd().add(tower)){
             useGold(cost);
             return true;
         }
@@ -506,4 +540,6 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     public boolean isDoneSpawn() {
         return spawner.isDoneSpawn();
     }
+
+
 }

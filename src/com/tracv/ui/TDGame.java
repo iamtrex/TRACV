@@ -1,5 +1,6 @@
 package com.tracv.ui;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.tracv.directional.Geometry;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
@@ -85,13 +86,9 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         gs.restartLevel();
     }
 
-    public void pauseGame(){
-        gs.setGameRunning(false);
-    }
-
-
     @Override
     public void update(Observable o, String msg) {
+        System.out.println("O msg " + o + " " + msg);
         if (o == gs) {
             if (msg.equals(Constants.OBSERVER_GAME_OVER)) {
                 tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);

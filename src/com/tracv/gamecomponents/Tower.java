@@ -41,6 +41,7 @@ public class Tower extends GameComponent {
         width = type.getWidth();
         height = type.getHeight();
         fireRate = type.getFireRate();
+
     }
 
     /**
