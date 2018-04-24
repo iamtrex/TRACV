@@ -25,8 +25,8 @@ public class Constants {
 
 
     //Size of Frame, game and HUD
-        private static final int FRAME_WIDTH = 1500;
-        private static final int FRAME_HEIGHT = 750;
+        private static final int FRAME_WIDTH = 1920;
+        private static final int FRAME_HEIGHT = 1080;
 
         public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -112,6 +112,10 @@ public class Constants {
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
     public static final String OBSERVER_GAME_PAUSED = "paused";
     public static final String OBSERVER_GAME_RESUMED = "resumed";
+
+
+
+    public static final int DEFAULT_GOLD = 500;
 
 }
 

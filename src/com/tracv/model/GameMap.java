@@ -6,9 +6,10 @@ import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Represents a mutable Map of the game which contains terrain and
@@ -31,11 +32,12 @@ public class GameMap {
     private List<Projectile> projectiles;
     private List<Base> bases;
 
-    private List<GameComponent> toAdd;
-    private List<GameComponent> toDel;
+    private Map<Enemy, List<Projectile>> targetMap; //Holds enemies and projetiles targetting them.
 
 
     private PathBuilder pathBuilder;
+
+    private ExecutorService pool;
 
 
 
@@ -51,11 +53,7 @@ public class GameMap {
         projectiles = new ArrayList<>();
         bases = new ArrayList<>();
 
-        //Switch to using hashset?
-        toAdd = new ArrayList<>();
-        toDel = new ArrayList<>();
-
-
+        targetMap = new HashMap<>();
 
         long endT = System.nanoTime();
 
@@ -81,7 +79,9 @@ public class GameMap {
      *
      */
     public GameMap () {
+        pool = Executors.newFixedThreadPool(10);
         reset();
+
     }
 
     private void buildTerrain(TerrainType[][] terrainTypes) {
@@ -116,26 +116,108 @@ public class GameMap {
         return gameComponents;
     }
 
+    public Map<Enemy,List<Projectile>> getTargetMap() {
+        return targetMap;
+    }
+
+
+    private class Remover implements Runnable{
+        private GameComponent gc;
+        public Remover(GameComponent gc){
+            this.gc = gc;
+        }
+
+        @Override
+        public void run(){
+            if(gc instanceof Projectile){
+                Projectile p = (Projectile) gc;
+                synchronized(projectiles) {
+                    projectiles.remove(p);
+                }
+                synchronized(targetMap){
+                    targetMap.get(p.getTarget()).remove(p);
+                }
+
+            }else if(gc instanceof Enemy){
+                Enemy e = (Enemy) gc;
+                synchronized(enemies) {
+                    enemies.remove(e);
+                }
+                synchronized(targetMap){
+                    targetMap.remove(e);
+                }
+
+            }else if(gc instanceof Tower){
+                synchronized(towers) {
+                    towers.remove(gc);
+                }
+
+            }else if(gc instanceof Base){
+                synchronized(bases) {
+                    bases.remove(gc);
+                }
+
+            }else{
+                System.out.println("Wrong component type");
+            }
+
+            synchronized(gameComponents) {
+                gameComponents.add(gc);
+            }
+        }
+    }
+    private class Adder implements Runnable {
+        private GameComponent gc;
+        public Adder(GameComponent gc){
+            this.gc = gc;
+        }
+        @Override
+        public void run(){
+            if(gc instanceof Projectile){
+                Projectile p = (Projectile) gc;
+                synchronized(projectiles){
+                    projectiles.add((Projectile)gc);
+                }
+                synchronized(targetMap){
+                    targetMap.get(p.getTarget()).add(p);
+                }
+
+            }else if(gc instanceof Enemy){
+                Enemy e = (Enemy) gc;
+                e.setPath(pathBuilder.generatePath(start, destination));
+                synchronized(enemies) {
+                    enemies.add(e);
+                }
+                synchronized(targetMap){
+                    targetMap.put(e, new ArrayList<>());
+                }
+
+            }else if(gc instanceof Tower){
+                synchronized(towers) {
+                    towers.add((Tower) gc);
+                }
+
+            }else if(gc instanceof Base){
+                synchronized(bases){
+                    bases.add((Base)gc);
+                }
+
+            }else{
+                System.out.println("Wrong component type");
+            }
+
+            synchronized(gameComponents) {
+                gameComponents.add(gc);
+            }
+        }
+    }
     /**
      * Adds the specific component to the GameMap
      * @param gc the component to add
      * @return true if the add operation was successful
      */
-    public boolean addComponent(GameComponent gc) {
-        if(gc instanceof Projectile){
-            projectiles.add((Projectile)gc);
-        }else if(gc instanceof Enemy){
-            Enemy e = (Enemy) gc;
-            e.setPath(pathBuilder.generatePath(start, destination));
-            enemies.add(e);
-        }else if(gc instanceof Tower){
-            towers.add((Tower)gc);
-        }else if(gc instanceof Base){
-            bases.add((Base)gc);
-        }else{
-            System.out.println("Wrong component type");
-        }
-        return gameComponents.add(gc);
+    public void addComponent(GameComponent gc) {
+        pool.execute(new Adder(gc));
     }
 
     /**
@@ -143,20 +225,8 @@ public class GameMap {
      * @param gc the component to remove
      * @return true if the remove operation was successful
      */
-    public boolean removeComponent(GameComponent gc) {
-        if(gc instanceof Projectile){
-            projectiles.remove(gc);
-        }else if(gc instanceof Enemy){
-            enemies.remove(gc);
-        }else if(gc instanceof Tower){
-            towers.remove(gc);
-        }else if(gc instanceof Base){
-            bases.remove(gc);
-        }else{
-            System.out.println("Wrong component type");
-        }
-        System.out.println("Removed " + gc);
-        return gameComponents.remove(gc);
+    public void removeComponent(GameComponent gc) {
+        pool.execute(new Remover(gc));
     }
 
     /**
@@ -195,9 +265,6 @@ public class GameMap {
         return towers;
     }
 
-    public List<GameComponent> getToAdd(){return toAdd;}
-
-    public List<GameComponent> getToDel(){return toDel;}
 
 
     public Dimension getMapDimensions() {

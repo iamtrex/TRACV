@@ -32,6 +32,9 @@ public class EnemySpawner{
     private Queue<List<EnemyType>> toSpawn;
     private Map<List<EnemyType>, Integer> timeToSpawn;
 
+    public EnemySpawner(Evolver evolver) {
+    }
+
     /**
      *
      * @param timeMillis

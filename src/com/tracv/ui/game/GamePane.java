@@ -26,11 +26,14 @@ import java.awt.event.*;
  *      a. Not interfere
  *      b. Redraw faster?
  */
+
 public class GamePane extends Pane implements Observer{
 
     private Point mouse;
 
     private GameState gs;
+    private Evolver evolver;
+
     private TowerType selectedTower;
 
     private Rectangle selectedRegion;
@@ -39,6 +42,7 @@ public class GamePane extends Pane implements Observer{
 
     public GamePane(){
         gs = new GameState();
+        evolver = new Evolver(gs);
 
         resetRectangle();
 
@@ -65,38 +69,35 @@ public class GamePane extends Pane implements Observer{
         int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
         if (top) {
             selectedRegion.setLocation(
-                    (int) selectedRegion.getX(),
-                    (int) selectedRegion.getY() - speed);
+                    (int) selectedRegion.getX(), (int) selectedRegion.getY() - speed);
 
         } else if (bot) {
             selectedRegion.setLocation(
-                    (int) selectedRegion.getX(),
-                    (int) selectedRegion.getY() + speed);
+                    (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
         }
+
         if (left) {
             selectedRegion.setLocation(
-                    (int) selectedRegion.getX() - speed,
-                    (int) selectedRegion.getY());
+                    (int) selectedRegion.getX() - speed, (int) selectedRegion.getY());
         } else if (right) {
             selectedRegion.setLocation(
-                    (int) selectedRegion.getX() + speed,
-                    (int) selectedRegion.getY());
+                    (int) selectedRegion.getX() + speed, (int) selectedRegion.getY());
         }
 
-        int mapWidth = (int)gs.getMap().getMapDimensions().getWidth();
-        int mapHeight = (int)gs.getMap().getMapDimensions().getHeight();
+        int mapWidth = (int) gs.getMap().getMapDimensions().getWidth();
+        int mapHeight = (int) gs.getMap().getMapDimensions().getHeight();
 
-        if(selectedRegion.getX() + selectedRegion.getWidth() > mapWidth){
-            selectedRegion.setLocation(mapWidth - (int)selectedRegion.getWidth(), (int) selectedRegion.getY());
+        if (selectedRegion.getX() + selectedRegion.getWidth() > mapWidth) {
+            selectedRegion.setLocation(mapWidth - (int) selectedRegion.getWidth(), (int) selectedRegion.getY());
         }
-        if(selectedRegion.getY() + selectedRegion.getHeight() > mapHeight){
-            selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int)selectedRegion.getHeight());
+        if (selectedRegion.getY() + selectedRegion.getHeight() > mapHeight) {
+            selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int) selectedRegion.getHeight());
         }
         if (selectedRegion.getX() < 0) {
             selectedRegion.setLocation(0, (int) selectedRegion.getY());
         }
         if (selectedRegion.getY() < 0) {
-            selectedRegion.setLocation((int) selectedRegion.getX(), 00);
+            selectedRegion.setLocation((int) selectedRegion.getX(), 0);
         }
     }
 
@@ -106,11 +107,9 @@ public class GamePane extends Pane implements Observer{
         if(selectedTower != null) {
             Logger.getInstance().log("Attempting to build tower of type " + selectedTower.getName() +
                     " on point " + point.getX() + "," + point.getY(), LoggerLevel.STATUS);
-
             point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
 
             return gs.attemptToBuildTower(point, selectedTower);
-
         } else{
             Logger.getInstance().log("No Tower selected, no build.", LoggerLevel.STATUS);
             return false;
@@ -120,14 +119,13 @@ public class GamePane extends Pane implements Observer{
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
-
         handleMapMove();
 
         //DONE -- Awaiting implementation of getGameComponents();
         //DONE -- consider implementing iterator in gs.
+        //DONE -- Awaiting Draw implementation of GameComponents, currently temporary
 
-        //TODO -- Awaiting Draw implementation of GameComponents, currently temporary
-        //TODO -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
+        //DISCONTINUED -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
         //Draw TerrainType
         Terrain[][] terrains = gs.getTerrain();
 

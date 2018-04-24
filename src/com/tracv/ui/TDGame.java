@@ -2,6 +2,7 @@ package com.tracv.ui;
 
 import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.tracv.directional.Geometry;
+import com.tracv.model.Evolver;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -43,6 +44,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         mapThread = new MapThread();
 
         gamePane = new GamePane();
+
         gs = gamePane.getGameState();
 
         hudPane = new HUDPane(gs);
@@ -67,7 +69,6 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
                 GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
 
         hudPane.getHUDButtonsPane().addPropertyChangeListener(new TowerChangeListener());
-
     }
 
     /*
@@ -82,7 +83,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         gs.setGameRunning(true);
     }
 
-    public void restart() {
+    public void restartGame() {
         gs.restartLevel();
     }
 
@@ -156,8 +157,11 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
         public void run(){
             while(gs.isRunning()){
                 try{
+                    long start = System.nanoTime();
                     handle();
-                    Thread.sleep(Constants.MAP_MOVE_REFRESH);
+                    long end = System.nanoTime();
+
+                    Thread.sleep(Constants.MAP_MOVE_REFRESH - (end-start)/1000);
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }catch(Exception e){

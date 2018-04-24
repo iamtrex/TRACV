@@ -22,6 +22,7 @@ import java.awt.image.Kernel;
 public class MenuPane extends JPanel implements ActionListener {
 
     private TDFrame tdf;
+    private TDGame tdg;
 
 
     private Label displayMessage;
@@ -32,9 +33,12 @@ public class MenuPane extends JPanel implements ActionListener {
 
     private boolean returnEnabled = false;
 
-    public MenuPane(TDFrame tdf) {
+    private BufferedImage background;
+
+    public MenuPane(TDFrame tdf, TDGame tdg) {
         this.tdf = tdf;
-        //    this.setBorder(new LineBorder(Color.RED, 3));
+        this.tdg = tdg;
+
         this.addMouseListener(new MyMouseListener());
 
         displayMessage = new Label("", Label.LARGE);
@@ -62,8 +66,21 @@ public class MenuPane extends JPanel implements ActionListener {
     }
 
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        if(source == continueGame){
+            //tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
+        }else if(source == newGame){
+            tdg.restartGame();
+        }else if (source == returnToMain) {
+            tdf.switchToMainPanel();
+        }else if(source == settings){
+            tdf.switchToSettingsPanel();
+        }
+        tdf.toggleMenu(false);
+    }
 
-    private BufferedImage background;
 
     /**
      * Show different menus based off of where the source is from.
@@ -146,23 +163,6 @@ public class MenuPane extends JPanel implements ActionListener {
         g.setColor(new Color(238,242,245,200)); //TODO move to constants.
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-        if(source == continueGame){
-            //tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
-        }else if(source == newGame){
-            tdf.restartGame();
-        }else if (source == returnToMain) {
-            tdf.switchToMainPanel();
-        }else if(source == settings){
-            tdf.switchToSettingsPanel();
-        }
-        tdf.toggleMenu(false);
-    }
-
 
     private class MyMouseListener implements MouseListener {
         private boolean down = false;

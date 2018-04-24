@@ -14,15 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelSelectPane extends JPanel implements ActionListener {
+    private TDFrame tdf;
+    private TDGame tdg;
 
     private Label title;
-    private TDFrame tdf;
     private List<LevelSelectButton> buttons;
     private Pane buttonsPane;
     private Button back;
 
-    public LevelSelectPane(TDFrame tdf){
+    public LevelSelectPane(TDFrame tdf, TDGame tdg){
         this.tdf = tdf;
+        this.tdg = tdg;
 
         title = new Label("Select Level", Label.LARGE, Label.MID);
         buttons = new ArrayList<>();
@@ -58,7 +60,7 @@ public class LevelSelectPane extends JPanel implements ActionListener {
                 //Load level
                 //TODO - Change how level name is read in case we want to change that in the future
 
-                tdf.newGame(Integer.parseInt(b.getText()));
+                tdg.startNewGame(Integer.parseInt(b.getText()));
                 return;
             }
         }
