@@ -101,7 +101,6 @@ public class HUDButtonPane extends Pane
         Object source = e.getSource();
         for(HUDTowerButton b : buttons){
             if(b == source){
-                //hudPane.setSelectedTowerType(b.getType());
                 if(!b.isSelected()) {
                     firePropertyChange(TOWER_CHANGED, null, b.getType());
                     b.setSelected(true);

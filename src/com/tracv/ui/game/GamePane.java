@@ -37,8 +37,6 @@ public class GamePane extends Pane implements Observer {
 
     private GameProcess game;
 
-    private TowerType selectedTower;
-
     private Rectangle selectedRegion;
 
     private boolean top, bot, left, right;
@@ -69,6 +67,7 @@ public class GamePane extends Pane implements Observer {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         synchronized (selectedRegion) {
+            //System.out.println("Update Draw");
             Terrain[][] terrains = game.getTerrain();
 
             double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
@@ -124,6 +123,7 @@ public class GamePane extends Pane implements Observer {
         //DONE -- CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
         //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
 
+        TowerType selectedTower = game.getBuildTowerType();
         if (selectedTower != null) { // Only draw if currently has selected tower!
             Image img;
             Point point = mouse.getLocation();

@@ -32,9 +32,12 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
     public GameProcess(){
         levelParser = new LevelJsonParser();
         evolver = new Evolver();
-        spawner = new EnemySpawner(evolver);
+        spawner = evolver.getSpawner();
         state = evolver.getGameState();
         map = state.getGameMap();
+
+        evolver.addObserver(this);
+        state.addObserver(this);
     }
 
 
@@ -58,9 +61,12 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
      *
      */
     private void adjustTowerSelection(Point p){
+
         Tower selected = state.getSelectedTower();
-        if(Geometry.isPointInObject(p, selected)){
-            return; //Ignore.
+        if(selected != null) {
+            if (Geometry.isPointInObject(p, selected)) {
+                return; //Ignore.
+            }
         }
 
         //Otherwise, clear currently selected and potentially select new building.
@@ -89,7 +95,8 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
      * @return
      */
     public boolean isTowerLocationValid(Point p){
-        if(state.getSelectedTower() == null){
+        //System.out.println("Checking if tower valid");
+        if(state.getBuildTowerType() == null){
             return false;
         }
 
@@ -121,8 +128,8 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
      * @return
      */
     private List<Terrain> getTerrainInRange(Point p) {
-        int blockW = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
-        int blockH = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
+        double blockW = Constants.DEFAULT_BLOCK_SIZE; //TODO CAN APPLY ZOOM SCALING IN THE FUTURE
+        double blockH = Constants.DEFAULT_BLOCK_SIZE;
         List<Terrain> terrs = new ArrayList<>();
 
         TowerType tt = state.getBuildTowerType();
@@ -130,6 +137,7 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         double yMin = p.getY() - tt.getHeight()/2;
         double xMax = xMin + tt.getWidth();
         double yMax = yMin + tt.getHeight();
+
         Terrain[][] terrains = map.getTerrains();
 
         //Indexes of Terrains that might be covered by the tower.
@@ -143,7 +151,7 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         if(xMax >= terrains[0].length*blockW)
             endI = terrains[0].length;
         else
-            endI = (int)Math.ceil(xMin/blockW);
+            endI = (int)Math.ceil(xMax/blockW);
 
         if(yMin <= 0)
             startJ = 0;
@@ -162,18 +170,6 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
             }
         }
 
-
-        /*
-        for(int j=0; j<terrains.length; j++){
-            for(int i=0; i<terrains[j].length; i++){
-                int xPos = blockW * i;
-                int yPos = blockH * j;
-                if(xPos >= xMin && xPos <= xMax
-                    && yPos >= yMin && yPos <= yMax){
-                    terrs.add(terrains[j][i]);
-                }
-            }
-        }*/ //Slow O(n) speed.
         return terrs;
     }
 
@@ -229,21 +225,18 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
 
         //Evolver will start ticking the gamestate :)
         evolver.changeState(State.PLAYING);
-
         notifyObservers(Constants.OBSERVER_NEW_GAME);
-
     }
     public void pauseGame(){
         evolver.changeState(State.PAUSED);
+        notifyObservers(Constants.OBSERVER_GAME_PAUSED);
     }
     public void resumeGame() {
         evolver.changeState(State.PLAYING);
     }
 
     public void restartGame() {
-        evolver.changeState(State.PAUSED);
-        //TODO
-        evolver.changeState(State.PLAYING);
+        startNewGame(state.getLevel());
     }
 
 
@@ -258,6 +251,9 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
     }
     public void setBuildTowerType(TowerType tt){
         state.setBuildTowerType(tt);
+    }
+    public TowerType getBuildTowerType() {
+        return state.getBuildTowerType();
     }
 
     public GameMap getMap() {
@@ -293,6 +289,9 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         return spawner.getTimeToNextWave();
     }
 
+    public String getWave() {
+        return spawner.getWave();
+    }
 
 }
 

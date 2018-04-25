@@ -97,6 +97,7 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == pause) {
+            System.out.println("Pausing Game");
             game.pauseGame();
             tdf.toggleMenu(true);
         }

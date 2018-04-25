@@ -4,6 +4,7 @@ import com.tracv.swing.Frame;
 import com.tracv.util.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
@@ -42,8 +43,11 @@ public class TDFrame extends Frame implements WindowFocusListener {
         menuPane = new MenuPane(this, tdGame);
         settingsPane = new SettingsPane(this);
 
+
         this.setContentPane(mainPane);
         this.setGlassPane(menuPane);
+
+        this.setVisible(true);
     }
 
     public static void main(String args[]) {

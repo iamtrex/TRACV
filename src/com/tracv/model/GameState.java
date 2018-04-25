@@ -28,6 +28,7 @@ public class GameState extends Observable{
     public GameState(){
         map = new GameMap();
         levelParser = new LevelJsonParser();
+        reset();
     }
 
     public void reset(){
@@ -58,16 +59,13 @@ public class GameState extends Observable{
     public Tower getSelectedTower(){
         return selectedTower;
     }
-    public void setBuildTowerType(TowerType tt){
-        buildTowerType = tt;
-    }
+    public void setBuildTowerType(TowerType tt){buildTowerType = tt;}
     public TowerType getBuildTowerType(){
         return buildTowerType;
     }
     public int getGold(){return gold;}
     public String getBaseHealth(){return map.getBase().getHealth();}
-
-
+    public int getScore(){return score;}
     /**
      * Game Termination - User completed level successfully
      */

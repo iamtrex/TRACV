@@ -32,7 +32,6 @@ public class MainPane extends JPanel
     public MainPane(TDFrame tdf){
         this.tdf = tdf;
 
-
         title = new Label(Constants.GAME_NAME, Label.LARGE);
         version = new Label("Version - " + Constants.VERSION_NUMBER, Label.MEDIUM);
 

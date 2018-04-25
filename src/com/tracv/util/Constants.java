@@ -24,10 +24,11 @@ public class Constants {
     public static final Double DEFAULT_BLOCK_SIZE = 50.0;
     public static final long MAP_MOVE_REFRESH_DELAY = REFRESH_DELAY;
 
+    public static final int DEFAULT_GOLD = 1000;
 
     //Size of Frame, game and HUD
-        private static final int FRAME_WIDTH = 1920;
-        private static final int FRAME_HEIGHT = 1080;
+        private static final int FRAME_WIDTH = 1200;
+        private static final int FRAME_HEIGHT = 700;
 
         public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -120,7 +121,6 @@ public class Constants {
     public static final String OBSERVER_STATE_TERMINATED = "TERMINATED";
 
 
-    public static final int DEFAULT_GOLD = 500;
 
 }
 

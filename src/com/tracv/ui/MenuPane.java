@@ -89,7 +89,7 @@ public class MenuPane extends JPanel implements ActionListener {
      */
     public void showMenu(JComponent source, String msg){
         if(source instanceof TDGame){
-            if(msg == null){
+            if(msg == null){ //Pause game?
                 displayMessage.setVisible(false);
                 resumeGame.setVisible(true);
                 clickToReturnEnabled = true;
@@ -172,6 +172,9 @@ public class MenuPane extends JPanel implements ActionListener {
         @Override
         public void mouseReleased(MouseEvent e) {
             if(clickToReturnEnabled) { //Only allow cancel if resumeGame is visible...
+                if(resumeGame.isVisible()){ //Equivalent to if(tdf.getContentPane == tdg)
+                    tdg.resumeGame(); //Resume game since it must be panel underneath
+                }
                 tdf.toggleMenu(false);
             }
         }

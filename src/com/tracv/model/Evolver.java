@@ -38,10 +38,9 @@ public class Evolver extends Observable {
         state = TERMINATED;
         evolving = false;
         evolutionThread = new EvolutionThread();
-
         this.gs = new GameState();
         this.map = gs.getGameMap();
-
+        spawner = new EnemySpawner(this);
 
         retarget = new ArrayList<>();
         toSpawn = new HashMap<>();
@@ -108,6 +107,7 @@ public class Evolver extends Observable {
     private void updateGameState() {
         gs.increaseTime(Constants.REFRESH_DELAY);
         notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
+
         checkGameEnd();
         updateSpawns();
         updateEnemies();
@@ -204,14 +204,24 @@ public class Evolver extends Observable {
     }
 
     private void updateSpawns() {
-        spawner.update(Constants.REFRESH_DELAY);
-        toSpawn.forEach((k, v)->{
-            v--;
-            if(v <=0){
-                map.addComponent(k);
-                toSpawn.remove(k);
-            }
-        });
+        if(!spawner.isDoneSpawn()) {
+            spawner.update(Constants.REFRESH_DELAY);
+        }
+        Map<Enemy, Integer> replace = new HashMap<>();
+
+        if(!toSpawn.isEmpty()) {
+            toSpawn.forEach((k, v) -> {
+                System.out.println("spawner " + v.toString());
+                v = v-Constants.REFRESH_DELAY;
+                if (v <= 0) {
+                    map.addComponent(k);
+                }else{
+                    replace.put(k, v);
+                }
+            });
+        }
+
+        toSpawn = replace;
     }
 
 
@@ -220,13 +230,13 @@ public class Evolver extends Observable {
      */
     private void checkGameEnd(){
         if(map.getBase().isExploded()){
+            System.out.println("Level failed");
             changeState(TERMINATED);
             gs.levelFailed();
         }
 
-        if(!spawner.isDoneSpawn()){
-            spawner.update(Constants.REFRESH_DELAY);
-        } else {
+        if(spawner.isDoneSpawn()){
+            System.out.println("Level complete");
             if(map.getEnemies().isEmpty() && toSpawn.isEmpty()){
                 changeState(TERMINATED);
                 gs.levelCompleted();
@@ -247,26 +257,51 @@ public class Evolver extends Observable {
         }
 
         if(s == State.PLAYING){
+            if(evolutionThread == null){
+                evolutionThread = new EvolutionThread();
+            }else{
+                evolutionThread = new EvolutionThread();
+                System.out.println("Evolution thread not null?");
+            }
+
             if(state == State.PAUSED){//Resume
-                evolutionThread.notify();
+                evolutionThread.start();
             }else if(state == TERMINATED){ //Restart
                 evolving = true;
                 evolutionThread.start();
             }
-
+            notifyObservers(Constants.OBSERVER_GAME_RESUMED);
+            notifyObservers(Constants.OBSERVER_STATE_RUNNING);
         }else if(s == State.PAUSED){
-            try {
-                evolutionThread.wait();
-            }catch(InterruptedException ie){
-                ie.printStackTrace();
-            }
 
+            evolutionThread.cancel();
+            try{
+                evolutionThread.join(100);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            evolving = false;
+            evolutionThread = null;
+
+            notifyObservers(Constants.OBSERVER_GAME_PAUSED);
+            notifyObservers(Constants.OBSERVER_STATE_PAUSED);
         }else if(s == TERMINATED){
             evolutionThread.cancel();
+            try{
+                evolutionThread.join(100);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
             evolving = false;
-            evolutionThread.reset();
+            evolutionThread.interrupt();
+            evolutionThread = null;
 
+            notifyObservers(Constants.OBSERVER_STATE_TERMINATED);
         }
+    }
+
+    public EnemySpawner getSpawner(){
+        return spawner;
     }
 
 }

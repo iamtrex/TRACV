@@ -47,19 +47,21 @@ public class GameMap {
      */
     public GameMap () {
         pool = Executors.newFixedThreadPool(10);
+        gameComponents = new ArrayList<>();
         reset();
     }
 
     public void reset() {
-        long startT = System.nanoTime();
-        this.gameComponents = new ArrayList<>();
-        towers = new ArrayList<>();
-        enemies = new ArrayList<>();
-        projectiles = new ArrayList<>();
-        bases = new ArrayList<>();
-        targetMap = new HashMap<>();
-        long endT = System.nanoTime();
-        System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
+        synchronized(gameComponents) {
+            long startT = System.nanoTime();
+            this.gameComponents.clear();
+            towers = new ArrayList<>();
+            enemies = new ArrayList<>();
+            projectiles = new ArrayList<>();
+            bases = new ArrayList<>();
+            targetMap = new HashMap<>();
+            long endT = System.nanoTime();
+        }
     }
 
 

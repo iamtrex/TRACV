@@ -13,6 +13,5 @@ public class Frame extends JFrame {
         this.setSize(Constants.FRAME_DEFAULT_SIZE);
         Comp.center(this);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
     }
 }
