@@ -8,7 +8,7 @@ import com.tracv.util.Constants;
 import java.util.*;
 
 
-public class GameState extends Observable implements Iterable<GameComponent> {
+public class GameState extends Observable{
 
     private GameMap map;
 
@@ -30,14 +30,6 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         levelParser = new LevelJsonParser();
     }
 
-    public void loadNewGame(int level){
-        this.level = level;
-        levelParser.readLevel(level);
-        map.loadLevel(levelParser.getFile());
-        notifyObservers(Constants.OBSERVER_NEW_GAME);
-
-    }
-
     public void reset(){
         map.reset();
         gold = Constants.DEFAULT_GOLD;
@@ -49,8 +41,20 @@ public class GameState extends Observable implements Iterable<GameComponent> {
 
 
     public void setSelectedTower(Tower t){
+        if(t == selectedTower)
+            return;
+
+        if(selectedTower != null)
+            selectedTower.setSelected(false);
+
         selectedTower = t;
+
+        if(selectedTower != null)
+            selectedTower.setSelected(true);
+
+        notifyObservers(Constants.OBSERVER_TOWER_SELECTED);
     }
+
     public Tower getSelectedTower(){
         return selectedTower;
     }
@@ -63,10 +67,6 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     public int getGold(){return gold;}
     public String getBaseHealth(){return map.getBase().getHealth();}
 
-    @Override
-    public Iterator<GameComponent> iterator() {
-        return map.getGameComponents().iterator();
-    }
 
     /**
      * Game Termination - User completed level successfully

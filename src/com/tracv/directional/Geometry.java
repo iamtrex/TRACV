@@ -2,6 +2,7 @@ package com.tracv.directional;
 
 import com.tracv.gamecomponents.GameComponent;
 import com.tracv.gamecomponents.Terrain;
+import com.tracv.gamecomponents.Tower;
 import com.tracv.util.Constants;
 
 import java.awt.*;
@@ -91,4 +92,5 @@ public class Geometry {
     public static boolean isPointInRight(Point p, Rectangle r, int pad) {
         return p.getX() >= r.getX() + r.getWidth() - pad && p.getX() <= r.getX() + r.getWidth();
     }
+
 }

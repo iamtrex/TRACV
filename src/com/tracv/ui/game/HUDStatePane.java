@@ -112,7 +112,7 @@ public class HUDStatePane extends Pane implements Observer {
         SwingUtilities.invokeLater(()->lGold.setText("Gold " + game.getGameState().getGold()));
     }
     private void updateWave(){
-        SwingUtilities.invokeLater(()->lWave.setText("Wave " + game.getGameState().getWave()));
+        SwingUtilities.invokeLater(()->lWave.setText("Wave " + game.getWave()));
     }
     private void updateLevel(){
         SwingUtilities.invokeLater(()->lLevel.setText("Level " + game.getGameState().getLevel()));

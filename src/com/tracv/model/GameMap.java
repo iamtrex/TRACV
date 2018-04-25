@@ -93,6 +93,7 @@ public class GameMap {
         this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
     }
 
+
     private class Remover implements Runnable{
         private GameComponent gc;
         public Remover(GameComponent gc){
