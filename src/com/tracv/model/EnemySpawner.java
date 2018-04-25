@@ -12,27 +12,28 @@ import java.util.*;
 public class EnemySpawner{
 
     private LevelJsonParser parser;
-    private GameMap map;
+    private Evolver evolver;
     private GameState gs;
 
+    private Random random;
 
-    private double millisFromLastSpawn = 0;
-
+    private double msSinceLastSpawn = 0;
     private int wave;
     private int maxWave;
 
-    public EnemySpawner(LevelJsonParser parser, GameState gs){
-        this.parser = parser;
-        this.map = gs.getMap();
-        this.gs = gs;
-
-    }
 
 
-    private Queue<List<EnemyType>> toSpawn;
-    private Map<List<EnemyType>, Integer> timeToSpawn;
+    private Queue<List<EnemyType>> spawnQueue;
+    private Map<List<EnemyType>, Integer> spawnTimer;
 
     public EnemySpawner(Evolver evolver) {
+        this.evolver = evolver;
+        this.random = new Random();
+    }
+
+    public void loadLevel(Map<List<EnemyType>, Integer> spawnTimer, Queue<List<EnemyType>> spawnQueue){
+        this.spawnQueue = spawnQueue;
+        this.spawnTimer = spawnTimer;
     }
 
     /**
@@ -41,31 +42,34 @@ public class EnemySpawner{
      * @return - True if level is complete with spawning
      */
     public void update(int timeMillis){
-        if(toSpawn.isEmpty()){
+        if(spawnQueue.isEmpty()){
             System.err.println("Calling update when spawn empty");
             return; //Done spawn
         }
 
-        millisFromLastSpawn += timeMillis;
+        msSinceLastSpawn += timeMillis;
 
         boolean spawnRepeat = true;
 
         while(spawnRepeat) { //Can spawn multiple waves if lag... lol
+            int timeToNext = spawnTimer.get(spawnQueue.peek());
 
-            int timeToNext = timeToSpawn.get(toSpawn.peek());
-
-            if (timeToNext <= millisFromLastSpawn / 1000.0) { //Convert to seconds.
+            if (timeToNext <= msSinceLastSpawn / 1000) { //Convert to seconds.
                 System.out.println("Spawning Wave");
                 wave++;
-                updateGSWave();
+                msSinceLastSpawn -= timeToNext*1000;
+                List<EnemyType> toSpawnTypes = spawnQueue.poll();
 
-                millisFromLastSpawn -= timeToNext*1000;
+                List<Enemy> mobs = createMobs(toSpawnTypes);
+                mobs.forEach(e-> {
+                            //Random delay of up to 2000 seconds.
+                            int randomTimeMS = random.nextInt(2000);
+                            evolver.addEnemyToQueue(e, randomTimeMS);
+                        });
 
-                List<EnemyType> toSpawnTypes = toSpawn.poll();
-                gs.addToSpawnQueue(createMobs(toSpawnTypes)); // Saves some time with Casting of all the comps to enemies...?
-                timeToSpawn.remove(toSpawnTypes);
+                spawnTimer.remove(toSpawnTypes);
 
-                if(toSpawn.isEmpty()){
+                if(spawnQueue.isEmpty()){
                     spawnRepeat = false;
                 }
             }else{
@@ -97,25 +101,19 @@ public class EnemySpawner{
         return String.valueOf(wave) + "/" + String.valueOf(maxWave);
     }
 
-    //TODO - I dont' like this implementation, but can't think of a better way.
-    public void updateGSWave(){
-        gs.updateWave();
-    }
-
-
     public void reset() {
-        millisFromLastSpawn = 0;
-        toSpawn = parser.getSpawnQueue();
-        maxWave = toSpawn.size();
+        msSinceLastSpawn = 0;
+        spawnQueue = parser.getSpawnQueue();
+        maxWave = spawnQueue.size();
         wave = 0;
-        timeToSpawn = parser.getSpawnTime();
+        spawnTimer = parser.getSpawnTime();
     }
 
     public int getTimeToNextWave() {
-        return timeToSpawn.get(toSpawn.peek()) - (int)(millisFromLastSpawn/1000.0);
+        return spawnTimer.get(spawnQueue.peek()) - (int)(msSinceLastSpawn /1000.0);
     }
 
     public boolean isDoneSpawn() {
-        return toSpawn.isEmpty();
+        return spawnQueue.isEmpty();
     }
 }

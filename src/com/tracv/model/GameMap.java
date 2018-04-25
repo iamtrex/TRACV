@@ -40,39 +40,6 @@ public class GameMap {
     private ExecutorService pool;
 
 
-
-
-    public void reset() {
-        long startT = System.nanoTime();
-
-
-
-        this.gameComponents = new ArrayList<>();
-        towers = new ArrayList<>();
-        enemies = new ArrayList<>();
-        projectiles = new ArrayList<>();
-        bases = new ArrayList<>();
-
-        targetMap = new HashMap<>();
-
-        long endT = System.nanoTime();
-
-        System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
-    }
-
-
-    public void loadLevel(String levelTerrainFile) {
-        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
-        buildTerrain(terrainTypes);
-        pathBuilder = new PathBuilder(terrains);
-        start = terrains[0][0];
-        destination = terrains[terrains.length-1][0];
-        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
-
-
-
-    }
-
     /**
      * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
      * no GameComponents
@@ -81,8 +48,20 @@ public class GameMap {
     public GameMap () {
         pool = Executors.newFixedThreadPool(10);
         reset();
-
     }
+
+    public void reset() {
+        long startT = System.nanoTime();
+        this.gameComponents = new ArrayList<>();
+        towers = new ArrayList<>();
+        enemies = new ArrayList<>();
+        projectiles = new ArrayList<>();
+        bases = new ArrayList<>();
+        targetMap = new HashMap<>();
+        long endT = System.nanoTime();
+        System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
+    }
+
 
     private void buildTerrain(TerrainType[][] terrainTypes) {
 
@@ -93,7 +72,6 @@ public class GameMap {
         terrains = new Terrain[terrainTypes.length][terrainTypes[0].length];
         for(int i=0; i<terrainTypes.length; i++){
             for(int j=0; j<terrainTypes[i].length; j++){
-                //terrains.add(new Terrain(terrainTypes[i][j], j, i));
                 terrains[i][j] = new Terrain(terrainTypes[i][j], j, i, width, height);
 
                 if(terrainTypes[i][j] == TerrainType.NEXUS){
@@ -104,22 +82,16 @@ public class GameMap {
                 }
             }
         }
-
-
     }
 
-    /**
-     * Getter to return a list of the GameComponents in the GameMap
-     * @return a list of GameComponents within the GameMap
-     */
-    public List<GameComponent> getGameComponents() {
-        return gameComponents;
+    public void loadLevel(String levelTerrainFile) {
+        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
+        buildTerrain(terrainTypes);
+        pathBuilder = new PathBuilder(terrains);
+        start = terrains[0][0];
+        destination = terrains[terrains.length-1][0];
+        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
     }
-
-    public Map<Enemy,List<Projectile>> getTargetMap() {
-        return targetMap;
-    }
-
 
     private class Remover implements Runnable{
         private GameComponent gc;
@@ -237,7 +209,6 @@ public class GameMap {
         return terrains;
     }
 
-
     public Double getBlockSize(){
         return blockSize;
     }
@@ -247,6 +218,24 @@ public class GameMap {
 
     }
 
+    public void setTarget(Projectile p, Enemy e){
+        synchronized(targetMap){
+            targetMap.get(e).add(p);
+        }
+    }
+
+
+    /**
+     * Getter to return a list of the GameComponents in the GameMap
+     * @return a list of GameComponents within the GameMap
+     */
+    public List<GameComponent> getGameComponents() {
+        return gameComponents;
+    }
+
+    public Map<Enemy,List<Projectile>> getTargetMap() {
+        return targetMap;
+    }
 
     //TODO Fix this implementation
     public Base getBase() {
@@ -266,16 +255,11 @@ public class GameMap {
     }
 
 
-
     public Dimension getMapDimensions() {
         double width = Constants.DEFAULT_BLOCK_SIZE * terrains[0].length;
         double height = Constants.DEFAULT_BLOCK_SIZE * terrains.length;
         return new Dimension((int)width, (int)height);
     }
 
-
-    public List<Terrain> generatePath() {
-        return pathBuilder.generatePath(start, destination);
-    }
 
 }

@@ -1,7 +1,8 @@
-package com.tracv.model;
+package com.tracv.obsolete;
 
 import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.*;
+import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
@@ -17,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class GameStateOld extends Observable implements Iterable<GameComponent> {
-
 
     //private List<GameComponent> gameComponents;
     private GameMap map;
@@ -225,7 +225,7 @@ public class GameStateOld extends Observable implements Iterable<GameComponent> 
             if (toDel.contains(p)) {
                 continue; // Skip.
             }
-            boolean crashed = ProjectileMotion.updateProjectile(p);
+            boolean crashed = ProjectileMotion.updateProjectile(p, Constants.REFRESH_DELAY);
             if (crashed) {
                 Enemy e = p.getTarget();
                 boolean dead = e.takeDmg(p.getDmg());
@@ -312,8 +312,8 @@ public class GameStateOld extends Observable implements Iterable<GameComponent> 
         toDel.clear();
         toAdd.clear();
 
-        notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
-    }
+    notifyObservers(Constants.OBSERVER_TIME_MODIFIED);
+}
 
 
     private boolean isSpawnerEmpty() {
@@ -573,6 +573,5 @@ public class GameStateOld extends Observable implements Iterable<GameComponent> 
     public boolean isDoneSpawn() {
         return spawner.isDoneSpawn();
     }
-
 
 }

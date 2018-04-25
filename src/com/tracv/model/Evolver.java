@@ -21,7 +21,7 @@ import static com.tracv.model.State.TERMINATED;
 public class Evolver extends Observable {
     private EnemySpawner spawner;
 
-    private EvolutionThread evolver;
+    private EvolutionThread evolutionThread;
 
     private volatile State state;
     private volatile boolean evolving;
@@ -34,18 +34,30 @@ public class Evolver extends Observable {
     private Map<Enemy, Integer> toSpawn;
 
 
-    public Evolver(GameState gs){
+    public Evolver(){
         state = TERMINATED;
         evolving = false;
-        evolver = new EvolutionThread();
+        evolutionThread = new EvolutionThread();
 
-        spawner = new EnemySpawner(this);
-        this.gs = gs;
+        this.gs = new GameState();
         this.map = gs.getGameMap();
+
 
         retarget = new ArrayList<>();
         toSpawn = new HashMap<>();
 
+    }
+
+    public GameState getGameState(){
+        return gs;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void addEnemyToQueue(Enemy e, int randomTimeMS) {
+        toSpawn.put(e, randomTimeMS);
     }
 
     /**
@@ -61,7 +73,6 @@ public class Evolver extends Observable {
                 long start = System.nanoTime();
 
                 updateGameState();
-
                 delay = Math.round((System.nanoTime() - start)/1000000.0);
                 Logger.getInstance().updateDelay(delay);
                 long sleepTime = Constants.REFRESH_DELAY - delay;
@@ -107,81 +118,93 @@ public class Evolver extends Observable {
     }
 
     private void updateTowers() {
-        map.getTowers().forEach(t->{
-            t.decrementCooldown(Constants.REFRESH_DELAY);
-            if(t.canFire()){
-                double range = t.getRange();
-                Point towerPt = new Point((int)t.getX(), (int)t.getY());
-                for (Enemy e : map.getEnemies()) {
-                    Point enemyPt = new Point((int) e.getX(), (int) e.getY());
-                    if (Geometry.getDistance(towerPt, enemyPt) < range) {
-                        map.addComponent(new Projectile(e, t, t.getProjectileType()));
-                        t.setFired();
-                        break;
-                    }
-                }
-            }
-        });
-    }
-
-    private void updateRetargettingEnemies() {
-        Map<Enemy, List<Projectile>> target = map.getTargetMap();
-
-        retarget.forEach(e->{
-            List<Projectile> projs = target.get(e);
-            projs.forEach(p-> {
-                for (Enemy e2 : map.getEnemies()) {
-                    if (e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
-                        if (!retarget.contains(e2)) {
-                            if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
-                                p.setTarget(e2);
-                                break; //goto next enemy.
+        synchronized(map.getTowers()) {
+            map.getTowers().forEach(t -> {
+                t.decrementCooldown(Constants.REFRESH_DELAY);
+                if (t.canFire()) {
+                    double range = t.getRange();
+                    Point towerPt = new Point((int) t.getX(), (int) t.getY());
+                    synchronized(map.getEnemies()) {
+                        for (Enemy e : map.getEnemies()) {
+                            Point enemyPt = new Point((int) e.getX(), (int) e.getY());
+                            if (Geometry.getDistance(towerPt, enemyPt) < range) {
+                                map.addComponent(new Projectile(e, t, t.getProjectileType()));
+                                t.setFired();
+                                break;
                             }
                         }
                     }
                 }
             });
-        });
+        }
+    }
 
-        retarget.clear();
+    private void updateRetargettingEnemies() {
+        synchronized(map.getTargetMap()) {
+            Map<Enemy, List<Projectile>> target = map.getTargetMap();
+
+            retarget.forEach(e -> {
+                List<Projectile> projs = target.get(e);
+                projs.forEach(p -> {
+                    synchronized(map.getEnemies()) {
+                        for (Enemy e2 : map.getEnemies()) {
+                            if (e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
+                                if (!retarget.contains(e2)) {
+                                    if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
+                                        p.setTarget(e2);
+                                        map.setTarget(p, e2);
+                                        break; //goto next enemy.
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            retarget.clear();
+        }
     }
 
 
     private void updateProjectiles() {
         List<GameComponent> temp = new ArrayList<>();
+        synchronized(map.getProjectiles()) {
+            map.getProjectiles().forEach(p -> {
+                boolean hitEnemy = ProjectileMotion.updateProjectile(p, Constants.REFRESH_DELAY);
+                if (hitEnemy) {
+                    Enemy e = p.getTarget();
+                    boolean dead = e.takeDmg(p.getDmg());
+                    if (dead) {
+                        temp.add(e);
+                        retarget.add(e);
+                        gs.gainGold(e.getKillGold());
+                    }
+                    temp.add(p);
 
-        map.getProjectiles().forEach(p->{
-            boolean hitEnemy = ProjectileMotion.updateProjectile(p, Constants.REFRESH_DELAY);
-            if(hitEnemy){
-                Enemy e = p.getTarget();
-                boolean dead = e.takeDmg(p.getDmg());
-                if(dead){
-                    temp.add(e);
-                    retarget.add(e);
-                    gs.gainGold(e.getKillGold());
                 }
-                temp.add(p);
-
-            }
-        });
+            });
+        }
     }
 
     private void updateEnemies() {
         List<Enemy> temp = new ArrayList<>();
-
-        map.getEnemies().forEach(e->{
-           boolean reachedBase = EnemyMotion.updateEnemy(e, Constants.REFRESH_DELAY);
-           if(reachedBase){
-               temp.add(e);
-               map.getBase().takeDmg(e.getDmg());
-               notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
-           }
-        });
+        synchronized(map.getEnemies()) {
+            map.getEnemies().forEach(e -> {
+                boolean reachedBase = EnemyMotion.updateEnemy(e, Constants.REFRESH_DELAY);
+                if (reachedBase) {
+                    temp.add(e);
+                    map.getBase().takeDmg(e.getDmg());
+                    notifyObservers(Constants.OBSERVER_BASE_HEALTH_CHANGED);
+                }
+            });
+        }
 
         temp.forEach(e-> map.removeComponent(e));
     }
 
     private void updateSpawns() {
+        spawner.update(Constants.REFRESH_DELAY);
         toSpawn.forEach((k, v)->{
             v--;
             if(v <=0){
@@ -217,7 +240,7 @@ public class Evolver extends Observable {
      * Changes Game's State Status.
      * @param s - Enum State, can either be set to PLAYING, PAUSED, OR TERMINATED.
      */
-    private void changeState(State s){
+    public void changeState(State s){
         if(s == state){
             Logger.getInstance().log("Trying to make same state", LoggerLevel.WARNING);
             return;
@@ -225,24 +248,23 @@ public class Evolver extends Observable {
 
         if(s == State.PLAYING){
             if(state == State.PAUSED){//Resume
-                evolver.notify();
-
-
+                evolutionThread.notify();
             }else if(state == TERMINATED){ //Restart
-                evolver.start();
+                evolving = true;
+                evolutionThread.start();
             }
 
         }else if(s == State.PAUSED){
             try {
-                evolver.wait();
+                evolutionThread.wait();
             }catch(InterruptedException ie){
                 ie.printStackTrace();
             }
 
         }else if(s == TERMINATED){
-            evolver.cancel();
+            evolutionThread.cancel();
             evolving = false;
-            evolver.reset();
+            evolutionThread.reset();
 
         }
     }

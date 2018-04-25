@@ -1,5 +1,6 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameProcess;
 import com.tracv.model.GameState;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
@@ -21,16 +22,16 @@ public class HUDPane extends JPanel implements Observer{
     private TowerType selectedTowerType;
 
 
-    public HUDPane(GameState gs){
+    public HUDPane(GameProcess game){
         this.setPreferredSize(Constants.HUD_DIMENSION);
         this.setBackground(Color.BLACK);
         //this.setOpaque(true);
 
-        hudButtonPane = new HUDButtonPane(this, gs);
+        hudButtonPane = new HUDButtonPane(this, game);
         hudButtonPane.addPropertyChangeListener(new TowerChangeListener());
 
-        hudStatsPane = new HUDStatsPane(this, gs);
-        hudStatePane = new HUDStatePane(this, gs);
+        hudStatsPane = new HUDStatsPane(this, game);
+        hudStatePane = new HUDStatePane(this, game);
 
         Pane statsSpaceHolderPane = new Pane();
 

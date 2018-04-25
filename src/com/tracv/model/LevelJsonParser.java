@@ -11,6 +11,10 @@ import java.util.*;
 
 public class LevelJsonParser {
 
+    private String name, map;
+    private Map<List<EnemyType>, Integer> spawnTimer;
+    private Queue<List<EnemyType>> spawnQueue;
+
     public LevelJsonParser(){
         spawnTimer = new HashMap<>();
         spawnQueue = new LinkedList<>();
@@ -67,10 +71,6 @@ public class LevelJsonParser {
         }
         return wave;
     }
-
-    private String name, map;
-    private Map<List<EnemyType>, Integer> spawnTimer;
-    private Queue<List<EnemyType>> spawnQueue;
 
     public Map<List<EnemyType>,Integer> getSpawnTime() {
         return spawnTimer;

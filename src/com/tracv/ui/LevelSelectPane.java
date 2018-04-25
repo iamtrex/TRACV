@@ -57,10 +57,8 @@ public class LevelSelectPane extends JPanel implements ActionListener {
         Object source = e.getSource();
         for(LevelSelectButton b : buttons){
             if(b == source){
-                //Load level
-                //TODO - Change how level name is read in case we want to change that in the future
-
                 tdg.startNewGame(Integer.parseInt(b.getText()));
+                tdf.switchToGamePanel();
                 return;
             }
         }

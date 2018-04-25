@@ -22,6 +22,7 @@ public class Constants {
     public static final int REFRESH_RATE =  60; //FPS
     public static final int REFRESH_DELAY = (int)Math.round(1000/REFRESH_RATE);
     public static final Double DEFAULT_BLOCK_SIZE = 50.0;
+    public static final long MAP_MOVE_REFRESH_DELAY = REFRESH_DELAY;
 
 
     //Size of Frame, game and HUD
@@ -103,16 +104,20 @@ public class Constants {
     public static final int INSETS_OUTSIDE = 10;
     public static final int INSETS_BETWEEN = 5;
 
-    public static final String OBSERVER_GAME_OVER = "GGWP";
+    //public static final String OBSERVER_GAME_OVER = "GGWP";
     public static final String OBSERVER_LEVEL_COMPLETE = "GGEZ";
     public static final String OBSERVER_GAME_TICK = "UPDATE";
     public static final String OBSERVER_WAVE_SPAWNED = "wave spawned";
     public static final String OBSERVER_TOWER_SELECTED = "tower sel";
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
-    public static final String OBSERVER_GAME_PAUSED = "paused";
-    public static final String OBSERVER_GAME_RESUMED = "resumed";
+    public static final String OBSERVER_GAME_PAUSED = "game paused";
+    public static final String OBSERVER_GAME_RESUMED = "game resumed";
+    public static final String OBSERVER_LEVEL_FAILED = "FAILED";
 
+    public static final String OBSERVER_STATE_RUNNING = "RUNNING";
+    public static final String OBSERVER_STATE_PAUSED = "PAUSED";
+    public static final String OBSERVER_STATE_TERMINATED = "TERMINATED";
 
 
     public static final int DEFAULT_GOLD = 500;

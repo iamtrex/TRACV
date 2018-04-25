@@ -1,20 +1,11 @@
 package com.tracv.model;
 
-import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.*;
 import com.tracv.observerpattern.Observable;
-import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
-import com.tracv.util.Logger;
-import com.tracv.util.LoggerLevel;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 
 public class GameState extends Observable implements Iterable<GameComponent> {
@@ -28,9 +19,9 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     //GameState Elements.
     private int gold;
     private int score;
-    private int timeElapsed;
+    private int timeElapsed; //Time in milliseconds.
     private int level;
-    private TowerType selectedTowerType; //Build tower type.
+    private TowerType buildTowerType; //Build tower type.
     private Tower selectedTower; //Selected tower on the map
 
 
@@ -52,7 +43,7 @@ public class GameState extends Observable implements Iterable<GameComponent> {
         gold = Constants.DEFAULT_GOLD;
         score = 0;
         timeElapsed = 0;
-        selectedTowerType = null;
+        buildTowerType = null;
         selectedTower = null;
     }
 
@@ -63,31 +54,60 @@ public class GameState extends Observable implements Iterable<GameComponent> {
     public Tower getSelectedTower(){
         return selectedTower;
     }
-    public void setSelectedTowerType(TowerType tt){
-        selectedTowerType = tt;
+    public void setBuildTowerType(TowerType tt){
+        buildTowerType = tt;
     }
-    public TowerType getSelectedTowerType(){
-        return selectedTowerType;
+    public TowerType getBuildTowerType(){
+        return buildTowerType;
     }
+    public int getGold(){return gold;}
+    public String getBaseHealth(){return map.getBase().getHealth();}
 
     @Override
     public Iterator<GameComponent> iterator() {
-        return null;
+        return map.getGameComponents().iterator();
     }
 
+    /**
+     * Game Termination - User completed level successfully
+     */
     public void levelCompleted() {
+        reset();
+        notifyObservers(Constants.OBSERVER_LEVEL_COMPLETE);
     }
 
-    public void increaseTime(int refreshDelay) {
-    }
-
+    /**
+     * Game Termination - User failed to complete the level.
+     */
     public void levelFailed() {
+        reset();
+        notifyObservers(Constants.OBSERVER_LEVEL_FAILED);
+    }
+
+
+    public void increaseTime(int timeMS) {
+        timeElapsed += timeMS;
     }
 
     public GameMap getGameMap() {
         return map;
     }
 
-    public void gainGold(int killGold) {
+    public void useGold(int gold){
+        this.gold -= gold;
+    }
+    public void gainGold(int gold) {
+        this.gold += gold;
+    }
+
+    public int getTimeMS() {
+        return timeElapsed;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+    public int getLevel(){
+        return level;
     }
 }

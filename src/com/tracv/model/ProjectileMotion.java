@@ -21,8 +21,9 @@ public class ProjectileMotion {
     /**
      * Updates the projectile's position.
      * @param p - Projectile
+     * @param refreshDelay
      */
-    public static boolean updateProjectile(Projectile p){
+    public static boolean updateProjectile(Projectile p, int refreshDelay){
         Enemy e = p.getTarget();
         //TODO eval if enemy is within range of movement. If so, set projectile to enemy and autocollide.
 

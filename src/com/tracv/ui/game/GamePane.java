@@ -11,6 +11,7 @@ import com.tracv.swing.Pane;
 import com.tracv.types.EnemyType;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
+import com.tracv.ui.TDGame;
 import com.tracv.util.Constants;
 import com.tracv.util.Logger;
 import com.tracv.util.LoggerLevel;
@@ -18,21 +19,23 @@ import com.tracv.util.LoggerLevel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+
+import static com.tracv.model.State.PLAYING;
 
 /**
  * The 'game' portion of the interface (not including hud).
- *
+ * <p>
  * TODO - May change implementation to have 3 layers: Background (TerrainType), moveable sprites, and mouse... and only redraw as needed
- *      a. Not interfere
- *      b. Redraw faster?
+ * a. Not interfere
+ * b. Redraw faster?
  */
 
-public class GamePane extends Pane implements Observer{
+public class GamePane extends Pane implements Observer {
 
     private Point mouse;
 
-    private GameState gs;
-    private Evolver evolver;
+    private GameProcess game;
 
     private TowerType selectedTower;
 
@@ -40,9 +43,11 @@ public class GamePane extends Pane implements Observer{
 
     private boolean top, bot, left, right;
 
-    public GamePane(){
-        gs = new GameState();
-        evolver = new Evolver(gs);
+    private MapMoveThread mapMoveThread;
+
+
+    public GamePane() {
+        game = new GameProcess();
 
         resetRectangle();
 
@@ -54,130 +59,58 @@ public class GamePane extends Pane implements Observer{
         this.setFocusable(true);
     }
 
-    public GameState getGameState(){
-        return gs;
-    }
 
-    public void updateMapMove(boolean top, boolean bot, boolean left, boolean right) {
-        this.top = top;
-        this.bot = bot;
-        this.left = left;
-        this.right = right;
-    }
-
-    private void handleMapMove() {
-        int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
-        if (top) {
-            selectedRegion.setLocation(
-                    (int) selectedRegion.getX(), (int) selectedRegion.getY() - speed);
-
-        } else if (bot) {
-            selectedRegion.setLocation(
-                    (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
-        }
-
-        if (left) {
-            selectedRegion.setLocation(
-                    (int) selectedRegion.getX() - speed, (int) selectedRegion.getY());
-        } else if (right) {
-            selectedRegion.setLocation(
-                    (int) selectedRegion.getX() + speed, (int) selectedRegion.getY());
-        }
-
-        int mapWidth = (int) gs.getMap().getMapDimensions().getWidth();
-        int mapHeight = (int) gs.getMap().getMapDimensions().getHeight();
-
-        if (selectedRegion.getX() + selectedRegion.getWidth() > mapWidth) {
-            selectedRegion.setLocation(mapWidth - (int) selectedRegion.getWidth(), (int) selectedRegion.getY());
-        }
-        if (selectedRegion.getY() + selectedRegion.getHeight() > mapHeight) {
-            selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int) selectedRegion.getHeight());
-        }
-        if (selectedRegion.getX() < 0) {
-            selectedRegion.setLocation(0, (int) selectedRegion.getY());
-        }
-        if (selectedRegion.getY() < 0) {
-            selectedRegion.setLocation((int) selectedRegion.getX(), 0);
-        }
-    }
-
-
-
-    private boolean attemptToBuildTower(Point point) {
-        if(selectedTower != null) {
-            Logger.getInstance().log("Attempting to build tower of type " + selectedTower.getName() +
-                    " on point " + point.getX() + "," + point.getY(), LoggerLevel.STATUS);
-            point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
-
-            return gs.attemptToBuildTower(point, selectedTower);
-        } else{
-            Logger.getInstance().log("No Tower selected, no build.", LoggerLevel.STATUS);
-            return false;
-        }
-    }
-
+    /**
+     * Draw the game.
+     *
+     * @param g
+     */
     @Override
-    protected void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        handleMapMove();
+        synchronized (selectedRegion) {
+            Terrain[][] terrains = game.getTerrain();
 
-        //DONE -- Awaiting implementation of getGameComponents();
-        //DONE -- consider implementing iterator in gs.
-        //DONE -- Awaiting Draw implementation of GameComponents, currently temporary
+            double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
+            double blockSizeY = Constants.DEFAULT_BLOCK_SIZE;
 
-        //DISCONTINUED -- Switch to multilayered pane so that we don't have to redraw the terrainType each iteration
-        //Draw TerrainType
-        Terrain[][] terrains = gs.getTerrain();
+            //Draw TerrainType
+            for (int y = 0; y < terrains.length; y++) {
+                for (int x = 0; x < terrains[y].length; x++) {
+                    if (!Geometry.isObjectInsideRegion(terrains[y][x], selectedRegion)) {
+                        continue; // Skip object.
+                    }
+                    g.setColor(terrains[y][x].getType().getColor());
+                    g.fillRect((int) (x * blockSizeX + 1 - selectedRegion.getX()),
+                            (int) (y * blockSizeY + 1 - selectedRegion.getY()),
+                            (int) blockSizeX,
+                            (int) blockSizeY);
 
-        double blockSizeX = Constants.DEFAULT_BLOCK_SIZE;
-        double blockSizeY = Constants.DEFAULT_BLOCK_SIZE;
-
-        //Draw TerrainType
-        for(int y = 0; y< terrains.length; y++){
-            for(int x = 0; x< terrains[y].length; x++){
-                if(!Geometry.isObjectInsideRegion(terrains[y][x], selectedRegion)){
-                    continue; // Skip object.
-                }
-                for(TerrainType t : TerrainType.getTerrains()){
-                    if(t.equals(terrains[y][x].getType())){
-                        g.setColor(t.getColor());
-                        break;
+                    //Draw Border if buildable
+                    if (terrains[y][x].getType() == TerrainType.BUILDABLE) {
+                        g.setColor(Color.BLACK);
+                        g.drawRect((int) (x * blockSizeX - selectedRegion.getX()),
+                                (int) (y * blockSizeY - selectedRegion.getY()),
+                                (int) blockSizeX,
+                                (int) blockSizeY);
                     }
                 }
+            }
+            List<GameComponent> gcs = game.getMap().getGameComponents();
 
-                //TODO perhaps change implementation of how we draw TerrainType
-                //  Either use preloaded image? or fix how the border looks
-                //  The +1 works because drawn from top left to bottom right, so the top and left borders
-                //      Are already fine, but the bottom and right borders may be overwritten, however the +1 fixes that
-                g.fillRect((int)(x*blockSizeX + 1 - selectedRegion.getX()),
-                        (int)(y*blockSizeY + 1 - selectedRegion.getY()),
-                        (int)blockSizeX,
-                        (int)blockSizeY);
-
-                //Draw Border if buildable
-                if(terrains[y][x].getType() == TerrainType.BUILDABLE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int)(x * blockSizeX - selectedRegion.getX()),
-                            (int)(y * blockSizeY - selectedRegion.getY()),
-                            (int)blockSizeX,
-                            (int)blockSizeY);
+            synchronized (gcs) {
+                for (GameComponent gc : gcs) {
+                    if (Geometry.isObjectInsideRegion(gc, selectedRegion)) {
+                        gc.draw(g, selectedRegion);
+                    }
                 }
+            }
 
+            //Draw Mouse hover.
+            if (mouse != null) {
+                drawTowerHighlightOnMouse(g);
             }
         }
-
-        for(GameComponent gc : gs){
-            if(Geometry.isObjectInsideRegion(gc, selectedRegion)) {
-                gc.draw(g, selectedRegion);
-            }
-        }
-
-
-        //Draw Mouse hover.
-        if(mouse != null) {
-            drawTowerHighlightOnMouse(g);
-        }
-        //System.out.println("Draw Time Taken " + (System.nanoTime() - curr)/1000000);
     }
 
     /*
@@ -186,106 +119,112 @@ public class GamePane extends Pane implements Observer{
                 // -> Get the Sprite based off of TowerType that is currently selected.
 
      */
-    private void drawTowerHighlightOnMouse(Graphics g){
+    private void drawTowerHighlightOnMouse(Graphics g) {
         //DONE - Ask GameState if the current position is legal. (Determine red or green shade on the object)
         //DONE -- CURRENTLY DRAWS FULL SPRITE... NEED TO ADJUST...
         //TODO ALSO SHOULD DRAW TO THE GRID? idek anymore... maybe not draw this so early
 
-        if(selectedTower != null) { // Only draw if currently has selected tower!
+        if (selectedTower != null) { // Only draw if currently has selected tower!
             Image img;
             Point point = mouse.getLocation();
-            point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
+            convertToGamePoint(point);
 
-            if(gs.isTowerBuildValid(point, selectedTower)){
+            if (game.isTowerLocationValid(point)) {
                 img = selectedTower.getSpriteActive();
-            }else{
+            } else {
                 img = selectedTower.getSpriteDeactive();
             }
 
-            int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth()/2);
-            int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight()/2);
+            int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth() / 2);
+            int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight() / 2);
             g.drawImage(img, x, y, null);
         }
     }
 
     @Override
     public void update(Observable o, String msg) {
-        if(msg.equals(Constants.OBSERVER_GAME_TICK)){
+        if (msg.equals(Constants.OBSERVER_GAME_TICK)) {
             this.repaint();
-        }else if(msg.equals(Constants.OBSERVER_GAME_PAUSED) || msg.equals(Constants.OBSERVER_GAME_OVER) || msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
+        } else if (msg.equals(Constants.OBSERVER_GAME_PAUSED) || msg.equals(Constants.OBSERVER_LEVEL_FAILED) || msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)) {
             resetRectangle();
-        }else if(msg.equals(Constants.OBSERVER_NEW_GAME)){
+        } else if (msg.equals(Constants.OBSERVER_NEW_GAME)) {
             resetRectangle();
+        } else if (msg.equals(Constants.OBSERVER_STATE_RUNNING)) {
+            startMapThread();
+        } else if (msg.equals(Constants.OBSERVER_STATE_PAUSED)) {
+
+        } else if (msg.equals(Constants.OBSERVER_STATE_TERMINATED)) {
+
         }
     }
-    
-    private void resetRectangle(){
-        selectedRegion = new Rectangle(0,0,
-                (int)Constants.GAME_DIMENSION.getWidth(), (int)Constants.GAME_DIMENSION.getHeight());
 
+
+    private void resetRectangle() {
+        selectedRegion = new Rectangle(0, 0,
+                (int) Constants.GAME_DIMENSION.getWidth(), (int) Constants.GAME_DIMENSION.getHeight());
         top = false;
         bot = false;
         left = false;
         right = false;
     }
 
-    public void setSelectedTower(TowerType selectedTower) {
-        this.selectedTower = selectedTower;
+    public GameProcess getGameProcess() {
+        return game;
     }
 
 
     //Key and Mouse Listeners
-    private class MyKeyListener implements KeyListener{
+    private class MyKeyListener implements KeyListener {
 
         //TODO REMOVE GOD MODE HACKS... HACKS
         @Override
         public void keyTyped(KeyEvent e) {
-            //System.out.println("Key typed " + e.getKeyChar());
-            if(Constants.DEBUGGING_MODE){
-                if(e.getKeyChar() == 'e'){
-                    //Spawn enemy.
-                    //SwingUtilities.invokeLater(()-> gs.spawnEnemy(0, 0));
-                    gs.getMap().addComponent(new Enemy(EnemyType.BASIC, 0, 0));
-                }else if(e.getKeyChar() == 'm'){
+            if (Constants.DEBUGGING_MODE) {
+                if (e.getKeyChar() == 'e') {
+                    game.getMap().addComponent(new Enemy(EnemyType.BASIC, 0, 0));
+                } else if (e.getKeyChar() == 'm') {
                     System.out.println("Gold!");
-                    gs.gainGold(1000); //Money maker!
+                    game.gainGold(1000); //Money maker!
                 }
             }
         }
-        @Override
-        public void keyPressed(KeyEvent e) {}
 
         @Override
-        public void keyReleased(KeyEvent e) {}
+        public void keyPressed(KeyEvent e) {
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
     }
+
     private class MyMouseListener implements MouseListener {
-        private Point click;
+        private Point down;
+
         @Override
         public void mouseClicked(MouseEvent e) {
             GamePane.this.grabFocus();
         }
 
-        //Registers point of first click, then builds tower on mouse release.
+        //Registers point of first down, then builds tower on mouse release.
         @Override
         public void mousePressed(MouseEvent e) {
-            if(click == null) {
-                click = e.getPoint();
+            if (down == null) {
+                down = e.getPoint();
             }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if(click != null){
+            if (down != null) {
                 Point p = e.getPoint();
-                if(Geometry.withinDistance(p, click)) {
-                    boolean b = attemptToBuildTower(p);
-
-                    if(!b){ //Attempt to select tower if applicable
-                        gs.attemptToSelectTower(p);
-                    }
+                if (Geometry.withinDistance(p, down)) {
+                    //Try to build tower first:
+                    convertToGamePoint(p);
+                    game.mouseClick(p);
                 }
                 //Set to null regardless
-                click = null;
+                down = null;
             }
         }
 
@@ -297,7 +236,7 @@ public class GamePane extends Pane implements Observer{
         @Override
         public void mouseExited(MouseEvent e) {
             mouse = null;
-            SwingUtilities.invokeLater(()->GamePane.this.repaint());
+            //SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }
 
@@ -310,10 +249,105 @@ public class GamePane extends Pane implements Observer{
         //Creates a hover image of where to build the tower...
         @Override
         public void mouseMoved(MouseEvent e) {
-            mouse = e.getPoint();
+            Point point = e.getPoint();
+            convertToGamePoint(point);
+            mouse = point;
             GamePane.this.getParent().dispatchEvent(e);
-            SwingUtilities.invokeLater(()->GamePane.this.repaint());
+            //SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }
 
+    private void convertToGamePoint(Point point) {
+        point.setLocation((point.getX() + selectedRegion.getX()), (point.getY() + selectedRegion.getY()));
+    }
+
+    private void startMapThread() {
+        if (mapMoveThread == null) {
+            mapMoveThread = new MapMoveThread();
+        }
+        if (mapMoveThread.isAlive()) {
+            Logger.getInstance().log("Map Thread is somehow still alive... zz", LoggerLevel.WARNING);
+            mapMoveThread.interrupt();
+            try {
+                mapMoveThread.join(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                Logger.getInstance().log("Map Thread now " + mapMoveThread.isAlive(), LoggerLevel.WARNING);
+            }
+        }
+
+        mapMoveThread.run();
+
+    }
+
+    /**
+     * Deals with moving the Selected Region of the map.
+     */
+    private class MapMoveThread extends Thread {
+        @Override
+        public void run() {
+            while (game.getState() == PLAYING) {
+                long start = System.nanoTime();
+                Point mouse = MouseInfo.getPointerInfo().getLocation();
+                Point p = GamePane.this.getLocationOnScreen();
+                Rectangle r = new Rectangle((int) p.getX(), (int) p.getY(),
+                        (int) Constants.GAME_DIMENSION.getWidth(), (int) Constants.GAME_DIMENSION.getHeight());
+
+                top = Geometry.isPointInTop(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+                bot = Geometry.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+                left = Geometry.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+                right = Geometry.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+                handleMapMove();
+
+                long delay = Math.round((System.nanoTime() - start) / 1000000.0);
+                if (delay >= Constants.MAP_MOVE_REFRESH_DELAY) {
+                    Logger.getInstance().log("Map move took too long, not sleeping", LoggerLevel.WARNING);
+                    continue; //don't sleep.
+                }
+                try {
+                    Thread.sleep(Constants.MAP_MOVE_REFRESH_DELAY - delay);
+                } catch (InterruptedException ie) {
+                    ie.printStackTrace();
+                }
+            }
+        }
+
+        private void handleMapMove() {
+            synchronized (selectedRegion) {
+                int mapWidth = (int) game.getMap().getMapDimensions().getWidth();
+                int mapHeight = (int) game.getMap().getMapDimensions().getHeight();
+                int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
+                if (top) {
+                    selectedRegion.setLocation(
+                            (int) selectedRegion.getX(), (int) selectedRegion.getY() - speed);
+
+                    if (selectedRegion.getY() < 0) {
+                        selectedRegion.setLocation((int) selectedRegion.getX(), 0);
+                    }
+                } else if (bot) {
+                    selectedRegion.setLocation(
+                            (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
+
+                    if (selectedRegion.getY() + selectedRegion.getHeight() > mapHeight) {
+                        selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int) selectedRegion.getHeight());
+                    }
+                }
+                if (left) {
+                    selectedRegion.setLocation(
+                            (int) selectedRegion.getX() - speed, (int) selectedRegion.getY());
+
+                    if (selectedRegion.getX() < 0) {
+                        selectedRegion.setLocation(0, (int) selectedRegion.getY());
+                    }
+                } else if (right) {
+                    selectedRegion.setLocation(
+                            (int) selectedRegion.getX() + speed, (int) selectedRegion.getY());
+                    if (selectedRegion.getX() + selectedRegion.getWidth() > mapWidth) {
+                        selectedRegion.setLocation(mapWidth - (int) selectedRegion.getWidth(), (int) selectedRegion.getY());
+                    }
+                }
+            }
+        }
+    }
 }

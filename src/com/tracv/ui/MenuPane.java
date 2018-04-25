@@ -26,12 +26,12 @@ public class MenuPane extends JPanel implements ActionListener {
 
 
     private Label displayMessage;
-    private Button newGame;
-    private Button continueGame;
+    private Button restartGame;
+    private Button resumeGame;
     private Button returnToMain;
     private Button settings;
 
-    private boolean returnEnabled = false;
+    private boolean clickToReturnEnabled = false;
 
     private BufferedImage background;
 
@@ -42,25 +42,25 @@ public class MenuPane extends JPanel implements ActionListener {
         this.addMouseListener(new MyMouseListener());
 
         displayMessage = new Label("", Label.LARGE);
-        continueGame = new Button("Resume");
-        newGame = new Button("Restart");
+        resumeGame = new Button("Resume");
+        restartGame = new Button("Restart");
         returnToMain = new Button("Return to Main");
         settings = new Button("Settings");
 
         Comp.add(displayMessage, this, 0, 0, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER, 0, 0, 10, 0); //Add 10 spacer to bottom
 
-        Comp.add(continueGame, this, 0, 1, 1, 1, 1, 0,
+        Comp.add(resumeGame, this, 0, 1, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(newGame, this, 0, 2, 1, 1, 1, 0,
+        Comp.add(restartGame, this, 0, 2, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         Comp.add(returnToMain, this, 0, 3, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         Comp.add(settings, this, 0, 4, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
-        continueGame.addActionListener(this);
-        newGame.addActionListener(this);
+        resumeGame.addActionListener(this);
+        restartGame.addActionListener(this);
         returnToMain.addActionListener(this);
         settings.addActionListener(this);
     }
@@ -69,9 +69,9 @@ public class MenuPane extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if(source == continueGame){
-            //tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
-        }else if(source == newGame){
+        if(source == resumeGame){
+            tdg.resumeGame();
+        }else if(source == restartGame){
             tdg.restartGame();
         }else if (source == returnToMain) {
             tdf.switchToMainPanel();
@@ -91,28 +91,28 @@ public class MenuPane extends JPanel implements ActionListener {
         if(source instanceof TDGame){
             if(msg == null){
                 displayMessage.setVisible(false);
-                continueGame.setVisible(true);
-                returnEnabled = true;
+                resumeGame.setVisible(true);
+                clickToReturnEnabled = true;
             }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
                 displayMessage.setText("Level Complete! :)");
                 displayMessage.setVisible(true);
-                continueGame.setVisible(false);
-                returnEnabled = false;
-            }else if(msg.equals(Constants.OBSERVER_GAME_OVER)){
+                resumeGame.setVisible(false);
+                clickToReturnEnabled = false;
+            }else if(msg.equals(Constants.OBSERVER_LEVEL_FAILED)){
                 displayMessage.setText("Game Over! :(");
                 displayMessage.setVisible(true);
-                continueGame.setVisible(false);
-                returnEnabled = false;
+                resumeGame.setVisible(false);
+                clickToReturnEnabled = false;
             }
-
-            newGame.setVisible(true);
+            restartGame.setVisible(true);
             returnToMain.setVisible(true);
             settings.setVisible(true);
+            clickToReturnEnabled = true;
         }else if(source instanceof MainPane){
-            returnEnabled = true;
+            clickToReturnEnabled = false;
             displayMessage.setVisible(false);
-            continueGame.setVisible(false);
-            newGame.setVisible(false);
+            resumeGame.setVisible(false);
+            restartGame.setVisible(false);
             returnToMain.setVisible(true);
             settings.setVisible(true);
         }
@@ -165,37 +165,24 @@ public class MenuPane extends JPanel implements ActionListener {
     }
 
     private class MyMouseListener implements MouseListener {
-        private boolean down = false;
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            down = true;
-        }
-
         /**
          * Close menu everytime user clicks outside of buttons
          * @param e
          */
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (down) {
-                if(returnEnabled) { //Only allow cancel if continueGame is visible...
-                    tdf.toggleMenu(false);
-                }
-                down = false;
+            if(clickToReturnEnabled) { //Only allow cancel if resumeGame is visible...
+                tdf.toggleMenu(false);
             }
         }
 
         @Override
-        public void mouseEntered(MouseEvent e) {
-        }
-
+        public void mousePressed(MouseEvent e){}
         @Override
-        public void mouseExited(MouseEvent e) {
-        }
+        public void mouseClicked(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
     }
 }

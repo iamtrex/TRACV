@@ -1,5 +1,6 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameProcess;
 import com.tracv.model.GameState;
 import com.tracv.swing.HUDTowerButton;
 import com.tracv.swing.Label;
@@ -29,7 +30,7 @@ public class HUDButtonPane extends Pane
     private Pane buttonsPane;
     private Label lTower;
 
-    public HUDButtonPane(HUDPane hudPane, GameState gs) {
+    public HUDButtonPane(HUDPane hudPane, GameProcess gs) {
         this.hudPane = hudPane;
         buttonsPane = new Pane();
 
