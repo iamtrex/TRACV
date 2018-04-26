@@ -93,9 +93,11 @@ public class GameState extends Observable{
 
     public void useGold(int gold){
         this.gold -= gold;
+        notifyObservers(Constants.OBSERVER_GOLD_CHANGED);
     }
     public void gainGold(int gold) {
         this.gold += gold;
+        notifyObservers(Constants.OBSERVER_GOLD_CHANGED);
     }
 
     public int getTimeMS() {

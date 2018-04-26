@@ -44,6 +44,7 @@ public class Evolver extends Observable {
 
         retarget = new ArrayList<>();
         toSpawn = new HashMap<>();
+        toDel = new ArrayList<>();
 
     }
 
@@ -114,9 +115,14 @@ public class Evolver extends Observable {
         updateProjectiles();
         updateTowers();
         updateRetargettingEnemies();
+        recycle();
         notifyObservers(Constants.OBSERVER_GAME_TICK);
     }
 
+    private List<GameComponent> toDel;
+    private void recycle(){
+        //Deletes components queued for deletion
+    }
     private void updateTowers() {
         synchronized(map.getTowers()) {
             map.getTowers().forEach(t -> {
@@ -185,6 +191,9 @@ public class Evolver extends Observable {
                 }
             });
         }
+
+        temp.forEach(e-> map.removeComponent(e));
+
     }
 
     private void updateEnemies() {
@@ -199,8 +208,8 @@ public class Evolver extends Observable {
                 }
             });
         }
-
         temp.forEach(e-> map.removeComponent(e));
+
     }
 
     private void updateSpawns() {
@@ -211,8 +220,7 @@ public class Evolver extends Observable {
 
         if(!toSpawn.isEmpty()) {
             toSpawn.forEach((k, v) -> {
-                System.out.println("spawner " + v.toString());
-                v = v-Constants.REFRESH_DELAY;
+                v = v - Constants.REFRESH_DELAY;
                 if (v <= 0) {
                     map.addComponent(k);
                 }else{
@@ -270,19 +278,21 @@ public class Evolver extends Observable {
                 evolving = true;
                 evolutionThread.start();
             }
+            state = s;
             notifyObservers(Constants.OBSERVER_GAME_RESUMED);
             notifyObservers(Constants.OBSERVER_STATE_RUNNING);
         }else if(s == State.PAUSED){
-
             evolutionThread.cancel();
-            try{
+            /*try{
                 evolutionThread.join(100);
             }catch(InterruptedException e){
                 e.printStackTrace();
-            }
+            }*/
+            System.out.println("Evolution Thread State " + evolutionThread.getState());
             evolving = false;
             evolutionThread = null;
 
+            state = s;
             notifyObservers(Constants.OBSERVER_GAME_PAUSED);
             notifyObservers(Constants.OBSERVER_STATE_PAUSED);
         }else if(s == TERMINATED){
@@ -296,6 +306,7 @@ public class Evolver extends Observable {
             evolutionThread.interrupt();
             evolutionThread = null;
 
+            state = s;
             notifyObservers(Constants.OBSERVER_STATE_TERMINATED);
         }
     }

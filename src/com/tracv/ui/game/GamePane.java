@@ -262,9 +262,11 @@ public class GamePane extends Pane implements Observer {
     }
 
     private void startMapThread() {
-        if (mapMoveThread == null) {
+        System.out.println("Creating Map Move Thread");
+        if (mapMoveThread == null || mapMoveThread.getState() == Thread.State.TERMINATED) { //Reset thread if needed.
             mapMoveThread = new MapMoveThread();
         }
+
         if (mapMoveThread.isAlive()) {
             Logger.getInstance().log("Map Thread is somehow still alive... zz", LoggerLevel.WARNING);
             mapMoveThread.interrupt();
@@ -276,9 +278,7 @@ public class GamePane extends Pane implements Observer {
                 Logger.getInstance().log("Map Thread now " + mapMoveThread.isAlive(), LoggerLevel.WARNING);
             }
         }
-
-        mapMoveThread.run();
-
+        mapMoveThread.start();
     }
 
     /**
@@ -287,7 +287,16 @@ public class GamePane extends Pane implements Observer {
     private class MapMoveThread extends Thread {
         @Override
         public void run() {
+            while(game.getState() != PLAYING){
+                try{
+                    Thread.sleep(100);
+                    System.out.println(game.getState().toString());
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
             while (game.getState() == PLAYING) {
+                System.out.println("Refresh Map");
                 long start = System.nanoTime();
                 Point mouse = MouseInfo.getPointerInfo().getLocation();
                 Point p = GamePane.this.getLocationOnScreen();
@@ -311,10 +320,13 @@ public class GamePane extends Pane implements Observer {
                     ie.printStackTrace();
                 }
             }
+            System.out.println("Terminating Map Thread");
         }
 
         private void handleMapMove() {
+            System.out.println("Move map");
             synchronized (selectedRegion) {
+                System.out.println("Actually Moving");
                 int mapWidth = (int) game.getMap().getMapDimensions().getWidth();
                 int mapHeight = (int) game.getMap().getMapDimensions().getHeight();
                 int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;

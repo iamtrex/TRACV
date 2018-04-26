@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Represents a mutable Map of the game which contains terrain and
@@ -39,6 +40,11 @@ public class GameMap {
 
     private ExecutorService pool;
 
+    private Lock gcLock;
+
+    public Lock getGcLock(){
+        return gcLock;
+    }
 
     /**
      * Constructor for GameMap, makes a new GameMap with the input terrainTypes containing
@@ -104,13 +110,20 @@ public class GameMap {
 
         @Override
         public void run(){
+            synchronized(gameComponents) {
+                gameComponents.remove(gc);
+            }
             if(gc instanceof Projectile){
                 Projectile p = (Projectile) gc;
                 synchronized(projectiles) {
                     projectiles.remove(p);
                 }
                 synchronized(targetMap){
-                    targetMap.get(p.getTarget()).remove(p);
+                    Enemy e = p.getTarget();
+                    if(e != null && targetMap.get(e) != null) {
+                        //Enemy could've died and been removed from map.
+                        targetMap.get(e).remove(p);
+                    }
                 }
 
             }else if(gc instanceof Enemy){
@@ -136,9 +149,6 @@ public class GameMap {
                 System.out.println("Wrong component type");
             }
 
-            synchronized(gameComponents) {
-                gameComponents.add(gc);
-            }
         }
     }
     private class Adder implements Runnable {
