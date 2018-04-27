@@ -228,7 +228,8 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         levelParser.readLevel(level);
         map.reset();
         map.loadLevel(levelParser.getFile());
-        spawner.loadLevel(levelParser.getSpawnTime(), levelParser.getSpawnQueue(), map.getStart().getX(), map.getStart().getY());
+        spawner.loadLevel(levelParser.getSpawnTime(), levelParser.getSpawnQueue(),
+                map.getStart().getPixelX(), map.getStart().getPixelY());
 
         //Evolver will start ticking the gamestate :)
         evolver.changeState(State.PLAYING);

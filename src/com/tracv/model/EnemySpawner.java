@@ -2,6 +2,7 @@ package com.tracv.model;
 
 import com.tracv.gamecomponents.Enemy;
 import com.tracv.types.EnemyType;
+import com.tracv.util.Constants;
 
 import java.util.*;
 
@@ -93,8 +94,9 @@ public class EnemySpawner{
 
         for(EnemyType type : next){
             enemies.add(new Enemy(type, x, y));
-            x -= random.nextInt(10)*10;
-            y = random.nextInt(10) * 5;
+            x -= random.nextInt(10)*5;
+            y = startY + random.nextInt((int)Math.round(Constants.DEFAULT_BLOCK_SIZE)-25);
+            //TODO REMOVE MAGIC NUMBER 25, REPLACE WITH TYPE.GETSIZE SIZE WHEN WE FIX THE TEMP SIZE...
         }
         return enemies;
     }
