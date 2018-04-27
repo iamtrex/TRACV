@@ -164,7 +164,12 @@ public class GameMap {
                     projectiles.add((Projectile)gc);
                 }
                 synchronized(targetMap){
-                    targetMap.get(p.getTarget()).add(p);
+                    if(p.getTarget() == null) {
+                        System.out.println("Oops, enemy died before the projectile fired, uhh... " +
+                                "Technically should retarget, but we gonna toss it for now until we find an easier way to fix it... ");
+                    }else {
+                        targetMap.get(p.getTarget()).add(p);
+                    }
                 }
 
             }else if(gc instanceof Enemy){
@@ -268,7 +273,7 @@ public class GameMap {
     }
 
 
-    public Dimension getMapDimensions() {
+    public Dimension getMapSize() {
         double width = Constants.DEFAULT_BLOCK_SIZE * terrains[0].length;
         double height = Constants.DEFAULT_BLOCK_SIZE * terrains.length;
         return new Dimension((int)width, (int)height);

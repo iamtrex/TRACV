@@ -65,12 +65,18 @@ public class MenuPane extends JPanel implements ActionListener {
         settings.addActionListener(this);
     }
 
+    private void resume() {
+        if(resumeGame.isVisible()){ //Equivalent to if(tdf.getContentPane == tdg)
+            tdg.resumeGame(); //Resume game since it must be panel underneath
+        }
+        tdf.toggleMenu(false);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if(source == resumeGame){
-            tdg.resumeGame();
+            resume();
         }else if(source == restartGame){
             tdg.restartGame();
         }else if (source == returnToMain) {
@@ -172,10 +178,7 @@ public class MenuPane extends JPanel implements ActionListener {
         @Override
         public void mouseReleased(MouseEvent e) {
             if(clickToReturnEnabled) { //Only allow cancel if resumeGame is visible...
-                if(resumeGame.isVisible()){ //Equivalent to if(tdf.getContentPane == tdg)
-                    tdg.resumeGame(); //Resume game since it must be panel underneath
-                }
-                tdf.toggleMenu(false);
+                resume();
             }
         }
 
@@ -188,4 +191,5 @@ public class MenuPane extends JPanel implements ActionListener {
         @Override
         public void mouseExited(MouseEvent e) {}
     }
+
 }

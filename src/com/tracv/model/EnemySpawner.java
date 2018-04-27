@@ -10,11 +10,6 @@ import java.util.*;
  * Spawns enemies in accordance to the json's instructions
  */
 public class EnemySpawner{
-
-    private LevelJsonParser parser;
-    private Evolver evolver;
-    private GameState gs;
-
     private Random random;
 
     private double msSinceLastSpawn = 0;
@@ -26,14 +21,16 @@ public class EnemySpawner{
     private Queue<List<EnemyType>> spawnQueue;
     private Map<List<EnemyType>, Integer> spawnTimer;
 
-    public EnemySpawner(Evolver evolver) {
-        this.evolver = evolver;
+    public EnemySpawner() {
         this.random = new Random();
     }
 
     public void loadLevel(Map<List<EnemyType>, Integer> spawnTimer, Queue<List<EnemyType>> spawnQueue){
         this.spawnQueue = spawnQueue;
         this.spawnTimer = spawnTimer;
+        msSinceLastSpawn = 0;
+        maxWave = spawnQueue.size();
+        wave = 0;
     }
 
     /**
@@ -41,10 +38,11 @@ public class EnemySpawner{
      * @param timeMillis
      * @return - True if level is complete with spawning
      */
-    public void update(int timeMillis){
+    public Map<Enemy, Integer> update(int timeMillis){
+        Map<Enemy, Integer> ret = new HashMap<>();
         if(spawnQueue.isEmpty()){
             System.err.println("Calling update when spawn empty");
-            return; //Done spawn
+            return ret; //Done spawn
         }
 
         msSinceLastSpawn += timeMillis;
@@ -62,10 +60,10 @@ public class EnemySpawner{
 
                 List<Enemy> mobs = createMobs(toSpawnTypes);
                 mobs.forEach(e-> {
-                            //Random delay of up to 2000 seconds.
-                            int randomTimeMS = random.nextInt(2000);
-                            evolver.addEnemyToQueue(e, randomTimeMS);
-                        });
+                    //Random delay of up to 2000 seconds.
+                    int randomTimeMS = random.nextInt(2000);
+                    ret.put(e, randomTimeMS);
+                });
 
                 spawnTimer.remove(toSpawnTypes);
 
@@ -76,8 +74,9 @@ public class EnemySpawner{
                 spawnRepeat = false;
             }
         }
-
+        return ret;
     }
+
 
     /**
      * Craete a list of enemies from a list of enemy types.
@@ -99,14 +98,6 @@ public class EnemySpawner{
 
     public String getWave(){
         return String.valueOf(wave) + "/" + String.valueOf(maxWave);
-    }
-
-    public void reset() {
-        msSinceLastSpawn = 0;
-        spawnQueue = parser.getSpawnQueue();
-        maxWave = spawnQueue.size();
-        wave = 0;
-        spawnTimer = parser.getSpawnTime();
     }
 
     public int getTimeToNextWave() {

@@ -12,7 +12,7 @@ import com.tracv.util.Constants;
 import com.tracv.util.Logger;
 import com.tracv.util.LoggerLevel;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,9 +31,11 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
 
     public GameProcess(){
         levelParser = new LevelJsonParser();
-        evolver = new Evolver();
-        spawner = evolver.getSpawner();
-        state = evolver.getGameState();
+        spawner = new EnemySpawner();
+        state = new GameState();
+        evolver = new Evolver(spawner, state);
+        //spawner = evolver.getSpawner();
+        //state = evolver.getGameState();
         map = state.getGameMap();
 
         evolver.addObserver(this);
@@ -194,6 +196,7 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         if(state.getGold() >= upgradeType.getUpgradeCost()){
             state.useGold(upgradeType.getUpgradeCost());
             getSelectedTower().modifyType(upgradeType);
+            notifyObservers(Constants.OBSERVER_UPGRADED_TOWER);
             Logger.getInstance().log("Successfully upgraded tower", LoggerLevel.STATUS);
         }else{
             Logger.getInstance().log("Cannot upgrade tower, insufficient gold", LoggerLevel.WARNING);
@@ -204,6 +207,7 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         state.gainGold((int)Math.round(getSelectedTower().getSellPrice()));
         map.removeComponent(getSelectedTower());
         setSelectedTower(null);
+        notifyObservers(Constants.OBSERVER_SOLD_TOWER);
 
     }
 
@@ -218,9 +222,11 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
      */
     public void startNewGame(int level) {
         //Load the level.
+        state.reset();
         state.setLevel(level);
         levelParser.readLevel(level);
         spawner.loadLevel(levelParser.getSpawnTime(), levelParser.getSpawnQueue());
+        map.reset();
         map.loadLevel(levelParser.getFile());
 
         //Evolver will start ticking the gamestate :)
@@ -293,5 +299,8 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
         return spawner.getWave();
     }
 
+    public Dimension getMapSize() {
+        return map.getMapSize();
+    }
 }
 

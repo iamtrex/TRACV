@@ -34,30 +34,22 @@ public class Evolver extends Observable {
     private Map<Enemy, Integer> toSpawn;
 
 
-    public Evolver(){
+    public Evolver(EnemySpawner spawner, GameState gs){
         state = TERMINATED;
         evolving = false;
         evolutionThread = new EvolutionThread();
-        this.gs = new GameState();
+        this.gs = gs;
         this.map = gs.getGameMap();
-        spawner = new EnemySpawner(this);
+        this.spawner = spawner;
 
         retarget = new ArrayList<>();
         toSpawn = new HashMap<>();
-        toDel = new ArrayList<>();
 
     }
 
-    public GameState getGameState(){
-        return gs;
-    }
 
     public State getState() {
         return state;
-    }
-
-    public void addEnemyToQueue(Enemy e, int randomTimeMS) {
-        toSpawn.put(e, randomTimeMS);
     }
 
     /**
@@ -81,8 +73,8 @@ public class Evolver extends Observable {
                 }else{
                     try{
                         Thread.sleep(sleepTime);
-                    }catch(InterruptedException ie){
-                        ie.printStackTrace(); //TODO Can prob ignore.
+                    }catch(InterruptedException ignore){
+                        //ie.printStackTrace(); //TODO Can prob ignore.
                     }
                 }
             }
@@ -93,11 +85,6 @@ public class Evolver extends Observable {
             evolving = false;
 
         }
-
-        public void reset() {
-
-        }
-
     }
 
     /**
@@ -115,14 +102,9 @@ public class Evolver extends Observable {
         updateProjectiles();
         updateTowers();
         updateRetargettingEnemies();
-        recycle();
         notifyObservers(Constants.OBSERVER_GAME_TICK);
     }
 
-    private List<GameComponent> toDel;
-    private void recycle(){
-        //Deletes components queued for deletion
-    }
     private void updateTowers() {
         synchronized(map.getTowers()) {
             map.getTowers().forEach(t -> {
@@ -151,21 +133,23 @@ public class Evolver extends Observable {
 
             retarget.forEach(e -> {
                 List<Projectile> projs = target.get(e);
-                projs.forEach(p -> {
-                    synchronized(map.getEnemies()) {
-                        for (Enemy e2 : map.getEnemies()) {
-                            if (e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
-                                if (!retarget.contains(e2)) {
-                                    if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
-                                        p.setTarget(e2);
-                                        map.setTarget(p, e2);
-                                        break; //goto next enemy.
+                if(projs != null){
+                    projs.forEach(p -> {
+                        synchronized(map.getEnemies()) {
+                            for (Enemy e2 : map.getEnemies()) {
+                                if (e2.getX() > 0 && e2.getY() > 0) { //TODO fix for other directions too.
+                                    if (!retarget.contains(e2)) {
+                                        if (Geometry.withinRange(e2, p.getTower(), p.getTower().getRange())) {
+                                            p.setTarget(e2);
+                                            map.setTarget(p, e2);
+                                            break; //goto next enemy.
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             });
 
             retarget.clear();
@@ -213,9 +197,7 @@ public class Evolver extends Observable {
     }
 
     private void updateSpawns() {
-        if(!spawner.isDoneSpawn()) {
-            spawner.update(Constants.REFRESH_DELAY);
-        }
+
         Map<Enemy, Integer> replace = new HashMap<>();
 
         if(!toSpawn.isEmpty()) {
@@ -228,8 +210,15 @@ public class Evolver extends Observable {
                 }
             });
         }
-
+        //toSpawn.clear(); -> Java should autodelete... :O
         toSpawn = replace;
+
+        if(!spawner.isDoneSpawn()) {
+            Map<Enemy, Integer> add = spawner.update(Constants.REFRESH_DELAY);
+            if(add != null)
+                add.forEach((k, v)-> toSpawn.put(k, v));
+        }
+
     }
 
 
@@ -244,8 +233,8 @@ public class Evolver extends Observable {
         }
 
         if(spawner.isDoneSpawn()){
-            System.out.println("Level complete");
             if(map.getEnemies().isEmpty() && toSpawn.isEmpty()){
+                System.out.println("Level complete");
                 changeState(TERMINATED);
                 gs.levelCompleted();
 
@@ -259,6 +248,7 @@ public class Evolver extends Observable {
      * @param s - Enum State, can either be set to PLAYING, PAUSED, OR TERMINATED.
      */
     public void changeState(State s){
+        System.out.println("Trying to set state to " + s.toString());
         if(s == state){
             Logger.getInstance().log("Trying to make same state", LoggerLevel.WARNING);
             return;
@@ -273,14 +263,17 @@ public class Evolver extends Observable {
             }
 
             if(state == State.PAUSED){//Resume
+                evolving = true;
                 evolutionThread.start();
             }else if(state == TERMINATED){ //Restart
                 evolving = true;
                 evolutionThread.start();
             }
             state = s;
+            System.out.println("Game Running!");
             notifyObservers(Constants.OBSERVER_GAME_RESUMED);
             notifyObservers(Constants.OBSERVER_STATE_RUNNING);
+
         }else if(s == State.PAUSED){
             evolutionThread.cancel();
             /*try{
@@ -290,6 +283,7 @@ public class Evolver extends Observable {
             }*/
             System.out.println("Evolution Thread State " + evolutionThread.getState());
             evolving = false;
+            evolutionThread.interrupt();
             evolutionThread = null;
 
             state = s;
@@ -310,9 +304,4 @@ public class Evolver extends Observable {
             notifyObservers(Constants.OBSERVER_STATE_TERMINATED);
         }
     }
-
-    public EnemySpawner getSpawner(){
-        return spawner;
-    }
-
 }

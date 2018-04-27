@@ -11,12 +11,10 @@ import com.tracv.swing.Pane;
 import com.tracv.types.EnemyType;
 import com.tracv.types.TerrainType;
 import com.tracv.types.TowerType;
-import com.tracv.ui.TDGame;
 import com.tracv.util.Constants;
 import com.tracv.util.Logger;
 import com.tracv.util.LoggerLevel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -26,14 +24,14 @@ import static com.tracv.model.State.PLAYING;
 /**
  * The 'game' portion of the interface (not including hud).
  * <p>
- * TODO - May change implementation to have 3 layers: Background (TerrainType), moveable sprites, and mouse... and only redraw as needed
+ * TODO - May change implementation to have 3 layers: Background (TerrainType), moveable sprites, and mouseOnScreen... and only redraw as needed
  * a. Not interfere
  * b. Redraw faster?
  */
 
 public class GamePane extends Pane implements Observer {
 
-    private Point mouse;
+    private Point mouseOnScreen; //Mouse's Position on screen
 
     private GameProcess game;
 
@@ -106,7 +104,7 @@ public class GamePane extends Pane implements Observer {
             }
 
             //Draw Mouse hover.
-            if (mouse != null) {
+            if (mouseOnScreen != null) {
                 drawTowerHighlightOnMouse(g);
             }
         }
@@ -126,7 +124,7 @@ public class GamePane extends Pane implements Observer {
         TowerType selectedTower = game.getBuildTowerType();
         if (selectedTower != null) { // Only draw if currently has selected tower!
             Image img;
-            Point point = mouse.getLocation();
+            Point point = mouseOnScreen.getLocation();
             convertToGamePoint(point);
 
             if (game.isTowerLocationValid(point)) {
@@ -135,8 +133,8 @@ public class GamePane extends Pane implements Observer {
                 img = selectedTower.getSpriteDeactive();
             }
 
-            int x = (int) Math.round(this.mouse.getX() - selectedTower.getWidth() / 2);
-            int y = (int) Math.round(this.mouse.getY() - selectedTower.getHeight() / 2);
+            int x = (int) Math.round(this.mouseOnScreen.getX() - selectedTower.getWidth() / 2);
+            int y = (int) Math.round(this.mouseOnScreen.getY() - selectedTower.getHeight() / 2);
             g.drawImage(img, x, y, null);
         }
     }
@@ -206,7 +204,7 @@ public class GamePane extends Pane implements Observer {
             GamePane.this.grabFocus();
         }
 
-        //Registers point of first down, then builds tower on mouse release.
+        //Registers point of first down, then builds tower on mouseOnScreen release.
         @Override
         public void mousePressed(MouseEvent e) {
             if (down == null) {
@@ -235,7 +233,7 @@ public class GamePane extends Pane implements Observer {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            mouse = null;
+            mouseOnScreen = null;
             //SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
     }
@@ -249,9 +247,7 @@ public class GamePane extends Pane implements Observer {
         //Creates a hover image of where to build the tower...
         @Override
         public void mouseMoved(MouseEvent e) {
-            Point point = e.getPoint();
-            convertToGamePoint(point);
-            mouse = point;
+            mouseOnScreen = e.getPoint();
             GamePane.this.getParent().dispatchEvent(e);
             //SwingUtilities.invokeLater(()->GamePane.this.repaint());
         }
@@ -263,6 +259,7 @@ public class GamePane extends Pane implements Observer {
 
     private void startMapThread() {
         System.out.println("Creating Map Move Thread");
+
         if (mapMoveThread == null || mapMoveThread.getState() == Thread.State.TERMINATED) { //Reset thread if needed.
             mapMoveThread = new MapMoveThread();
         }
@@ -285,6 +282,17 @@ public class GamePane extends Pane implements Observer {
      * Deals with moving the Selected Region of the map.
      */
     private class MapMoveThread extends Thread {
+        boolean wideEnough, tallEnough;
+        double width, height;
+
+        public MapMoveThread(){
+            width = game.getMapSize().getWidth();
+            height = game.getMapSize().getHeight();
+
+            wideEnough = width > Constants.GAME_DIMENSION.getWidth();
+            tallEnough = height > Constants.GAME_DIMENSION.getHeight();
+        }
+
         @Override
         public void run() {
             while(game.getState() != PLAYING){
@@ -296,7 +304,16 @@ public class GamePane extends Pane implements Observer {
                 }
             }
             while (game.getState() == PLAYING) {
-                System.out.println("Refresh Map");
+                if(!GamePane.this.hasFocus() || !GamePane.this.isVisible()){ //Stall if no focus.
+                    try{
+                        Thread.sleep(10);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
+
+
                 long start = System.nanoTime();
                 Point mouse = MouseInfo.getPointerInfo().getLocation();
                 Point p = GamePane.this.getLocationOnScreen();
@@ -307,11 +324,13 @@ public class GamePane extends Pane implements Observer {
                 bot = Geometry.isPointInBot(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
                 left = Geometry.isPointInLeft(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
                 right = Geometry.isPointInRight(mouse, r, Constants.MOVEMENT_PIXEL_PADDING);
+
+
                 handleMapMove();
 
                 long delay = Math.round((System.nanoTime() - start) / 1000000.0);
                 if (delay >= Constants.MAP_MOVE_REFRESH_DELAY) {
-                    Logger.getInstance().log("Map move took too long, not sleeping", LoggerLevel.WARNING);
+                    //Logger.getInstance().log("Map move took too long, not sleeping", LoggerLevel.WARNING);
                     continue; //don't sleep.
                 }
                 try {
@@ -324,39 +343,44 @@ public class GamePane extends Pane implements Observer {
         }
 
         private void handleMapMove() {
-            System.out.println("Move map");
             synchronized (selectedRegion) {
-                System.out.println("Actually Moving");
-                int mapWidth = (int) game.getMap().getMapDimensions().getWidth();
-                int mapHeight = (int) game.getMap().getMapDimensions().getHeight();
+                //int mapWidth = (int) game.getMap().getMapDimensions().getWidth();
+                //int mapHeight = (int) game.getMap().getMapDimensions().getHeight();
                 int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
-                if (top) {
-                    selectedRegion.setLocation(
-                            (int) selectedRegion.getX(), (int) selectedRegion.getY() - speed);
+                if(wideEnough) {
+                    if (top) {
+                        if (selectedRegion.getY() - speed < 0) {
+                            selectedRegion.setLocation((int) selectedRegion.getX(), 0);
+                        } else {
+                            selectedRegion.setLocation(
+                                    (int) selectedRegion.getX(), (int) selectedRegion.getY() - speed);
+                        }
 
-                    if (selectedRegion.getY() < 0) {
-                        selectedRegion.setLocation((int) selectedRegion.getX(), 0);
-                    }
-                } else if (bot) {
-                    selectedRegion.setLocation(
-                            (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
-
-                    if (selectedRegion.getY() + selectedRegion.getHeight() > mapHeight) {
-                        selectedRegion.setLocation((int) selectedRegion.getX(), mapHeight - (int) selectedRegion.getHeight());
+                    } else if (bot) {
+                        if (selectedRegion.getY() + speed + selectedRegion.getHeight() > height) {
+                            selectedRegion.setLocation((int) selectedRegion.getX(), (int) height - (int) selectedRegion.getHeight());
+                        } else {
+                            selectedRegion.setLocation(
+                                    (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
+                        }
                     }
                 }
-                if (left) {
-                    selectedRegion.setLocation(
-                            (int) selectedRegion.getX() - speed, (int) selectedRegion.getY());
+                if(tallEnough) {
+                    if (left) {
+                        if (selectedRegion.getX() - speed < 0) {
+                            selectedRegion.setLocation(0, (int) selectedRegion.getY());
+                        } else {
+                            selectedRegion.setLocation(
+                                    (int) selectedRegion.getX() - speed, (int) selectedRegion.getY());
+                        }
+                    } else if (right) {
+                        if (selectedRegion.getX() + speed + selectedRegion.getWidth() > width) {
+                            selectedRegion.setLocation((int) width - (int) selectedRegion.getWidth(), (int) selectedRegion.getY());
+                        } else {
+                            selectedRegion.setLocation(
+                                    (int) selectedRegion.getX() + speed, (int) selectedRegion.getY());
 
-                    if (selectedRegion.getX() < 0) {
-                        selectedRegion.setLocation(0, (int) selectedRegion.getY());
-                    }
-                } else if (right) {
-                    selectedRegion.setLocation(
-                            (int) selectedRegion.getX() + speed, (int) selectedRegion.getY());
-                    if (selectedRegion.getX() + selectedRegion.getWidth() > mapWidth) {
-                        selectedRegion.setLocation(mapWidth - (int) selectedRegion.getWidth(), (int) selectedRegion.getY());
+                        }
                     }
                 }
             }
