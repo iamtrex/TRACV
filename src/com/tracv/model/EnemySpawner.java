@@ -16,7 +16,7 @@ public class EnemySpawner{
     private int wave;
     private int maxWave;
 
-
+    private int startX, startY;
 
     private Queue<List<EnemyType>> spawnQueue;
     private Map<List<EnemyType>, Integer> spawnTimer;
@@ -25,7 +25,9 @@ public class EnemySpawner{
         this.random = new Random();
     }
 
-    public void loadLevel(Map<List<EnemyType>, Integer> spawnTimer, Queue<List<EnemyType>> spawnQueue){
+    public void loadLevel(Map<List<EnemyType>, Integer> spawnTimer, Queue<List<EnemyType>> spawnQueue, int startX, int startY){
+        this.startX = startX;
+        this.startY = startY;
         this.spawnQueue = spawnQueue;
         this.spawnTimer = spawnTimer;
         msSinceLastSpawn = 0;
@@ -86,7 +88,8 @@ public class EnemySpawner{
     private List<Enemy> createMobs(List<EnemyType> next) {
         List<Enemy> enemies = new LinkedList<>();
         Random random = new Random();
-        int x = 0, y = 0;
+        int x = startX;
+        int y = startY;
 
         for(EnemyType type : next){
             enemies.add(new Enemy(type, x, y));

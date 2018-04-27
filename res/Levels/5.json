@@ -1,0 +1,25 @@
+{
+    "level": {
+      "name": "Real Level Test 1",
+      "map": "TerrainMapTest5.csv",
+      "enemy-spawn": [
+        {
+          "Duration": "6",
+          "spawn": "B,B,B,B,B,B,B,T,T"
+        },
+        {
+          "Duration": "6",
+          "spawn": "F,F,F,B,B,F,F,T"
+        },
+        {
+          "Duration": "10",
+          "spawn": "F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,B,B,B,B,B"
+        },
+        {
+          "Duration": "7",
+          "spawn": "T,T,T,T,T,T"
+        }
+      ]
+    }
+
+}

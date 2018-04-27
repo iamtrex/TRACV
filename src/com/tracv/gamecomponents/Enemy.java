@@ -2,6 +2,7 @@ package com.tracv.gamecomponents;
 
 import com.tracv.types.EnemyType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.awt.*;
@@ -91,8 +92,8 @@ public class Enemy extends MoveableComponent {
     }
 
     public void setPath(List<Terrain> path){
-        this.path = path;
-    }
+        this.path = (ArrayList)((ArrayList)path).clone();
+}
     public List<Terrain> getPath(){
         return path;
     }

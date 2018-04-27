@@ -51,7 +51,7 @@ public class PathBuilder {
             curr = getLowestInSet(gScore.get(curr), curr, open, destination);
 
             if (curr == destination) {
-                //System.out.println("Proper Path found");
+                System.out.println("Proper Path found");
                 return generatePath(cameFrom, start, destination);
             }
 
@@ -101,18 +101,16 @@ public class PathBuilder {
     }
 
     private Integer getDistanceBetween(Terrain n, Terrain n2) {
-        return new Integer(
-                (int) Math.round(Math.sqrt(
-                        Math.pow(Math.abs(n.getX() - n2.getX()), 2) +
-                                Math.pow(Math.abs(n.getY() - n2.getY()), 2))));
+        return (int) Math.round(Math.sqrt(
+                Math.pow(Math.abs(n.getX() - n2.getX()), 2) +
+                        Math.pow(Math.abs(n.getY() - n2.getY()), 2)));
     }
 
 
     private Integer estimateDistanceToEnd(Terrain n, Terrain destination) {
-        return new Integer(
-                (int) Math.round(Math.sqrt(
-                        Math.pow(Math.abs(n.getX() - destination.getX()), 2) +
-                                Math.pow(Math.abs(n.getY() - destination.getY()), 2))));
+        return (int) Math.round(Math.sqrt(
+                Math.pow(Math.abs(n.getX() - destination.getX()), 2) +
+                        Math.pow(Math.abs(n.getY() - destination.getY()), 2)));
     }
 
     private Terrain getLowestInSet(Integer curG, Terrain curr, Set<Terrain> toSearch, Terrain destination) {
@@ -173,7 +171,8 @@ public class PathBuilder {
     }
 
     private static void addIf(Set<Terrain> queue, Terrain terrain) {
-        if (terrain.getType() == TerrainType.MOVEABLE || terrain.getType() == TerrainType.NEXUS) {
+        TerrainType type = terrain.getType();
+        if (type == TerrainType.START || type == TerrainType.NEXUS || type == TerrainType.MOVEABLE) {
             queue.add(terrain);
         }
     }

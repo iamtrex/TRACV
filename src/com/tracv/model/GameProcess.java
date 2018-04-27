@@ -222,12 +222,13 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
      */
     public void startNewGame(int level) {
         //Load the level.
+        System.out.println("Starting new game!!");
         state.reset();
         state.setLevel(level);
         levelParser.readLevel(level);
-        spawner.loadLevel(levelParser.getSpawnTime(), levelParser.getSpawnQueue());
         map.reset();
         map.loadLevel(levelParser.getFile());
+        spawner.loadLevel(levelParser.getSpawnTime(), levelParser.getSpawnQueue(), map.getStart().getX(), map.getStart().getY());
 
         //Evolver will start ticking the gamestate :)
         evolver.changeState(State.PLAYING);

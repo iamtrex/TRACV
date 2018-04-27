@@ -34,6 +34,14 @@ public class HUDStatePane extends Pane implements Observer {
     public HUDStatePane(HUDPane hudPane, GameProcess game) {
         this.hudPane = hudPane;
         this.game = game;
+
+        lGold = new Label("Gold ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lTime = new Label("Time ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lLevel = new Label("Level ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lWave = new Label("Wave ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lNextWave = new Label("Next Wave In ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lHealth = new Label("Health ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+
         resetText();
 
         Comp.add(lGold, this, 0, 0, 2, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER,
@@ -78,12 +86,13 @@ public class HUDStatePane extends Pane implements Observer {
     }
 
     private void resetText() {
-        lGold = new Label("Gold ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
-        lTime = new Label("Time ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
-        lLevel = new Label("Level ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
-        lWave = new Label("Wave ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
-        lNextWave = new Label("Next Wave In ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
-        lHealth = new Label("Health ", Label.MEDIUM, Label.LEFT, Label.INVISIBLE);
+        lGold.setText("Gold");
+        lTime.setText("Time");
+        lLevel.setText("Level");
+        lWave.setText("Wave");
+        lNextWave.setText("Next Wave in: ");
+        lHealth.setText("Health");
+
     }
 
     private void updateTime(){

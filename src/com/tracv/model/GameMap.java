@@ -23,6 +23,7 @@ public class GameMap {
     private Terrain[][] terrains;
     private Terrain start, destination;
 
+    private List<Terrain> path;
 
     private Double blockSize;
     //private Base base;
@@ -57,6 +58,12 @@ public class GameMap {
         reset();
     }
 
+    public void loadLevel(String levelTerrainFile) {
+        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
+        buildTerrain(terrainTypes);
+        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+    }
+
     public void reset() {
         synchronized(gameComponents) {
             long startT = System.nanoTime();
@@ -66,6 +73,7 @@ public class GameMap {
             projectiles = new ArrayList<>();
             bases = new ArrayList<>();
             targetMap = new HashMap<>();
+            path = new ArrayList<>();
             long endT = System.nanoTime();
         }
     }
@@ -73,8 +81,7 @@ public class GameMap {
 
     private void buildTerrain(TerrainType[][] terrainTypes) {
 
-        //int width = Constants.GAME_DIMENSION.width / terrainTypes[0].length;
-        //int height = Constants.GAME_DIMENSION.height / terrainTypes.length;
+        //TODO allow mouse zoom.
         int width = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
         int height = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
         terrains = new Terrain[terrainTypes.length][terrainTypes[0].length];
@@ -82,23 +89,25 @@ public class GameMap {
             for(int j=0; j<terrainTypes[i].length; j++){
                 terrains[i][j] = new Terrain(terrainTypes[i][j], j, i, width, height);
 
+                //TODO currently only supports 1 nexus.
                 if(terrainTypes[i][j] == TerrainType.NEXUS){
-                    //TODO do not use default base...
+                    System.out.println("Found base");
                     Base base = new Base(1000, terrains[i][j], null);
                     bases.add(base);
                     gameComponents.add(base);
+                    destination = terrains[i][j];
+                }else if(terrainTypes[i][j] == TerrainType.START){
+                    System.out.println("Found start!");
+                    start = terrains[i][j];
                 }
             }
         }
-    }
 
-    public void loadLevel(String levelTerrainFile) {
-        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
-        buildTerrain(terrainTypes);
         pathBuilder = new PathBuilder(terrains);
-        start = terrains[0][0];
-        destination = terrains[terrains.length-1][0];
-        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+        path = pathBuilder.generatePath(start, destination);
+    }
+    public Terrain getStart(){
+        return start;
     }
 
 
@@ -174,7 +183,7 @@ public class GameMap {
 
             }else if(gc instanceof Enemy){
                 Enemy e = (Enemy) gc;
-                e.setPath(pathBuilder.generatePath(start, destination));
+                e.setPath(path);
                 synchronized(enemies) {
                     enemies.add(e);
                 }

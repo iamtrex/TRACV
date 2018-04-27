@@ -113,7 +113,6 @@ public class MenuPane extends JPanel implements ActionListener {
             restartGame.setVisible(true);
             returnToMain.setVisible(true);
             settings.setVisible(true);
-            clickToReturnEnabled = true;
         }else if(source instanceof MainPane){
             clickToReturnEnabled = false;
             displayMessage.setVisible(false);

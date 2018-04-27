@@ -6,7 +6,8 @@ public enum TerrainType {
     MOVEABLE("M"),
     BUILDABLE("B"),
     VOID("V"),
-    NEXUS("N");
+    NEXUS("N"),
+    START("S"); //Start same as Moveable, but indicates where it can spawn.
 
     private String type;
     private Color color;
@@ -21,7 +22,7 @@ public enum TerrainType {
 
     TerrainType(String s){
         this.type = s;
-        if(s.equals("M")){
+        if(s.equals("M") || s.equals("S")){
             this.color = Color.GRAY;
         }else if(s.equals("B")){
             this.color = Color.GREEN;
@@ -33,7 +34,7 @@ public enum TerrainType {
     }
 
     public static TerrainType[] getTerrains(){
-        TerrainType[] terrainTypes = {MOVEABLE, BUILDABLE, VOID, NEXUS};
+        TerrainType[] terrainTypes = {MOVEABLE, BUILDABLE, VOID, NEXUS, START};
         return terrainTypes;
     }
 
