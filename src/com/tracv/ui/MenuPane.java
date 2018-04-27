@@ -22,48 +22,71 @@ import java.awt.image.Kernel;
 public class MenuPane extends JPanel implements ActionListener {
 
     private TDFrame tdf;
+    private TDGame tdg;
 
 
     private Label displayMessage;
-    private Button newGame;
-    private Button continueGame;
+    private Button restartGame;
+    private Button resumeGame;
     private Button returnToMain;
     private Button settings;
 
-    private boolean returnEnabled = false;
+    private boolean clickToReturnEnabled = false;
 
-    public MenuPane(TDFrame tdf) {
+    private BufferedImage background;
+
+    public MenuPane(TDFrame tdf, TDGame tdg) {
         this.tdf = tdf;
-        //    this.setBorder(new LineBorder(Color.RED, 3));
+        this.tdg = tdg;
+
         this.addMouseListener(new MyMouseListener());
 
         displayMessage = new Label("", Label.LARGE);
-        continueGame = new Button("Resume");
-        newGame = new Button("Restart");
+        resumeGame = new Button("Resume");
+        restartGame = new Button("Restart");
         returnToMain = new Button("Return to Main");
         settings = new Button("Settings");
 
         Comp.add(displayMessage, this, 0, 0, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER, 0, 0, 10, 0); //Add 10 spacer to bottom
 
-        Comp.add(continueGame, this, 0, 1, 1, 1, 1, 0,
+        Comp.add(resumeGame, this, 0, 1, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
-        Comp.add(newGame, this, 0, 2, 1, 1, 1, 0,
+        Comp.add(restartGame, this, 0, 2, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         Comp.add(returnToMain, this, 0, 3, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
         Comp.add(settings, this, 0, 4, 1, 1, 1, 0,
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
-        continueGame.addActionListener(this);
-        newGame.addActionListener(this);
+        resumeGame.addActionListener(this);
+        restartGame.addActionListener(this);
         returnToMain.addActionListener(this);
         settings.addActionListener(this);
     }
 
+    private void resume() {
+        if(resumeGame.isVisible()){ //Equivalent to if(tdf.getContentPane == tdg)
+            tdg.resumeGame(); //Resume game since it must be panel underneath
+        }
+        tdf.toggleMenu(false);
+    }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        if(source == resumeGame){
+            resume();
+        }else if(source == restartGame){
+            tdg.restartGame();
+        }else if (source == returnToMain) {
+            tdf.switchToMainPanel();
+        }else if(source == settings){
+            tdf.switchToSettingsPanel();
+        }
+        tdf.toggleMenu(false);
+    }
 
-    private BufferedImage background;
 
     /**
      * Show different menus based off of where the source is from.
@@ -72,30 +95,29 @@ public class MenuPane extends JPanel implements ActionListener {
      */
     public void showMenu(JComponent source, String msg){
         if(source instanceof TDGame){
-            if(msg == null){
+            if(msg == null){ //Pause game?
                 displayMessage.setVisible(false);
-                continueGame.setVisible(true);
-                returnEnabled = true;
+                resumeGame.setVisible(true);
+                clickToReturnEnabled = true;
             }else if(msg.equals(Constants.OBSERVER_LEVEL_COMPLETE)){
                 displayMessage.setText("Level Complete! :)");
                 displayMessage.setVisible(true);
-                continueGame.setVisible(false);
-                returnEnabled = false;
-            }else if(msg.equals(Constants.OBSERVER_GAME_OVER)){
+                resumeGame.setVisible(false);
+                clickToReturnEnabled = false;
+            }else if(msg.equals(Constants.OBSERVER_LEVEL_FAILED)){
                 displayMessage.setText("Game Over! :(");
                 displayMessage.setVisible(true);
-                continueGame.setVisible(false);
-                returnEnabled = false;
+                resumeGame.setVisible(false);
+                clickToReturnEnabled = false;
             }
-
-            newGame.setVisible(true);
+            restartGame.setVisible(true);
             returnToMain.setVisible(true);
             settings.setVisible(true);
         }else if(source instanceof MainPane){
-            returnEnabled = true;
+            clickToReturnEnabled = false;
             displayMessage.setVisible(false);
-            continueGame.setVisible(false);
-            newGame.setVisible(false);
+            resumeGame.setVisible(false);
+            restartGame.setVisible(false);
             returnToMain.setVisible(true);
             settings.setVisible(true);
         }
@@ -111,7 +133,6 @@ public class MenuPane extends JPanel implements ActionListener {
         if(b){
             createBlurredImage();
         }
-
         super.setVisible(b);
     }
 
@@ -148,55 +169,26 @@ public class MenuPane extends JPanel implements ActionListener {
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-        if(source == continueGame){
-            tdf.toggleMenu(false, Constants.OBSERVER_GAME_OVER);
-        }else if(source == newGame){
-            tdf.newGame();
-        }else if (source == returnToMain) {
-            tdf.switchToMainPanel();
-        }else if(source == settings){
-            tdf.switchToSettingsPanel();
-        }
-        this.setVisible(false);
-    }
-
-
     private class MyMouseListener implements MouseListener {
-        private boolean down = false;
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            down = true;
-        }
-
         /**
          * Close menu everytime user clicks outside of buttons
          * @param e
          */
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (down) {
-                if(returnEnabled) { //Only allow cancel if continueGame is visible...
-                    tdf.toggleMenu(false);
-                }
-                down = false;
+            if(clickToReturnEnabled) { //Only allow cancel if resumeGame is visible...
+                resume();
             }
         }
 
         @Override
-        public void mouseEntered(MouseEvent e) {
-        }
-
+        public void mousePressed(MouseEvent e){}
         @Override
-        public void mouseExited(MouseEvent e) {
-        }
+        public void mouseClicked(MouseEvent e) {}
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+        @Override
+        public void mouseExited(MouseEvent e) {}
     }
+
 }

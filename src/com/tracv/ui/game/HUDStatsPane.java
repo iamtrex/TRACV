@@ -1,5 +1,6 @@
 package com.tracv.ui.game;
 
+import com.tracv.model.GameProcess;
 import com.tracv.model.GameState;
 import com.tracv.gamecomponents.Tower;
 import com.tracv.observerpattern.Observable;
@@ -25,7 +26,7 @@ import java.util.List;
  */
 public class HUDStatsPane extends Pane implements Observer, ActionListener {
     private HUDPane hudPane;
-    private GameState gs;
+    private GameProcess game;
 
 
     private List<TowerUpgradeButton> towerUpgrades;
@@ -35,15 +36,11 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
 
 
 
-    private Tower selectedTower;
 
-
-
-    public HUDStatsPane(HUDPane hudPane, GameState gs) {
+    public HUDStatsPane(HUDPane hudPane, GameProcess game) {
         this.hudPane = hudPane;
-        this.gs = gs;
+        this.game = game;
 
-        selectedTower = null;
         towerUpgrades = new ArrayList<>();
         type = new Label("", Label.MEDIUM, Label.CENTER);
 
@@ -65,24 +62,21 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
                 new Dimension((int)this.getPreferredSize().getWidth(), (int)(this.getPreferredSize().getHeight()*0.5)));
 
         this.setVisible(false);
-
-
     }
 
 
     @Override
     public void update(Observable o, String msg) {
         if(msg.equals(Constants.OBSERVER_TOWER_SELECTED) ||
+                msg.equals(Constants.OBSERVER_SOLD_TOWER) ||
                 msg.equals(Constants.OBSERVER_UPGRADED_TOWER) ||
                 msg.equals(Constants.OBSERVER_NEW_GAME)){
-            System.out.println("Refresh Tower");
-            displayTowerInfo(gs.getSelectedTower());
+            System.out.println("Refresh Selected Tower");
+            displayTowerInfo(game.getSelectedTower());
         }
     }
 
     private void displayTowerInfo(Tower selectedTower) {
-        this.selectedTower = selectedTower;
-
 
         System.out.println("Updating Stats Pane");
 
@@ -110,7 +104,7 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
     }
 
     private TowerUpgradeButton createUpgradeButton(TowerType tt) {
-        TowerUpgradeButton b = new TowerUpgradeButton(tt, selectedTower);
+        TowerUpgradeButton b = new TowerUpgradeButton(tt, game.getSelectedTower());
         b.addActionListener(this);
         return b;
     }
@@ -119,15 +113,13 @@ public class HUDStatsPane extends Pane implements Observer, ActionListener {
     public void actionPerformed(ActionEvent e) {
         for(TowerUpgradeButton b : towerUpgrades){
             if(e.getSource() == b){
-
-                gs.attemptUpgradeTower(selectedTower, b.getUpgradeType());
-
+                game.attemptUpgradeTower(b.getUpgradeType());
                 return;
             }
         }
 
         if(e.getSource() == sellTower){
-            gs.attemptSellTower(selectedTower);
+            game.attemptSellTower();
 
         }
 

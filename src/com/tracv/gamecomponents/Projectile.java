@@ -31,9 +31,12 @@ public class Projectile extends MoveableComponent {
         height = 10;
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, Rectangle selectedRegion) {
         g.setColor(Color.ORANGE);
-        g.fillOval((int) x, (int) y, (int) width, (int) height);
+
+        int screenX = (int) Math.round(x - selectedRegion.getX());
+        int screenY = (int) Math.round(y - selectedRegion.getY());
+        g.fillOval(screenX, screenY, (int) width, (int) height);
     }
 
     public Tower getTower() {return tower;}

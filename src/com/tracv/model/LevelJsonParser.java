@@ -11,14 +11,20 @@ import java.util.*;
 
 public class LevelJsonParser {
 
+    private String name, map;
+    private Map<List<EnemyType>, Integer> spawnTimer;
+    private Queue<List<EnemyType>> spawnQueue;
+
     public LevelJsonParser(){
         spawnTimer = new HashMap<>();
         spawnQueue = new LinkedList<>();
-
     }
 
 
     public void readLevel(int level) {
+        spawnTimer.clear();
+        spawnQueue.clear();
+
         String contents = TextFileReader.readFile(Constants.LEVEL_DIR + String.valueOf(level) + ".json");
         parseJson(contents);
     }
@@ -65,10 +71,6 @@ public class LevelJsonParser {
         }
         return wave;
     }
-
-    private String name, map;
-    private Map<List<EnemyType>, Integer> spawnTimer;
-    private Queue<List<EnemyType>> spawnQueue;
 
     public Map<List<EnemyType>,Integer> getSpawnTime() {
         return spawnTimer;

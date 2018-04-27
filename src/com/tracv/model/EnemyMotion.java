@@ -15,9 +15,11 @@ public class EnemyMotion {
     /**
      * Updates position of enemy. Returns true if crashed into base.
      * @param e - Enemy to modify positon of.
+     * @param refreshTime - Real time in milliseconds that it took to update frame.
      * @return - true if crashed into base, false otherwise.
      */
-    public static boolean updateEnemy(Enemy e){
+    public static boolean updateEnemy(Enemy e, long refreshTime){
+        
         if(!e.getPath().isEmpty()){
             List<Terrain> path = e.getPath();
 
@@ -37,13 +39,14 @@ public class EnemyMotion {
             if(path.isEmpty()){
                 //Must've reached base, crashing.
                 return true; //Crashed
+
             }else{
                 //Using vector, move.
                 Terrain target = path.get(0);
                 Vector v = new Vector((target.getCenX() - (e.getX() + e.getSize()/2)),
                         (target.getCenY() - (e.getY() + e.getSize()/2)));
 
-                double speed = e.getSpeed();
+                double speed = e.getSpeed()*(double)refreshTime/1000.0;
                 e.addX(speed * v.getXRatio());
                 e.addY(speed * v.getYRatio());
             }

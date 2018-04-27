@@ -6,8 +6,6 @@ public class LevelSelectButton extends Button {
     public LevelSelectButton(String s){
         super();
         this.setText(s);
-
-
     }
 
 }

@@ -35,7 +35,7 @@ public class Base extends GameComponent{
      *CURRENTLY DRAWS A CENTERED BLUE CIRCLE WITH SIZE EQUALS TO size
      * @param g Swing Graphics
      */
-    public void draw(Graphics g) {
+    public void draw(Graphics g, Rectangle selectedRegion) {
 
         /*
         Graphics2D g2d = (Graphics2D)g;
@@ -44,18 +44,20 @@ public class Base extends GameComponent{
         Ellipse2D.Double circle = new Ellipse2D.Double(centerX, centerY, size, size);
         g2d.fill(circle);
         */
+        int screenX = (int) Math.round(x - selectedRegion.getX());
+        int screenY = (int) Math.round(y - selectedRegion.getY());
 
         g.setColor(Color.BLUE);
-        g.fillRect((int)x, (int)y, (int)width, (int)height);
-
+        g.fillRect(screenX, screenY, (int)width, (int)height);
         g.setColor(Color.GREEN);
 
         double maxWidth = (width * Constants.HEALTH_BAR_WIDTH_REDUCTION_FACTOR);
 
-        int healthX = (int)(x + 0.5*(width-maxWidth));
-        int healthY = (int) (y - Constants.HEALTH_BAR_SPACING_BASE);
+        int healthX = (int)(screenX + 0.5*(width-maxWidth));
+        int healthY = (screenY - Constants.HEALTH_BAR_SPACING_BASE);
 
         int hWidth = (int)Math.round((maxWidth * ((double)health/(double)maxHealth)));
+
 
 
         g.fillRect(healthX, healthY, hWidth, Constants.HEALTH_BAR_HEIGHT_BASE);
@@ -88,5 +90,9 @@ public class Base extends GameComponent{
     }
     public String getHealth() {
         return health + "/" + maxHealth;
+    }
+
+    public boolean isExploded() {
+        return health <= 0;
     }
 }

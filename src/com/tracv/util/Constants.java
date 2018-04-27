@@ -14,11 +14,21 @@ public class Constants {
     //Scaling and Dimensions
     public static final Double HUD_VERTICAL_SCALE = 0.2;
     public static final Double GAME_VERTICAL_SCALE = 1-HUD_VERTICAL_SCALE;
+    public static final long MOUSE_TRACKING_DELAY = 10; //Wait 10 ms between checking mouse
+    public static final long MAP_MOVE_REFRESH = 1;
+    public static final float DIM_FACTOR = 0.5f;
+    public static final int MOVEMENT_PIXEL_PADDING = 30;
+    public static final int MAP_MOVE_SPEED = 600;
+    public static final int REFRESH_RATE =  60; //FPS
+    public static final int REFRESH_DELAY = (int)Math.round(1000/REFRESH_RATE);
+    public static final Double DEFAULT_BLOCK_SIZE = 50.0;
+    public static final long MAP_MOVE_REFRESH_DELAY = REFRESH_DELAY;
 
+    public static final int DEFAULT_GOLD = 1000;
 
     //Size of Frame, game and HUD
-        private static final int FRAME_WIDTH = 1500;
-        private static final int FRAME_HEIGHT = 750;
+        private static final int FRAME_WIDTH = 1200;
+        private static final int FRAME_HEIGHT = 700;
 
         public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -55,6 +65,7 @@ public class Constants {
         public static final String EXTERNAL_ROOT_DIR = "TRACV/";
         public static final String SETTINGS_FILE = EXTERNAL_ROOT_DIR + "preferences.json";
 
+    public static final int DEFAULT_SIZE = 14;
 
     //Fonts
         public static final String FONT_FAMILY = "Calibri";
@@ -66,7 +77,8 @@ public class Constants {
         public static final Font MEDIUM_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
         public static final Font SMALL_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
 
-    public static final int DEFAULT_SIZE = 14;
+        public static final Font LOGGER_FONT = new Font(FONT_FAMILY, Font.PLAIN, DEFAULT_SIZE);
+
 
     //Default colours of selected vs unselected buttons
         public static final Color BUTTON_SELECTED_COLOR = new Color(150, 150, 150, 150);
@@ -78,11 +90,6 @@ public class Constants {
 
         // The distance between click and release to still build a tower... Makes for comfortable UI feel...
         public static final double CLICK_VAR_DISTANCE = 50;
-
-    public static final int REFRESH_RATE = 60; //FPS
-    public static final int REFRESH_DELAY = 1000/REFRESH_RATE;
-
-    public static final Double DEFAULT_BLOCK_SIZE = 50.0;
 
     public static final boolean DEBUGGING_MODE = true;
 
@@ -98,13 +105,23 @@ public class Constants {
     public static final int INSETS_OUTSIDE = 10;
     public static final int INSETS_BETWEEN = 5;
 
-    public static final String OBSERVER_GAME_OVER = "GGWP";
+    //public static final String OBSERVER_GAME_OVER = "GGWP";
     public static final String OBSERVER_LEVEL_COMPLETE = "GGEZ";
     public static final String OBSERVER_GAME_TICK = "UPDATE";
     public static final String OBSERVER_WAVE_SPAWNED = "wave spawned";
     public static final String OBSERVER_TOWER_SELECTED = "tower sel";
     public static final String OBSERVER_UPGRADED_TOWER = "tower modif";
+    public static final String OBSERVER_SOLD_TOWER = "SOLD";
     public static final String OBSERVER_BASE_HEALTH_CHANGED = "HEALTH";
+    public static final String OBSERVER_GAME_PAUSED = "game paused";
+    public static final String OBSERVER_GAME_RESUMED = "game resumed";
+    public static final String OBSERVER_LEVEL_FAILED = "FAILED";
+
+    public static final String OBSERVER_STATE_RUNNING = "RUNNING";
+    public static final String OBSERVER_STATE_PAUSED = "PAUSED";
+    public static final String OBSERVER_STATE_TERMINATED = "TERMINATED";
+
+
 
 }
 

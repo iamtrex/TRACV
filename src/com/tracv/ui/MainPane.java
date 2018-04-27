@@ -32,7 +32,6 @@ public class MainPane extends JPanel
     public MainPane(TDFrame tdf){
         this.tdf = tdf;
 
-
         title = new Label(Constants.GAME_NAME, Label.LARGE);
         version = new Label("Version - " + Constants.VERSION_NUMBER, Label.MEDIUM);
 
@@ -77,12 +76,10 @@ public class MainPane extends JPanel
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-
         if(source == start){
-            //tdf.newGame();
             tdf.switchToLevelSelectPanel();
         }else if(source == menu){
-            tdf.toggleMenu(true, Constants.OBSERVER_GAME_OVER);
+            tdf.toggleMenu(true);
         }else if(source == settings){
             tdf.switchToSettingsPanel();
         }else if(source == quit){

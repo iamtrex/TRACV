@@ -5,6 +5,7 @@ import com.tracv.settings.SettingsIO;
 import com.tracv.swing.Button;
 import com.tracv.swing.Pane;
 import com.tracv.util.Comp;
+import com.tracv.util.Logger;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +21,7 @@ public class SettingsPane extends Pane implements ActionListener {
 
     private TDFrame tdf;
 
-    private Button back;
+    private Button back, showLogger;
 
     public SettingsPane(TDFrame tdf){
         this.tdf = tdf;
@@ -29,9 +30,13 @@ public class SettingsPane extends Pane implements ActionListener {
         settings = sio.getSettings();
 
         back = new Button("Back");
+        showLogger = new Button("Show Log Window");
+
         Comp.add(back, this, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
+        Comp.add(showLogger, this, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
         back.addActionListener(this);
+        showLogger.addActionListener(this);
     }
 
     @Override
@@ -40,6 +45,8 @@ public class SettingsPane extends Pane implements ActionListener {
 
         if (source == back){
             tdf.returnToLast();
+        }else if(source == showLogger){
+            Logger.getInstance().showLogWindow();
         }
     }
 }

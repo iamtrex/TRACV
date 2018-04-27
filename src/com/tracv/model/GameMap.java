@@ -5,9 +5,12 @@ import com.tracv.gamecomponents.*;
 import com.tracv.types.TerrainType;
 import com.tracv.util.Constants;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Represents a mutable Map of the game which contains terrain and
@@ -20,6 +23,7 @@ public class GameMap {
     private Terrain[][] terrains;
     private Terrain start, destination;
 
+    private List<Terrain> path;
 
     private Double blockSize;
     //private Base base;
@@ -30,46 +34,17 @@ public class GameMap {
     private List<Projectile> projectiles;
     private List<Base> bases;
 
-    private List<GameComponent> toAdd;
-    private List<GameComponent> toDel;
+    private Map<Enemy, List<Projectile>> targetMap; //Holds enemies and projetiles targetting them.
 
 
     private PathBuilder pathBuilder;
 
+    private ExecutorService pool;
 
-    public void reset() {
-        long startT = System.nanoTime();
+    private Lock gcLock;
 
-
-
-        this.gameComponents = new ArrayList<>();
-        towers = new ArrayList<>();
-        enemies = new ArrayList<>();
-        projectiles = new ArrayList<>();
-        bases = new ArrayList<>();
-
-        //Switch to using hashset?
-        toAdd = new ArrayList<>();
-        toDel = new ArrayList<>();
-
-
-
-        long endT = System.nanoTime();
-
-        System.out.println("Time Taken to load map " + (endT-startT)/1000000.0 + " ms");
-    }
-
-
-    public void loadLevel(String levelTerrainFile) {
-        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
-        buildTerrain(terrainTypes);
-        pathBuilder = new PathBuilder(terrains);
-        start = terrains[0][0];
-        destination = terrains[terrains.length-1][0];
-        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
-
-
-
+    public Lock getGcLock(){
+        return gcLock;
     }
 
     /**
@@ -78,59 +53,170 @@ public class GameMap {
      *
      */
     public GameMap () {
+        pool = Executors.newFixedThreadPool(10);
+        gameComponents = new ArrayList<>();
         reset();
     }
 
+    public void loadLevel(String levelTerrainFile) {
+        TerrainType[][] terrainTypes = TerrainParser.parseTerrainFile(levelTerrainFile);
+        buildTerrain(terrainTypes);
+        this.blockSize = Constants.DEFAULT_BLOCK_SIZE;
+    }
+
+    public void reset() {
+        synchronized(gameComponents) {
+            long startT = System.nanoTime();
+            this.gameComponents.clear();
+            towers = new ArrayList<>();
+            enemies = new ArrayList<>();
+            projectiles = new ArrayList<>();
+            bases = new ArrayList<>();
+            targetMap = new HashMap<>();
+            path = new ArrayList<>();
+            long endT = System.nanoTime();
+        }
+    }
+
+
     private void buildTerrain(TerrainType[][] terrainTypes) {
 
-        int width = Constants.GAME_DIMENSION.width / terrainTypes[0].length;
-        int height = Constants.GAME_DIMENSION.height / terrainTypes.length;
+        //TODO allow mouse zoom.
+        int width = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
+        int height = (int)Math.round(Constants.DEFAULT_BLOCK_SIZE);
         terrains = new Terrain[terrainTypes.length][terrainTypes[0].length];
         for(int i=0; i<terrainTypes.length; i++){
             for(int j=0; j<terrainTypes[i].length; j++){
-                //terrains.add(new Terrain(terrainTypes[i][j], j, i));
                 terrains[i][j] = new Terrain(terrainTypes[i][j], j, i, width, height);
 
+                //TODO currently only supports 1 nexus.
                 if(terrainTypes[i][j] == TerrainType.NEXUS){
-                    //TODO do not use default base...
+                    System.out.println("Found base");
                     Base base = new Base(1000, terrains[i][j], null);
                     bases.add(base);
                     gameComponents.add(base);
+                    destination = terrains[i][j];
+                }else if(terrainTypes[i][j] == TerrainType.START){
+                    System.out.println("Found start!");
+                    start = terrains[i][j];
                 }
             }
         }
 
-
+        pathBuilder = new PathBuilder(terrains);
+        path = pathBuilder.generatePath(start, destination);
+    }
+    public Terrain getStart(){
+        return start;
     }
 
-    /**
-     * Getter to return a list of the GameComponents in the GameMap
-     * @return a list of GameComponents within the GameMap
-     */
-    public List<GameComponent> getGameComponents() {
-        return gameComponents;
-    }
 
+    private class Remover implements Runnable{
+        private GameComponent gc;
+        public Remover(GameComponent gc){
+            this.gc = gc;
+        }
+
+        @Override
+        public void run(){
+            synchronized(gameComponents) {
+                gameComponents.remove(gc);
+            }
+            if(gc instanceof Projectile){
+                Projectile p = (Projectile) gc;
+                synchronized(projectiles) {
+                    projectiles.remove(p);
+                }
+                synchronized(targetMap){
+                    Enemy e = p.getTarget();
+                    if(e != null && targetMap.get(e) != null) {
+                        //Enemy could've died and been removed from map.
+                        targetMap.get(e).remove(p);
+                    }
+                }
+
+            }else if(gc instanceof Enemy){
+                Enemy e = (Enemy) gc;
+                synchronized(enemies) {
+                    enemies.remove(e);
+                }
+                synchronized(targetMap){
+                    targetMap.remove(e);
+                }
+
+            }else if(gc instanceof Tower){
+                synchronized(towers) {
+                    towers.remove(gc);
+                }
+
+            }else if(gc instanceof Base){
+                synchronized(bases) {
+                    bases.remove(gc);
+                }
+
+            }else{
+                System.out.println("Wrong component type");
+            }
+
+        }
+    }
+    private class Adder implements Runnable {
+        private GameComponent gc;
+        public Adder(GameComponent gc){
+            this.gc = gc;
+        }
+        @Override
+        public void run(){
+            if(gc instanceof Projectile){
+                Projectile p = (Projectile) gc;
+                synchronized(projectiles){
+                    projectiles.add((Projectile)gc);
+                }
+                synchronized(targetMap){
+                    if(p.getTarget() == null) {
+                        System.out.println("Oops, enemy died before the projectile fired, uhh... " +
+                                "Technically should retarget, but we gonna toss it for now until we find an easier way to fix it... ");
+                    }else {
+                        targetMap.get(p.getTarget()).add(p);
+                    }
+                }
+
+            }else if(gc instanceof Enemy){
+                Enemy e = (Enemy) gc;
+                e.setPath(path);
+                synchronized(enemies) {
+                    enemies.add(e);
+                }
+                synchronized(targetMap){
+                    targetMap.put(e, new ArrayList<>());
+                }
+
+            }else if(gc instanceof Tower){
+                synchronized(towers) {
+                    towers.add((Tower) gc);
+                }
+
+            }else if(gc instanceof Base){
+                synchronized(bases){
+                    bases.add((Base)gc);
+                }
+
+            }else{
+                System.out.println("Wrong component type");
+            }
+
+            synchronized(gameComponents) {
+                gameComponents.add(gc);
+            }
+        }
+    }
     /**
      * Adds the specific component to the GameMap
      * @param gc the component to add
      * @return true if the add operation was successful
      */
-    public boolean addComponent(GameComponent gc) {
-        if(gc instanceof Projectile){
-            projectiles.add((Projectile)gc);
-        }else if(gc instanceof Enemy){
-            Enemy e = (Enemy) gc;
-            e.setPath(pathBuilder.generatePath(start, destination));
-            enemies.add(e);
-        }else if(gc instanceof Tower){
-            towers.add((Tower)gc);
-        }else if(gc instanceof Base){
-            bases.add((Base)gc);
-        }else{
-            System.out.println("Wrong component type");
-        }
-        return gameComponents.add(gc);
+    public void addComponent(GameComponent gc) {
+        pool.execute(new Adder(gc));
     }
 
     /**
@@ -138,19 +224,8 @@ public class GameMap {
      * @param gc the component to remove
      * @return true if the remove operation was successful
      */
-    public boolean removeComponent(GameComponent gc) {
-        if(gc instanceof Projectile){
-            projectiles.remove(gc);
-        }else if(gc instanceof Enemy){
-            enemies.remove(gc);
-        }else if(gc instanceof Tower){
-            towers.remove(gc);
-        }else if(gc instanceof Base){
-            bases.remove(gc);
-        }else{
-            System.out.println("Wrong component type");
-        }
-        return gameComponents.remove(gc);
+    public void removeComponent(GameComponent gc) {
+        pool.execute(new Remover(gc));
     }
 
     /**
@@ -161,7 +236,6 @@ public class GameMap {
         return terrains;
     }
 
-
     public Double getBlockSize(){
         return blockSize;
     }
@@ -171,6 +245,24 @@ public class GameMap {
 
     }
 
+    public void setTarget(Projectile p, Enemy e){
+        synchronized(targetMap){
+            targetMap.get(e).add(p);
+        }
+    }
+
+
+    /**
+     * Getter to return a list of the GameComponents in the GameMap
+     * @return a list of GameComponents within the GameMap
+     */
+    public List<GameComponent> getGameComponents() {
+        return gameComponents;
+    }
+
+    public Map<Enemy,List<Projectile>> getTargetMap() {
+        return targetMap;
+    }
 
     //TODO Fix this implementation
     public Base getBase() {
@@ -189,40 +281,12 @@ public class GameMap {
         return towers;
     }
 
-    public List<GameComponent> getToAdd(){return toAdd;}
 
-    public List<GameComponent> getToDel(){return toDel;}
-
-    public void addEnemies(List<Enemy> spawn) {
-        //TODO FIX- TOO TIRED TO DO SO RN
-        SpawnThread st = new SpawnThread(spawn);
-        st.start();
-
+    public Dimension getMapSize() {
+        double width = Constants.DEFAULT_BLOCK_SIZE * terrains[0].length;
+        double height = Constants.DEFAULT_BLOCK_SIZE * terrains.length;
+        return new Dimension((int)width, (int)height);
     }
 
 
-    public class SpawnThread extends Thread{
-        private List<Enemy> spawn;
-        public SpawnThread(List<Enemy> spawn){
-            super();
-            this.spawn = spawn;
-            r = new Random();
-        }
-
-        private Random r;
-
-        @Override
-        public void run(){
-            for(Enemy e : spawn){
-                e.setPath(pathBuilder.generatePath(start, destination));
-                toAdd.add(e);
-                try{
-                    int randomFactor = r.nextInt(10);
-                    Thread.sleep(100*randomFactor); //0.1 sec delay between spawns
-                }catch(InterruptedException ex){
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
 }
