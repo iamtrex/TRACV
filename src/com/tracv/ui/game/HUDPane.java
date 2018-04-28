@@ -24,8 +24,7 @@ public class HUDPane extends JPanel implements Observer{
 
     public HUDPane(GameProcess game){
         this.setPreferredSize(Constants.HUD_DIMENSION);
-        this.setBackground(Color.BLACK);
-        //this.setOpaque(true);
+        this.setOpaque(false);
 
         hudButtonPane = new HUDButtonPane(this, game);
         hudButtonPane.addPropertyChangeListener(new TowerChangeListener());
@@ -48,6 +47,9 @@ public class HUDPane extends JPanel implements Observer{
                 GridBagConstraints.BOTH, GridBagConstraints.EAST);
 
         statsSpaceHolderPane.setPreferredSize(Constants.HUD_STATS_SIZE);
+        statsSpaceHolderPane.setMaximumSize(Constants.HUD_STATS_SIZE);
+        statsSpaceHolderPane.setMinimumSize(Constants.HUD_STATS_SIZE);
+        statsSpaceHolderPane.setSize(Constants.HUD_STATS_SIZE);
 
     }
 

@@ -32,11 +32,10 @@ public class Constants {
 
         public static final Dimension FRAME_DEFAULT_SIZE = new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
 
-        public static final Dimension HUD_DIMENSION = new Dimension(FRAME_DEFAULT_SIZE.width,
-                (int)(FRAME_DEFAULT_SIZE.height * HUD_VERTICAL_SCALE));
+        public static final Dimension HUD_DIMENSION = new Dimension((int)(FRAME_DEFAULT_SIZE.width * 0.75), (int)(FRAME_DEFAULT_SIZE.height * HUD_VERTICAL_SCALE));
 
         public static final Dimension GAME_DIMENSION = new Dimension(FRAME_DEFAULT_SIZE.width,
-                (int)(FRAME_DEFAULT_SIZE.height * GAME_VERTICAL_SCALE));
+                (int)(FRAME_DEFAULT_SIZE.height));
 
 
         public static final Dimension HUD_STATS_SIZE = new Dimension((int)(FRAME_WIDTH * 0.33), (int)HUD_DIMENSION.getHeight());
