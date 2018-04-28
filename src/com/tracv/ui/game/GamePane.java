@@ -124,7 +124,7 @@ public class GamePane extends Pane implements Observer {
         TowerType selectedTower = game.getBuildTowerType();
         if (selectedTower != null) { // Only draw if currently has selected tower!
             Image img;
-            Point point = mouseOnScreen.getLocation();
+            Point point = new Point(mouseOnScreen.x, mouseOnScreen.y);
             convertToGamePoint(point);
 
             if (game.isTowerLocationValid(point)) {

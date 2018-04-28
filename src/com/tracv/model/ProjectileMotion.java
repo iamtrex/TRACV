@@ -27,7 +27,7 @@ public class ProjectileMotion {
         Enemy e = p.getTarget();
         //TODO eval if enemy is within range of movement. If so, set projectile to enemy and autocollide.
 
-
+        //TODO currently aims at top left corner of the enemy, make it aim at center?
         double x2 = e.getX();
         double y2 = e.getY();
 

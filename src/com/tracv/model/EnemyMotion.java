@@ -43,8 +43,8 @@ public class EnemyMotion {
             }else{
                 //Using vector, move.
                 Terrain target = path.get(0);
-                Vector v = new Vector((target.getCenX() - (e.getX() + e.getSize()/2)),
-                        (target.getCenY() - (e.getY() + e.getSize()/2)));
+                Vector v = new Vector((target.getCenX() - (e.getX() + e.getWidth()/2)),
+                        (target.getCenY() - (e.getY() + e.getHeight()/2)));
 
                 double speed = e.getSpeed()*(double)refreshTime/1000.0;
                 e.addX(speed * v.getXRatio());
