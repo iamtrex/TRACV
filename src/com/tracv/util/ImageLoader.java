@@ -8,10 +8,11 @@ public class ImageLoader {
     public static BufferedImage readImage(String loc, String dir, String fileType){
         if(loc != null && dir != null){
             try{
-                BufferedImage i = ImageIO.read(ImageIO.class.getResource(
+                BufferedImage i = ImageIO.read(ImageLoader.class.getResource(
                         dir + loc + fileType));
                 return i;
             } catch (Exception e) {
+                System.out.println(dir + loc + fileType);
                 e.printStackTrace();
             }
         }
