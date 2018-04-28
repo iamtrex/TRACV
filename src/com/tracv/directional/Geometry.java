@@ -45,7 +45,7 @@ public class Geometry {
     }
 
     /**
-     * REturns whether two objects are within a range of each other.
+     * Returns whether two objects are within a range of each other.
      * @param g1
      * @param g2
      * @param range
@@ -93,4 +93,44 @@ public class Geometry {
         return p.getX() >= r.getX() + r.getWidth() - pad && p.getX() <= r.getX() + r.getWidth();
     }
 
+    /**
+     *
+     * @param a
+     * @param b
+     * @return - if the two game components are overlapping.
+     */
+    public static boolean hasIntersection(GameComponent a, GameComponent b){
+        Point pa = a.getPoint();
+        Point pb = b.getPoint();
+        //System.out.println(pa + " " + pb + " " + a.getWidth() + " " + a.getHeight() + " " + b.getWidth() + " " + b.getHeight());
+        if(pa.x == pb.x && pa.y == pb.y){
+            return true; //Overlapping.
+        }
+
+        boolean withinHeight = false, withinWidth = false;
+
+        if(pb.x > pa.x){
+            // b is to the right of a.
+            if(pb.x - pa.x < a.getWidth()){
+                withinWidth = true; //X units overlap.
+            }
+        }else{
+            if(pa.x - pb.x < b.getWidth()){
+                withinWidth = true;
+            }
+        }
+
+        if(pb.y > pa.y){
+            //b is below a
+            if(pb.y - pa.y < a.getHeight()){
+                withinHeight = true;
+            }
+        }else{
+            if(pa.y - pb.y < b.getHeight()){
+                withinHeight = true;
+            }
+        }
+        //System.out.println(withinHeight + " " +  withinWidth);
+        return withinWidth && withinHeight; //Must be in height and with to be intersecting.
+    }
 }

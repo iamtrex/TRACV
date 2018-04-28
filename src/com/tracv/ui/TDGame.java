@@ -63,8 +63,8 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
                 GridBagConstraints.BOTH, GridBagConstraints.CENTER);
 
         //Align to bottom edge.
-        Comp.add(hudPane, this, 0, 0, 1, 1, 1, 1, 1,
-                GridBagConstraints.NONE, GridBagConstraints.BASELINE);
+        Comp.add(hudPane, this, 1, 0, 1, 1, 1, 1, 0,
+                GridBagConstraints.NONE, GridBagConstraints.BASELINE, 0, 0, 10, 0);
 
         //Align to top right corner with default sizes.
         Comp.add(menuPane, this, 1, 0, 0, 1, 1, 1, 1,
@@ -119,9 +119,10 @@ public class TDGame extends JLayeredPane implements ActionListener, Observer {
     private class MenuPane extends JPanel {
         public MenuPane() {
             this.setPreferredSize(Constants.ICON_SIZE); // TEMP SIZE.
+            this.setOpaque(false);
             pause = new IconButton("Pause"); //Show menu;
             pause.addActionListener(TDGame.this::actionPerformed);
-            Comp.add(pause, this, 0, 0, 1, 1, 0, 0,
+            Comp.add(pause, this, 0, 0, 1, 1, 1, 1,
                     GridBagConstraints.NONE, GridBagConstraints.FIRST_LINE_END);
         }
     }

@@ -66,8 +66,6 @@ public class Tower extends GameComponent {
 
 
         }
-
-
     }
 
     public double getAtkDmg() {

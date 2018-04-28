@@ -124,7 +124,7 @@ public class GamePane extends Pane implements Observer {
         TowerType selectedTower = game.getBuildTowerType();
         if (selectedTower != null) { // Only draw if currently has selected tower!
             Image img;
-            Point point = mouseOnScreen.getLocation();
+            Point point = new Point(mouseOnScreen.x, mouseOnScreen.y);
             convertToGamePoint(point);
 
             if (game.isTowerLocationValid(point)) {
@@ -290,7 +290,7 @@ public class GamePane extends Pane implements Observer {
             height = game.getMapSize().getHeight();
 
             wideEnough = width > Constants.GAME_DIMENSION.getWidth();
-            tallEnough = height > Constants.GAME_DIMENSION.getHeight();
+            tallEnough = height > Constants.GAME_DIMENSION.getHeight() - Constants.HUD_DIMENSION.getHeight();
         }
 
         @Override
@@ -344,10 +344,8 @@ public class GamePane extends Pane implements Observer {
 
         private void handleMapMove() {
             synchronized (selectedRegion) {
-                //int mapWidth = (int) game.getMap().getMapDimensions().getWidth();
-                //int mapHeight = (int) game.getMap().getMapDimensions().getHeight();
                 int speed = Constants.MAP_MOVE_SPEED / Constants.REFRESH_RATE;
-                if(wideEnough) {
+                if(tallEnough) {
                     if (top) {
                         if (selectedRegion.getY() - speed < 0) {
                             selectedRegion.setLocation((int) selectedRegion.getX(), 0);
@@ -357,15 +355,15 @@ public class GamePane extends Pane implements Observer {
                         }
 
                     } else if (bot) {
-                        if (selectedRegion.getY() + speed + selectedRegion.getHeight() > height) {
-                            selectedRegion.setLocation((int) selectedRegion.getX(), (int) height - (int) selectedRegion.getHeight());
+                        if (selectedRegion.getY() + speed + selectedRegion.getHeight() > height + Constants.HUD_DIMENSION.getHeight()) { //Adjust for height of hud pane.
+                            selectedRegion.setLocation((int) selectedRegion.getX(), (int) height - (int) selectedRegion.getHeight() + (int)Constants.HUD_DIMENSION.getHeight());
                         } else {
                             selectedRegion.setLocation(
                                     (int) selectedRegion.getX(), (int) selectedRegion.getY() + speed);
                         }
                     }
                 }
-                if(tallEnough) {
+                if(wideEnough) {
                     if (left) {
                         if (selectedRegion.getX() - speed < 0) {
                             selectedRegion.setLocation(0, (int) selectedRegion.getY());

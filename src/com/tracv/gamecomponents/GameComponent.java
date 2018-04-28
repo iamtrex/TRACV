@@ -41,7 +41,9 @@ public abstract class GameComponent {
     }
 
 
-
+    public Dimension getSize(){
+        return new Dimension((int)width, (int)height);
+    }
     /**
      * Getter method for the x coordinate
      * @return the x coordinate as a double
@@ -75,4 +77,7 @@ public abstract class GameComponent {
     }
 
 
+    public Point getPoint(){
+        return new Point((int)x, (int)y);
+    }
 }

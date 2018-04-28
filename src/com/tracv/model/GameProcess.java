@@ -109,13 +109,14 @@ public class GameProcess extends Observable implements Iterable<GameComponent>, 
                 return false;
             }
         }
+        TowerType type = state.getBuildTowerType();
+        Tower temp = new Tower(p.x-type.getWidth()/2, p.y-type.getHeight()/2, type); //Mouse is center of tower, but the tower takes the top left coord
 
         synchronized(map.getTowers()){
             for(Tower t : map.getTowers()){
                 //Point is on top of tower.
-                if (p.getX() >= t.getX() && p.getY () >= t.getY() &&
-                        Math.abs(p.getX() - t.getX()) <= t.getWidth() &&
-                        Math.abs((p.getY() - t.getY())) <= t.getHeight()) {
+                if(Geometry.hasIntersection(temp, t)){
+                    //If they intersect in any way...
                     return false;
                 }
             }

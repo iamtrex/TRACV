@@ -98,9 +98,7 @@ public class Enemy extends MoveableComponent {
         return path;
     }
 
-    public double getSize() {
-        return 25;
-    }
+
 
     public int getKillGold() {
         return gold;
