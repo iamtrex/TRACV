@@ -27,5 +27,7 @@ hs_err_pid*
 out/*
 out/
 preferences.json
+src/learning/*
+
 
 src/com/rweqx/
