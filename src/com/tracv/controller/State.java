@@ -1,4 +1,4 @@
-package com.tracv.model;
+package com.tracv.controller;
 
 public enum State {
     PLAYING, TERMINATED, PAUSED

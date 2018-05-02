@@ -1,7 +1,6 @@
 package com.tracv.ui.game;
 
-import com.tracv.model.GameProcess;
-import com.tracv.model.GameState;
+import com.tracv.controller.GameProcess;
 import com.tracv.swing.HUDTowerButton;
 import com.tracv.swing.Label;
 import com.tracv.swing.Pane;

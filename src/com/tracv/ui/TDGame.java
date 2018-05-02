@@ -1,11 +1,6 @@
 package com.tracv.ui;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-import com.tracv.directional.Geometry;
-import com.tracv.model.Evolver;
-import com.tracv.model.GameProcess;
-import com.tracv.model.GameState;
-import com.tracv.model.State;
+import com.tracv.controller.GameProcess;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.swing.IconButton;
@@ -15,9 +10,6 @@ import com.tracv.ui.game.HUDButtonPane;
 import com.tracv.ui.game.HUDPane;
 import com.tracv.util.Comp;
 import com.tracv.util.Constants;
-import com.tracv.util.Logger;
-import com.tracv.util.LoggerLevel;
-import javafx.concurrent.Worker;
 
 import javax.swing.*;
 import java.awt.*;

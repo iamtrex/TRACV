@@ -1,4 +1,4 @@
-package com.tracv.model;
+package com.tracv.game_util;
 
 import com.tracv.directional.Vector;
 import com.tracv.gamecomponents.Enemy;

@@ -1,10 +1,10 @@
 package com.tracv.ui.game;
 
+import com.tracv.controller.GameProcess;
 import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.Enemy;
 import com.tracv.gamecomponents.GameComponent;
 import com.tracv.gamecomponents.Terrain;
-import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.swing.Pane;
@@ -19,7 +19,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 
-import static com.tracv.model.State.PLAYING;
+import static com.tracv.controller.State.PLAYING;
 
 /**
  * The 'game' portion of the interface (not including hud).

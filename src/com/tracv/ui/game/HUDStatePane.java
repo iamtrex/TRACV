@@ -1,7 +1,6 @@
 package com.tracv.ui.game;
 
-import com.tracv.model.GameProcess;
-import com.tracv.model.GameState;
+import com.tracv.controller.GameProcess;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.swing.Label;
@@ -10,7 +9,6 @@ import com.tracv.util.Comp;
 import com.tracv.util.Constants;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**

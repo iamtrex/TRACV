@@ -1,9 +1,12 @@
-package com.tracv.model;
+package com.tracv.controller;
 
 import com.tracv.directional.Geometry;
 import com.tracv.gamecomponents.GameComponent;
 import com.tracv.gamecomponents.Terrain;
 import com.tracv.gamecomponents.Tower;
+import com.tracv.model.GameMap;
+import com.tracv.model.GameState;
+import com.tracv.game_util.LevelJsonParser;
 import com.tracv.observerpattern.Observable;
 import com.tracv.observerpattern.Observer;
 import com.tracv.types.TerrainType;

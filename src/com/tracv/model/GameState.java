@@ -1,11 +1,10 @@
 package com.tracv.model;
 
+import com.tracv.game_util.LevelJsonParser;
 import com.tracv.gamecomponents.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.types.TowerType;
 import com.tracv.util.Constants;
-
-import java.util.*;
 
 
 public class GameState extends Observable{

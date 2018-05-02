@@ -1,6 +1,6 @@
 package com.tracv.ui;
 
-import com.tracv.model.LevelParser;
+import com.tracv.game_util.LevelParser;
 import com.tracv.swing.Label;
 import com.tracv.swing.Pane;
 import com.tracv.swing.Button;

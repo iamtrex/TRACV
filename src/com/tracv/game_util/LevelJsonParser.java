@@ -1,4 +1,4 @@
-package com.tracv.model;
+package com.tracv.game_util;
 
 import com.tracv.types.EnemyType;
 import com.tracv.util.Constants;

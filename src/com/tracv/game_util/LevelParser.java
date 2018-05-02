@@ -1,4 +1,4 @@
-package com.tracv.model;
+package com.tracv.game_util;
 
 import java.io.InputStream;
 import java.util.ArrayList;

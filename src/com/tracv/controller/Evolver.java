@@ -1,9 +1,12 @@
-package com.tracv.model;
+package com.tracv.controller;
 
 import com.tracv.directional.Geometry;
+import com.tracv.game_util.EnemyMotion;
+import com.tracv.game_util.ProjectileMotion;
 import com.tracv.gamecomponents.Enemy;
 import com.tracv.gamecomponents.GameComponent;
 import com.tracv.gamecomponents.Projectile;
+import com.tracv.model.*;
 import com.tracv.observerpattern.Observable;
 import com.tracv.util.Constants;
 import com.tracv.util.Logger;
@@ -16,7 +19,7 @@ import java.util.Map;
 
 import java.awt.Point;
 
-import static com.tracv.model.State.TERMINATED;
+import static com.tracv.controller.State.TERMINATED;
 
 public class Evolver extends Observable {
     private EnemySpawner spawner;
