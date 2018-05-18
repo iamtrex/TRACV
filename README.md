@@ -4,7 +4,9 @@ TRACV is an Open Source Tower Defense Game created on the premises of learning b
 
 Currently still in development, but functional! (Try Level 5, other levels are mainly for testing purposes)
 
-* The program is rooted in Object Oriented type heiarchy, where all game components (towers, enemies, projectiles) are built off of an ancestor GameComponet class.
+Some Features 
+
+* The program is built fundamentally from Object-Oriented design concepts. It uses inheritance, where all game components (towers, enemies, projectiles) are built off of an ancestor GameComponet class.
 
 * Structure based off a pre-designed UML Diagram. 
 
@@ -12,9 +14,15 @@ Currently still in development, but functional! (Try Level 5, other levels are m
 
 * Uses custom Swing for a more modern look 
 
+* Implements algorithms such as A* to enable path-finding for Enemies
+
+* Uses JSON Parsing for levels and settings. 
+
+
 
 INSTRUCTIONS - 
 * Clone code
 * Add Jackson, JavaJSON, and JNativeHook Libraries
+* Add res folder as resource root
 * Export Jar
 * Run! 
